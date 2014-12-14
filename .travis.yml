@@ -4,3 +4,4 @@ xcode_scheme: Einstein
 before_install:
   - brew update
   - brew upgrade xctool
+script: xctool -project _Build_/Xcode6/Einstein.xcodeproj -scheme Einstein test -listTestsOnly -showTasks
