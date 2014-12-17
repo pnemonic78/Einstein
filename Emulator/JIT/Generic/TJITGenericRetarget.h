@@ -130,7 +130,10 @@ protected:
 	 * \param the kind of test.
 	 */
 	void PutTestEnd( int inTest );
-	
+
+	void BeginLocals( KUInt32 inInstruction );
+	void EndLocals( KUInt32 inInstruction );
+
 	void DoTranslate_00( KUInt32 inVAddr, KUInt32 inInstruction );
 	void DoTranslate_01( KUInt32 inVAddr, KUInt32 inInstruction );
 	void DoTranslate_10( KUInt32 inVAddr, KUInt32 inInstruction );

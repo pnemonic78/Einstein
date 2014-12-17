@@ -21,30 +21,6 @@
 // $Id$
 // ==============================
 
-//			ldfd    f0, [pc, #16]                   @ 0x001E7268 0xED9F8104 - ....
-//			sfm     f4, 1, [sp, #-12]!				@ 0x000D2780 0xED2DC203 - .-..
-//sfm     f4, 1, [sp, #-12]!              @ 0x000ED69C 0xED2DC203 - .-..
-//ldfd    f4, [r11, #4]                   @ 0x000ED6A0 0xED9BC101 - ....
-//  --> L0038E2A4
-
-// ldf ->load fp register from memory
-// ldf%c%Q\t%12-14f, %A   0x0c000100, 0x0e100f00
-// stf%c%Q\t%12-14f, %A   0x0c100100, 0x0e100f00
-
-// 3 3 2 2  2 2 2 2  2 2 2 2  1 1 1 1  1 1 1 1  1 1
-// 1 0 9 8  7 6 5 4  3 2 1 0  9 8 7 6  5 4 3 2  1 0 9 8  7 6 5 4  3 2 1 0
-// --cond-  1 1 0 p  u P n l  ---r---  Q --f--  --CP#--  -----offset-----
-// PQ: 0x000000 = single, 0x00008000 = double, 0x00400000 = e, 0x0040800 = p
-// f: index of floating point register
-// p: pre/post index bit 0: add offset after transfer
-// u: up/down bit: 0: down, subtract offset from base
-// n: writeback: 1: write address into base
-// l: load/store bit: 0: store to memory
-// r: base register
-// CP#: always 1
-
-// sfm/lfm: 0x0c000200, 0x0e100f00, "sfm%c\t%12-14f, %F, %A"
-
 #include "TJITGenericRetarget.h"
 #include "JIT.h"
 
@@ -59,6 +35,11 @@
 
 #include "TROMImage.h"
 #include "UDisasm.h"
+
+
+// define this if you want the expensive tests in the retargeted code
+#define JITTARGET_GUARDED
+
 
 // This code enters the debugger right where we need it (OS X Intel)
 static const char *Debug = "__asm__(\"int $3\\n\" : : );";
@@ -316,8 +297,10 @@ void TJITGenericRetarget::Translate(KUInt32 inVAddr, KUInt32 inInstruction)
 	UDisasm::Disasm(buf, 2047, inVAddr, inInstruction);
 	fprintf(pCOut, "L%08X: // 0x%08X  %s\n", (unsigned int)inVAddr, (unsigned int)inInstruction, buf);
 	
+#ifdef JITTARGET_GUARDED
 	fprintf(pCOut, "\tif (ioCPU->mCurrentRegisters[15]!=0x%08X+4) %s // be paranoid about a correct PC\n", (unsigned int)inVAddr, Debug);
 	fprintf(pCOut, "\tioCPU->mCurrentRegisters[15] += 4; // update the PC\n");
+#endif
 	
 	// Always generate code for a condition, so we can use local variables
 	int theTestKind = inInstruction >> 28;
@@ -450,7 +433,6 @@ void TJITGenericRetarget::PutTestBegin( int inTest )
 			// 1111 = NV - never
 		case kTestNV:
 		default:
-			fprintf(pCOut, "\t{\n");
 			break;
 	}
 }
@@ -458,7 +440,48 @@ void TJITGenericRetarget::PutTestBegin( int inTest )
 
 void TJITGenericRetarget::PutTestEnd( int inTest )
 {
-	fprintf(pCOut, "\t}\n");
+	// Test the condition.
+	switch (inTest)
+	{
+		case kTestEQ:
+		case kTestNE:
+		case kTestCS:
+		case kTestCC:
+		case kTestMI:
+		case kTestPL:
+		case kTestVS:
+		case kTestVC:
+		case kTestHI:
+		case kTestLS:
+		case kTestGE:
+		case kTestLT:
+		case kTestGT:
+		case kTestLE:
+			fprintf(pCOut, "\t}\n");
+			break;
+	}
+}
+
+
+void TJITGenericRetarget::BeginLocals(KUInt32 inInstruction)
+{
+	switch (inInstruction>>28) {
+		case kTestAL:
+		case kTestNV:
+			fprintf(pCOut, "\t{\n");
+			break;
+	}
+}
+
+
+void TJITGenericRetarget::EndLocals(KUInt32 inInstruction)
+{
+	switch (inInstruction>>28) {
+		case kTestAL:
+		case kTestNV:
+			fprintf(pCOut, "\t}\n");
+			break;
+	}
 }
 
 
@@ -468,6 +491,7 @@ void TJITGenericRetarget::DoTranslate_00(KUInt32 inVAddr, KUInt32 inInstruction)
 	// -Cond-- 0  0  I  --Opcode--- S  --Rn--- --Rd--- ----------Operand 2-------- Data Processing PSR Transfer
 	// -Cond-- 0  0  0  0  0  0  A  S  --Rd--- --Rn--- --Rs--- 1  0  0  1  --Rm--- Multiply
 	// -Cond-- 0  0  0  1  0  B  0  0  --Rn--- --Rd--- 0 0 0 0 1  0  0  1  --Rm---
+	BeginLocals(inInstruction);
 	if ((inInstruction & 0x020000F0) == 0x90)	// I=0 & 0b1001----
 	{
 		if (inInstruction & 0x01000000)
@@ -481,6 +505,7 @@ void TJITGenericRetarget::DoTranslate_00(KUInt32 inVAddr, KUInt32 inInstruction)
 	} else {
 		Translate_DataProcessingPSRTransfer(inVAddr, inInstruction);
 	}
+	EndLocals(inInstruction);
 }
 
 
@@ -537,6 +562,7 @@ void TJITGenericRetarget::Translate_SingleDataSwap( KUInt32 inVAddr, KUInt32 inI
 void TJITGenericRetarget::DoTranslate_01(KUInt32 inVAddr, KUInt32 inInstruction)
 {
 	// Single Data Transfer & Undefined
+	BeginLocals(inInstruction);
 	if ((inInstruction & 0x02000010) == 0x02000010)
 	{
 		if ((inInstruction&0x0FFFFFFF)==0x06000510) {
@@ -549,6 +575,7 @@ void TJITGenericRetarget::DoTranslate_01(KUInt32 inVAddr, KUInt32 inInstruction)
 		// -Cond-- 0  1  I  P  U  B  W  L  --Rn--- --Rd--- -----------offset----------
 		Translate_SingleDataTransfer(inVAddr, inInstruction);
 	}
+	EndLocals(inInstruction);
 }
 
 
@@ -1309,6 +1336,7 @@ void TJITGenericRetarget::DoTranslate_10(KUInt32 inVAddr, KUInt32 inInstruction)
 	// Branch
 	// -Cond-- 1  0  0  P  U  S  W  L  --Rn--- ------------register list---------- Block Data Transfer
 	// -Cond-- 1  0  1  L  ---------------------offset---------------------------- Branch
+	BeginLocals(inInstruction);
 	if (inInstruction & 0x02000000)
 	{
 		Translate_Branch(inVAddr, inInstruction);
@@ -1316,6 +1344,7 @@ void TJITGenericRetarget::DoTranslate_10(KUInt32 inVAddr, KUInt32 inInstruction)
 		// Block Data Transfer.
 		Translate_BlockDataTransfer(inVAddr, inInstruction);
 	}
+	EndLocals(inInstruction);
 }
 
 
@@ -1391,9 +1420,11 @@ void TJITGenericRetarget::Translate_Branch(KUInt32 inVAddr, KUInt32 inInstructio
 		}
 		fprintf(pCOut, "\t\tSETPC(0x%08X+4);\n", (unsigned int)dest);
 		fprintf(pCOut, "\t\tFunc_0x%08X(ioCPU, 0x%08X);\n", (unsigned int)dest, (unsigned int)inVAddr+8);
+#ifdef JITTARGET_GUARDED
 		fprintf(pCOut, "\t\tif (ioCPU->mCurrentRegisters[15]!=0x%08X) {\n", (unsigned int)inVAddr+8);
 		fprintf(pCOut, "\t\t	RT_PANIC_UNEXPECTED_RETURN_ADDRESS\n"); // throws an exception that leaves simulation and returns to JIT
 		fprintf(pCOut, "\t\t}\n");
+#endif
 	} else {
 		KUInt32 destination = inVAddr + delta;
 		if (destination<pFunctionBegin||destination>=pFunctionEnd) {
@@ -1944,6 +1975,7 @@ void TJITGenericRetarget::DoTranslate_11(KUInt32 inVAddr, KUInt32 inInstruction)
 	// Extension for native calls:
 	// -Cond-- 1  1  1  1  1  0  ---------------------index----------------------- Call Native Code at Index
 	// -Cond-- 1  1  1  1  1  1  ---------------------index----------------------- Call Injection at Index
+	BeginLocals(inInstruction);
 	if (inInstruction & 0x02000000)
 	{
 		if (inInstruction & 0x01000000)
@@ -1958,9 +1990,11 @@ void TJITGenericRetarget::DoTranslate_11(KUInt32 inVAddr, KUInt32 inInstruction)
 				// SWI.
 				fprintf(pCOut, "\t\tioCPU->DoSWI();\n");
 				fprintf(pCOut, "\t\tFunc_0x00000008(ioCPU, 0x%08X);\n", (unsigned int)inVAddr+8);
+#ifdef JITTARGET_GUARDED
 				fprintf(pCOut, "\t\tif (ioCPU->mCurrentRegisters[15]!=0x%08X) {\n", (unsigned int)inVAddr+8);
 				fprintf(pCOut, "\t\t\tRT_PANIC_UNEXPECTED_RETURN_ADDRESS\n");
 				fprintf(pCOut, "\t\t}\n");
+#endif
 			}
 		} else {
 			if (inInstruction & 0x00000010)
@@ -1969,18 +2003,23 @@ void TJITGenericRetarget::DoTranslate_11(KUInt32 inVAddr, KUInt32 inInstruction)
 			} else {
 				fprintf(pCOut, "\t\tioCPU->DoUndefinedInstruction(); // (1)\n");
 				fprintf(pCOut, "\t\tFunc_0x00000004(ioCPU, 0x%08X);\n", (unsigned int)inVAddr+8);
+#ifdef JITTARGET_GUARDED
 				fprintf(pCOut, "\t\tif (ioCPU->mCurrentRegisters[15]!=0x%08X) {\n", (unsigned int)inVAddr+8);
 				fprintf(pCOut, "\t\t\tRT_PANIC_UNEXPECTED_RETURN_ADDRESS\n");
 				fprintf(pCOut, "\t\t}\n");
+#endif
 			}
 		}
 	} else {
 		fprintf(pCOut, "\t\tioCPU->DoUndefinedInstruction(); // (2)\n");
 		fprintf(pCOut, "\t\tFunc_0x00000004(ioCPU, 0x%08X);\n", (unsigned int)inVAddr+8);
+#ifdef JITTARGET_GUARDED
 		fprintf(pCOut, "\t\tif (ioCPU->mCurrentRegisters[15]!=0x%08X) {\n", (unsigned int)inVAddr+8);
 		fprintf(pCOut, "\t\t\tRT_PANIC_UNEXPECTED_RETURN_ADDRESS\n");
 		fprintf(pCOut, "\t\t}\n");
+#endif
 	}
+	EndLocals(inInstruction);
 }
 
 
@@ -2001,9 +2040,11 @@ void TJITGenericRetarget::CoprocRegisterTransfer(KUInt32 inVAddr, KUInt32 inInst
 	} else {
 		fprintf(pCOut, "\t\tioCPU->DoUndefinedInstruction(); // (3)\n");
 		fprintf(pCOut, "\t\tFunc_0x00000004(ioCPU, 0x%08X);\n", (unsigned int)inVAddr+8);
+#ifdef JITTARGET_GUARDED
 		fprintf(pCOut, "\t\tif (ioCPU->mCurrentRegisters[15]!=0x%08X) {\n", (unsigned int)inVAddr+8);
 		fprintf(pCOut, "\t\t\tRT_PANIC_UNEXPECTED_RETURN_ADDRESS\n");
 		fprintf(pCOut, "\t\t}\n");
+#endif
 	}
 	// FIXME: this could write the PC register
 }
