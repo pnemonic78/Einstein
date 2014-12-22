@@ -39,7 +39,7 @@
 
 // Define this if you want the expensive tests in the retargeted code.
 // As of Dec 21st 2014, undefining this will result in invalid code.
-#define JITTARGET_GUARDED
+#undef JITTARGET_GUARDED
 
 
 // This code enters the debugger right where we need it (OS X Intel)
@@ -262,71 +262,6 @@ void TJITGenericRetarget::CloseFiles()
 
 
 /**
- * Translate a range of ARM commands as if they are a self-contained function.
- *
- * \param inFirst the address of the first word to translate
- * \param inLast translate to the word just before this address
- * \param inName the name of the function 
- * \param cont continue after this function: instead of just returning from this
- *			function, generate a retaurn to the address in \a inLast. This is 
- *			used for functions that 'fall through' to the next function.
- * \param dontLink do not create the code that will insert a patch into the ROM 
- *			at launch time, making this function unavailable for the interpreter,
- *			but still visible for direct callers.
- */
-void TJITGenericRetarget::TranslateFunction(KUInt32 inFirst, KUInt32 inLast, const char *inName, bool cont, bool dontLink)
-{
-	pFunctionBegin = inFirst;
-	pFunctionEnd = inLast;
-	fprintf(pCOut, "\n/**\n * Transcoded function %s\n * ROM: 0x%08X - 0x%08X\n */\n", inName, (unsigned int)inFirst, (unsigned int)inLast);
-	if (pHOut!=stdout)
-		fprintf(pHOut, "extern void Func_0x%08X(TARMProcessor* ioCPU, KUInt32 ret); // %s\n", (unsigned int)inFirst, inName);
-	fprintf(pCOut, "void Func_0x%08X(TARMProcessor* ioCPU, KUInt32 ret)\n{\n", (unsigned int)inFirst);
-	KUInt32 instr = 0;
-	KUInt32 addr = inFirst;
-	for ( ; addr<inLast; addr+=4) {
-		MemoryRead(addr, instr);
-		switch (gJITGenericRetargetMap[addr>>2]) {
-			case 1:
-				Translate(addr, instr);
-				break;
-			case 2: // byte
-			case 3: // word
-			case 4: // string
-			case 5:
-			case 6:
-			default:
-			{
-				char sym[512], cmt[512];
-				int off;
-				if (pSymbolList->GetSymbolExact(instr, sym, cmt, &off)) {
-					fprintf(pCOut, "\t// KUInt32 D_%08X = 0x%08X; // %s\n", (unsigned int)addr, (unsigned int)instr, sym);
-				} else {
-					fprintf(pCOut, "\t// KUInt32 D_%08X = 0x%08X;\n", (unsigned int)addr, (unsigned int)instr);
-				}
-				break;
-			}
-		}
-	}
-	if (cont) {
-		// If the following commands are translated as well, this line will avoid
-		// falling back to the interpreter and instead generate a simple "goto"
-		// instruction (still having the cost of the function prolog and epilog though)
-		fprintf(pCOut, "\tPC = 0x%08X + 4;\n", (unsigned int)inLast);
-		fprintf(pCOut, "\treturn Func_0x%08X(ioCPU, ret);\n", (unsigned int)inLast);
-	} else {
-		// If no 
-		fprintf(pCOut, "\t%s // There was no return instruction found\n", Debug);
-	}
-	fprintf(pCOut, "}\n");
-	if (!dontLink) {
-		// This line creates a ROM patch that diverts the interpreter into running the code above
-		fprintf(pCOut, "T_ROM_SIMULATION3(0x%08X, \"%s\", Func_0x%08X)\n\n", (unsigned int)inFirst, inName, (unsigned int)inFirst);
-	}
-}
-
-
-/**
  * Create code to return from simulation to the emulator.
  *
  * This function creates code that on execution throws an exception, leaving
@@ -388,77 +323,6 @@ void TJITGenericRetarget::GenerateReturnInstruction(bool withFlags)
 	// If the caller was a simulated function, and the return address equals the
 	// expected address, we can simply return.
 	fprintf(pCOut, "\t\treturn;\n");
-}
-
-
-/**
- * Translate a single instruction.
- *
- * Read a single ARM instruction and create "C" code that will run the same
- * instructions that the JIT compiler would run.
- *
- * The idea is to save the translation overhead as well as to give the compiler
- * a chance to optimize the generated code at compile time.
- */
-void TJITGenericRetarget::Translate(KUInt32 inVAddr, KUInt32 inInstruction)
-{
-	pAction = 0;
-	pWarning = 0;
-	
-#ifndef EINSTEIN_RETARGET
-	// Make sure that injections are handled in a transparent manner
-	if ((inInstruction & 0xffe00000)==0xefc00000) {
-		inInstruction = TJITGenericROMPatch::GetOriginalInstructionAt(inInstruction);
-	} else if ((inInstruction & 0xffe00000)==0xefa00000) {
-		inInstruction = TJITGenericROMPatch::GetOriginalInstructionAt(inInstruction);
-	}
-#endif
-	
-	// Generate some crude disassmbly for comparison
-	char buf[2048];
-	UDisasm::Disasm(buf, 2047, inVAddr, inInstruction);
-	fprintf(pCOut, "L%08X: // 0x%08X  %s\n", (unsigned int)inVAddr, (unsigned int)inInstruction, buf);
-	
-#ifdef JITTARGET_GUARDED
-	fprintf(pCOut, "\tif (PC!=0x%08X+4) %s // be paranoid about a correct PC\n", (unsigned int)inVAddr, Debug);
-	fprintf(pCOut, "\tPC += 4; // update the PC\n");
-#endif
-	
-	// Always generate code for a condition, so we can use local variables
-	int theTestKind = inInstruction >> 28;
-	PutTestBegin(theTestKind);
-	
-	if (pAction==0) {
-		// Translate the instructionusing the original JIT source as a guideline
-		if (theTestKind!=kTestNV)
-		{
-			switch ((inInstruction >> 26) & 0x3)				// 27 & 26
-			{
-				case 0x0:	// 00
-					DoTranslate_00(inVAddr, inInstruction);
-					break;
-					
-				case 0x1:	// 01
-					DoTranslate_01(inVAddr, inInstruction);
-					break;
-					
-				case 0x2:	// 10
-					DoTranslate_10(inVAddr, inInstruction);
-					break;
-					
-				case 0x3:	// 11
-					DoTranslate_11(inVAddr, inInstruction);
-					break;
-			} // switch 27 & 26
-		}
-	}
-	
-	if (pWarning) {
-		fprintf(pCOut, "#error %s\n", pWarning);
-	}
-	
-	// End of condition
-	PutTestEnd(theTestKind);
 }
 
 
@@ -631,6 +495,142 @@ void TJITGenericRetarget::EndLocals(KUInt32 inInstruction)
 
 
 /**
+ * Translate a range of ARM commands as if they are a self-contained function.
+ *
+ * \param inFirst the address of the first word to translate
+ * \param inLast translate to the word just before this address
+ * \param inName the name of the function
+ * \param cont continue after this function: instead of just returning from this
+ *			function, generate a retaurn to the address in \a inLast. This is
+ *			used for functions that 'fall through' to the next function.
+ * \param dontLink do not create the code that will insert a patch into the ROM
+ *			at launch time, making this function unavailable for the interpreter,
+ *			but still visible for direct callers.
+ */
+void TJITGenericRetarget::TranslateFunction(KUInt32 inFirst, KUInt32 inLast, const char *inName, bool cont, bool dontLink)
+{
+	pFunctionBegin = inFirst;
+	pFunctionEnd = inLast;
+	fprintf(pCOut, "\n/**\n * Transcoded function %s\n * ROM: 0x%08X - 0x%08X\n */\n", inName, (unsigned int)inFirst, (unsigned int)inLast);
+	if (pHOut!=stdout)
+		fprintf(pHOut, "extern void Func_0x%08X(TARMProcessor* ioCPU, KUInt32 ret); // %s\n", (unsigned int)inFirst, inName);
+	fprintf(pCOut, "void Func_0x%08X(TARMProcessor* ioCPU, KUInt32 ret)\n{\n", (unsigned int)inFirst);
+	KUInt32 instr = 0;
+	KUInt32 addr = inFirst;
+	for ( ; addr<inLast; addr+=4) {
+		MemoryRead(addr, instr);
+		switch (gJITGenericRetargetMap[addr>>2]) {
+			case 1:
+				Translate(addr, instr);
+				break;
+			case 2: // byte
+			case 3: // word
+			case 4: // string
+			case 5:
+			case 6:
+			default:
+			{
+				char sym[512], cmt[512];
+				int off;
+				if (pSymbolList->GetSymbolExact(instr, sym, cmt, &off)) {
+					fprintf(pCOut, "\t// KUInt32 D_%08X = 0x%08X; // %s\n", (unsigned int)addr, (unsigned int)instr, sym);
+				} else {
+					fprintf(pCOut, "\t// KUInt32 D_%08X = 0x%08X;\n", (unsigned int)addr, (unsigned int)instr);
+				}
+				break;
+			}
+		}
+	}
+	if (cont) {
+		// If the following commands are translated as well, this line will avoid
+		// falling back to the interpreter and instead generate a simple "goto"
+		// instruction (still having the cost of the function prolog and epilog though)
+		fprintf(pCOut, "\tPC = 0x%08X + 4;\n", (unsigned int)inLast);
+		fprintf(pCOut, "\treturn Func_0x%08X(ioCPU, ret);\n", (unsigned int)inLast);
+	} else {
+		// If no
+		fprintf(pCOut, "\t%s // There was no return instruction found\n", Debug);
+	}
+	fprintf(pCOut, "}\n");
+	if (!dontLink) {
+		// This line creates a ROM patch that diverts the interpreter into running the code above
+		fprintf(pCOut, "T_ROM_SIMULATION3(0x%08X, \"%s\", Func_0x%08X)\n\n", (unsigned int)inFirst, inName, (unsigned int)inFirst);
+	}
+}
+
+
+/**
+ * Translate a single instruction.
+ *
+ * Read a single ARM instruction and create "C" code that will run the same
+ * instructions that the JIT compiler would run.
+ *
+ * The idea is to save the translation overhead as well as to give the compiler
+ * a chance to optimize the generated code at compile time.
+ */
+void TJITGenericRetarget::Translate(KUInt32 inVAddr, KUInt32 inInstruction)
+{
+	pAction = 0;
+	pWarning = 0;
+	
+#ifndef EINSTEIN_RETARGET
+	// Make sure that injections are handled in a transparent manner
+	if ((inInstruction & 0xffe00000)==0xefc00000) {
+		inInstruction = TJITGenericROMPatch::GetOriginalInstructionAt(inInstruction);
+	} else if ((inInstruction & 0xffe00000)==0xefa00000) {
+		inInstruction = TJITGenericROMPatch::GetOriginalInstructionAt(inInstruction);
+	}
+#endif
+	
+	// Generate some crude disassmbly for comparison
+	char buf[2048];
+	UDisasm::Disasm(buf, 2047, inVAddr, inInstruction);
+	fprintf(pCOut, "L%08X: // 0x%08X  %s\n", (unsigned int)inVAddr, (unsigned int)inInstruction, buf);
+	
+#ifdef JITTARGET_GUARDED
+	fprintf(pCOut, "\tif (PC!=0x%08X+4) %s // be paranoid about a correct PC\n", (unsigned int)inVAddr, Debug);
+	fprintf(pCOut, "\tPC += 4; // update the PC\n");
+#endif
+	
+	// Always generate code for a condition, so we can use local variables
+	int theTestKind = inInstruction >> 28;
+	PutTestBegin(theTestKind);
+	
+	if (pAction==0) {
+		// Translate the instructionusing the original JIT source as a guideline
+		if (theTestKind!=kTestNV)
+		{
+			switch ((inInstruction >> 26) & 0x3)				// 27 & 26
+			{
+				case 0x0:	// 00
+					DoTranslate_00(inVAddr, inInstruction);
+					break;
+					
+				case 0x1:	// 01
+					DoTranslate_01(inVAddr, inInstruction);
+					break;
+					
+				case 0x2:	// 10
+					DoTranslate_10(inVAddr, inInstruction);
+					break;
+					
+				case 0x3:	// 11
+					DoTranslate_11(inVAddr, inInstruction);
+					break;
+			} // switch 27 & 26
+		}
+	}
+	
+	if (pWarning) {
+		fprintf(pCOut, "#error %s\n", pWarning);
+	}
+	
+	// End of condition
+	PutTestEnd(theTestKind);
+}
+
+
+/**
  * Translate the 00 group (bits 26 and 27) of ARM commands.
  */
 void TJITGenericRetarget::DoTranslate_00(KUInt32 inVAddr, KUInt32 inInstruction)
@@ -723,11 +723,13 @@ void TJITGenericRetarget::Translate_SingleDataSwap( KUInt32 inVAddr, KUInt32 inI
 	fprintf(pCOut, "\t\tKUInt32 theAddress = %s;\n", RegLUT[Rn]);
 	if (FLAG_B) {
 		// Swap byte quantity.
+		fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 		fprintf(pCOut, "\t\tKUInt8 theData = UJITGenericRetargetSupport::ManagedMemoryReadB(ioCPU, theAddress);\n");
 		fprintf(pCOut, "\t\tUJITGenericRetargetSupport::ManagedMemoryWriteB(ioCPU, theAddress, (KUInt8)(%s & 0xFF));\n", RegLUT[Rm]);
 		fprintf(pCOut, "\t\t%s = theData;\n", RegLUT[Rd]);
 	} else {
 		// Swap word quantity.
+		fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 		fprintf(pCOut, "\t\tKUInt32 theData = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, theAddress);\n");
 		fprintf(pCOut, "\t\tUJITGenericRetargetSupport::ManagedMemoryWrite(ioCPU, theAddress, %s);\n", RegLUT[Rm]);
 		fprintf(pCOut, "\t\t%s = theData;\n", RegLUT[Rd]);
@@ -741,6 +743,7 @@ void TJITGenericRetarget::Translate_SingleDataSwap( KUInt32 inVAddr, KUInt32 inI
  */
 void TJITGenericRetarget::Translate_DataProcessingPSRTransfer(KUInt32 inVAddr, KUInt32 inInstruction)
 {
+	// -Cond-- 0  0  I  --Opcode--- S  --Rn--- --Rd--- ----------Operand 2-------- Data Processing PSR Transfer
 	const Boolean theFlagS = (inInstruction & 0x00100000) != 0;
 	KUInt32 theMode;
 	KUInt32 thePushedValue;
@@ -1038,6 +1041,7 @@ void TJITGenericRetarget::Translate_MRS(KUInt32 inVAddr, KUInt32 inInstruction)
  */
 void TJITGenericRetarget::TestOp(KUInt32 inVAddr, KUInt32 inInstruction, KUInt32 OP, KUInt32 MODE, KUInt32 Rn, KUInt32 thePushedValue)
 {
+	// -Cond-- 0  0  I  --Opcode--- S  --Rn--- --Rd--- ----------Operand 2-------- Data Processing PSR Transfer
 	BeginLocals(inInstruction);
 	KUInt32 Rm = (inInstruction & 0x0000000F); // only valid if MODE is NoShift
 	if ((MODE == Imm) || (MODE == ImmC)) {
@@ -1106,6 +1110,17 @@ void TJITGenericRetarget::TestOp(KUInt32 inVAddr, KUInt32 inInstruction, KUInt32
  */
 void TJITGenericRetarget::LogicalOp(KUInt32 inVAddr, KUInt32 inInstruction, KUInt32 OP, KUInt32 MODE, KUInt32 FLAG_S, KUInt32 Rn, KUInt32 Rd, KUInt32 thePushedValue)
 {
+	// -Cond-- 0  0  I  --Opcode--- S  --Rn--- --Rd--- ----------Operand 2-------- Data Processing PSR Transfer
+	
+	// create simplified code for some common onstructions
+	if ( (inInstruction&0x0E100000)==0x02000000 && Rn!=15 && Rd!=15) {
+		if (OP == AND) fprintf(pCOut, "\t\t%s = %s & 0x%08X;\n", RegLUT[Rd], RegLUT[Rn], (unsigned int)thePushedValue);
+		if (OP == EOR) fprintf(pCOut, "\t\t%s = %s ^ 0x%08X;\n", RegLUT[Rd], RegLUT[Rn], (unsigned int)thePushedValue);
+		if (OP == ORR) fprintf(pCOut, "\t\t%s = %s | 0x%08X;\n", RegLUT[Rd], RegLUT[Rn], (unsigned int)thePushedValue);
+		if (OP == BIC) fprintf(pCOut, "\t\t%s = %s & 0x%08X;\n", RegLUT[Rd], RegLUT[Rn], (unsigned int)~thePushedValue);
+		return; // and rx, ry, imm
+	}
+
 	BeginLocals(inInstruction);
 	KUInt32 Rm = thePushedValue;
 	if ((MODE == Imm) || (MODE == ImmC)) {
@@ -1179,6 +1194,19 @@ void TJITGenericRetarget::LogicalOp(KUInt32 inVAddr, KUInt32 inInstruction, KUIn
  */
 void TJITGenericRetarget::ArithmeticOp(KUInt32 inVAddr, KUInt32 inInstruction, KUInt32 OP, KUInt32 MODE, KUInt32 FLAG_S, KUInt32 Rn, KUInt32 Rd, KUInt32 thePushedValue)
 {
+	// -Cond-- 0  0  I  --Opcode--- S  --Rn--- --Rd--- ----------Operand 2-------- Data Processing PSR Transfer
+
+	// create simplified code for some common onstructions
+	if ( (inInstruction&0x0E100000)==0x02000000 && Rn!=15 && Rd!=15) {
+		if (OP == SUB) fprintf(pCOut, "\t\t%s = %s - 0x%08X; // %d\n", RegLUT[Rd], RegLUT[Rn], (unsigned int)thePushedValue, (int)thePushedValue);
+		if (OP == RSB) fprintf(pCOut, "\t\t%s = 0x%08X - %s; // %d\n", RegLUT[Rd], (unsigned int)thePushedValue, RegLUT[Rn], (int)thePushedValue);
+		if (OP == ADD) fprintf(pCOut, "\t\t%s = %s + 0x%08X; // %d\n", RegLUT[Rd], RegLUT[Rn], (unsigned int)thePushedValue, (int)thePushedValue);
+		if (OP == ADC) fprintf(pCOut, "\t\t%s = %s + 0x%08X + ioCPU->mCPSR_C; // %d\n", RegLUT[Rd], RegLUT[Rn], (unsigned int)thePushedValue, (int)thePushedValue);
+		if (OP == SBC) fprintf(pCOut, "\t\t%s = %s - 0x%08X - 1 + ioCPU->mCPSR_C; // %d\n", RegLUT[Rd], RegLUT[Rn], (unsigned int)thePushedValue, (int)thePushedValue);
+		if (OP == RSC) fprintf(pCOut, "\t\t%s = 0x%08X - %s - 1 + ioCPU->mCPSR_C; // %d\n", RegLUT[Rd], (unsigned int)thePushedValue, RegLUT[Rn], (int)thePushedValue);
+		return; // add rx, ry, imm
+	}
+	
 	// FIXME: a very untypical, handcoded switch case statement:
 	// add     pc, pc, r1, lsr #24             @ 0x003ADD80 0xE08FFC21
 	if ( (inVAddr==0x003ADD80) && (inInstruction==0xE08FFC21) ) {
@@ -1283,6 +1311,8 @@ void TJITGenericRetarget::ArithmeticOp(KUInt32 inVAddr, KUInt32 inInstruction, K
  */
 void TJITGenericRetarget::MoveOp(KUInt32 inVAddr, KUInt32 inInstruction, KUInt32 OP, KUInt32 MODE, KUInt32 FLAG_S, KUInt32 Rd, KUInt32 thePushedValue)
 {
+	// -Cond-- 0  0  I  --Opcode--- S  --Rn--- --Rd--- ----------Operand 2-------- Data Processing PSR Transfer
+
 	KUInt32 Rm = thePushedValue;
 	
 	// create simplified code for some common onstructions
@@ -1394,6 +1424,7 @@ void TJITGenericRetarget::Translate_SingleDataTransfer(
 	KUInt32 Rn = ((inInstruction & 0x000F0000) >> 16);
 	KUInt32 Rd = ((inInstruction & 0x0000F000) >> 12);
 	if ( (inInstruction&0x0ff00fff)==0x05900000 && Rd!=15 && Rn!=15) {
+		fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 		fprintf(pCOut, "\t\t%s = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, %s);\n", RegLUT[Rd], RegLUT[Rn]);
 		return; // ldr rx, [ry]
 	}
@@ -1485,8 +1516,10 @@ void TJITGenericRetarget::Translate_SingleDataTransfer(
 		
 		if (FLAG_L) {
 			if (FLAG_B){
+				fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 				fprintf(pCOut, "\t\tKUInt8 theData = UJITGenericRetargetSupport::ManagedMemoryReadB(ioCPU, theAddress);\n");
 			} else {
+				fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 				fprintf(pCOut, "\t\tKUInt32 theData = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, theAddress);\n");
 			}
 		
@@ -1507,8 +1540,10 @@ void TJITGenericRetarget::Translate_SingleDataTransfer(
 			}
 		
 			if (FLAG_B) {
+				fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 				fprintf(pCOut, "\t\tUJITGenericRetargetSupport::ManagedMemoryWriteB(ioCPU, theAddress, (KUInt8)(theValue & 0xFF));\n");
 			} else {
+				fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 				fprintf(pCOut, "\t\tUJITGenericRetargetSupport::ManagedMemoryWrite(ioCPU, theAddress, theValue);\n");
 			}
 		}
@@ -1599,6 +1634,7 @@ void TJITGenericRetarget::Translate_Branch(KUInt32 inVAddr, KUInt32 inInstructio
 		delta = offset + 8;
 		dest = dest + delta;
 		BeginLocals(inInstruction);
+		fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 		fprintf(pCOut, "\t\tKUInt32 jumpInstr = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, 0x%08X);\n", (unsigned int)jumpTableDest);
 		fprintf(pCOut, "\t\tif (jumpInstr!=0x%08X) {\n", (unsigned int)jumpTableInstr);
 		fprintf(pCOut, "\t\t\t%s // unexpected jump table entry\n", Debug);
@@ -1716,6 +1752,7 @@ void TJITGenericRetarget::Translate_BlockDataTransfer_STM1(KUInt32 inVAddr, KUIn
 			fprintf(pCOut, "\t\tbaseAddress += 4;\n");
 		}
 	}
+	fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 	int indexReg = 0;
 	while (curRegList) {
 		if (curRegList & 1) {
@@ -1787,6 +1824,7 @@ void TJITGenericRetarget::Translate_BlockDataTransfer_STM2(KUInt32 inVAddr, KUIn
 	}
 	
 	// Store.
+	fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 	fprintf(pCOut, "\t\tif (curRegList) {\n");
 	if (theRegList & 0x0001) {
 		fprintf(pCOut, "\t\t\tif (curRegList & 0x0001) {\n");
@@ -1958,6 +1996,7 @@ void TJITGenericRetarget::Translate_BlockDataTransfer_LDM1(KUInt32 inVAddr, KUIn
 		}
 	}
 	
+	fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 	int indexReg = 0;
 	while (curRegList) {
 		if (curRegList & 1) {
@@ -2036,6 +2075,7 @@ void TJITGenericRetarget::Translate_BlockDataTransfer_LDM2(KUInt32 inVAddr, KUIn
 	}
 	
 	// Load.
+	fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 	fprintf(pCOut, "\t\tif (curRegList) {\n");
 	if (theRegList & 0x0001) {
 		fprintf(pCOut, "\t\t\tif (curRegList & 0x0001) {\n");
@@ -2205,6 +2245,7 @@ void TJITGenericRetarget::DoTranslate_11(KUInt32 inVAddr, KUInt32 inInstruction)
 				return; // do not push the current PC
 			} else {
 				// SWI.
+				fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 				fprintf(pCOut, "\t\tioCPU->DoSWI();\n");
 				fprintf(pCOut, "\t\tFunc_0x00000008(ioCPU, 0x%08X);\n", (unsigned int)inVAddr+8);
 #ifdef JITTARGET_GUARDED
@@ -2218,6 +2259,7 @@ void TJITGenericRetarget::DoTranslate_11(KUInt32 inVAddr, KUInt32 inInstruction)
 			{
 				CoprocRegisterTransfer(inVAddr, inInstruction);
 			} else {
+				fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 				fprintf(pCOut, "\t\tioCPU->DoUndefinedInstruction(); // (1)\n");
 				fprintf(pCOut, "\t\tFunc_0x00000004(ioCPU, 0x%08X);\n", (unsigned int)inVAddr+8);
 #ifdef JITTARGET_GUARDED
@@ -2228,6 +2270,7 @@ void TJITGenericRetarget::DoTranslate_11(KUInt32 inVAddr, KUInt32 inInstruction)
 			}
 		}
 	} else {
+		fprintf(pCOut, "\t\tSETPC(0x%08X+8);\n", inVAddr);
 		fprintf(pCOut, "\t\tioCPU->DoUndefinedInstruction(); // (2)\n");
 		fprintf(pCOut, "\t\tFunc_0x00000004(ioCPU, 0x%08X);\n", (unsigned int)inVAddr+8);
 #ifdef JITTARGET_GUARDED
