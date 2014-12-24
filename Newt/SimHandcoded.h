@@ -13,8 +13,23 @@
 
 // keep this empty if possible
 
-extern void Func_0x003AD750(TARMProcessor* ioCPU, KUInt32 ret); // SWI0_GetPort
-extern void Func_0x003AE1FC(TARMProcessor* ioCPU, KUInt32 ret); // _SemaphoreOpGlue
+class TTask;
 
+extern TARMProcessor *gCPU;
+
+extern TTask *GCurrentTask();
+extern void GSetCurrentTask(TTask *newTask);
+extern KUInt32 GAtomicFIQNestCountFast();
+extern KUInt32 GAtomicIRQNestCountFast();
+extern KUInt32 GAtomicNestCount();
+extern KUInt32 GAtomicFIQNestCount();
+extern KUInt32 GCopyDone();
+extern void GSetCopyDone(KUInt32 v);
+extern KUInt32 GWantDeferred();
+extern KUInt32 GSchedule();
+extern KUInt32 GWantSchedulerToRun();
+
+//extern void Func_0x003AD698(TARMProcessor* ioCPU, KUInt32 ret); // Func_0x003AD698
+extern void Func_0x003AD750(TARMProcessor* ioCPU, KUInt32 ret); // Func_0x003AD750
 
 #endif /* defined(__Einstein__SimHandcoded__) */
