@@ -86,8 +86,6 @@ rt cjit UnWindOp__15TSemaphoreGroupFP16TSemaphoreOpListl
 rt cjit WakeTasksOnInc__10TSemaphoreFv
 rt cjit WakeTasksOnZero__10TSemaphoreFv
 
-rt cjitr _SemaphoreOpGlue
-
 rt code 00800100-00800104
 rt cjit 00800100-00800104
 rt code 0080022C-0080023C
