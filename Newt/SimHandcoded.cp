@@ -36,7 +36,7 @@ private:
 	TObject		*fNext;				// +04
 	ObjectId	 fOwnerId;			// +08
 	ObjectId	 fAssignedOwnerId;	// +0C
-	
+
 };
 
 
@@ -214,7 +214,6 @@ void DisableInterrupt(InterruptObject *obj)
 //Func_0x000E57BC(ioCPU, 0x001CC4FC);
 void QuickEnableInterrupt(InterruptObject *obj)
 {
-#if 1
 	KUInt32 oldR0 = gCPU->mCurrentRegisters[0];
 	KUInt32 oldR2 = gCPU->mCurrentRegisters[2];
 	KUInt32 oldR3 = gCPU->mCurrentRegisters[3];
@@ -227,8 +226,6 @@ void QuickEnableInterrupt(InterruptObject *obj)
 	gCPU->mCurrentRegisters[3] = oldR3;
 	gCPU->mCurrentRegisters[12] = oldR12;
 	gCPU->mCurrentRegisters[14] = oldLR;
-#else
-#endif
 }
 
 
@@ -267,7 +264,7 @@ void SwapInGlobals(TTask *task)
 {
 	ObjectId id = task->GetId();
 	GSetCurrentTaskId( id );
-	
+
 	void *globals = task->GetGlobals();
 	GSetCurrentGlobals(globals);
 	
@@ -289,11 +286,11 @@ T_ROM_SIMULATION3(0x0025215C, "SwapInGlobals", Func_0x0025215C)
 /**
  * This function is the common exit code for all SWI calls.
  *
- * This function handles task switching. The code below does pretty much the
+ * This function handles task switching. The code below does pretty much the 
  * same that the original code would do to switch tasks, only it does that
  * for the emulator directly.
- *
- * A nativ version of this code would mainly contain SwapContext() or the
+ * 
+ * A nativ version of this code would mainly contain SwapContext() or the 
  * corresponding function for the host Fiber system.
  *
  * This function is very important in handling memory access violations. When
@@ -325,7 +322,7 @@ void Func_0x003AD750(TARMProcessor* ioCPU, KUInt32 ret)
 	KUInt32 initialR11;
 	KUInt32 initialR12;
 	KUInt32 initialLR;
-	
+
 	// Make things easier by having this globally available
 	gCPU = ioCPU;
 	
@@ -408,7 +405,7 @@ void Func_0x003AD750(TARMProcessor* ioCPU, KUInt32 ret)
 				R11 = initialR11;
 				R12 = initialR12;
 				LR = initialLR;
-				
+
 				// This variable is related to the Memory Access Fault handling.
 				if (GCopyDone()==0)
 				{
@@ -757,7 +754,7 @@ skipTaskSwitcher:
 		return;
 	}
 	else
-	{
+	{		
 		GSetCopyDone(0);
 		
 		newTask = GCurrentTask();
@@ -778,13 +775,13 @@ skipTaskSwitcher:
 		if (env) {
 			taskDomainAccess |= env->GetDomainAccess();
 		}
-		
+
 		currentTask = newTask;
 		for (;;) {
 			currentTask = currentTask->GetCurrentTask();
 			if (!currentTask)
 				break;
-			
+
 			env = currentTask->GetEnvironment();
 			if (!env)
 				break;
