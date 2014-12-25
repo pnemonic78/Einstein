@@ -229,6 +229,8 @@
 		C962429711B69A9D00EE66F3 /* TUsermodeNetwork.cp in Sources */ = {isa = PBXBuildFile; fileRef = C962429511B69A9D00EE66F3 /* TUsermodeNetwork.cp */; };
 		C96242A011B6A20A00EE66F3 /* TNetworkManager.cp in Sources */ = {isa = PBXBuildFile; fileRef = C962429E11B6A20A00EE66F3 /* TNetworkManager.cp */; };
 		C965D4011970A47000348893 /* TJITGenericRetargetMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C965D3FF1970A47000348893 /* TJITGenericRetargetMap.cpp */; };
+		C96FB5B21A4C8CB10041C2BC /* unsorted_027.cp in Sources */ = {isa = PBXBuildFile; fileRef = C96FB5AF1A4C8CB10041C2BC /* unsorted_027.cp */; };
+		C96FB5B31A4C8CB10041C2BC /* unsorted_027.rts in Resources */ = {isa = PBXBuildFile; fileRef = C96FB5B11A4C8CB10041C2BC /* unsorted_027.rts */; };
 		C97BA74D1A4BB51E00F21819 /* unsorted_026.cp in Sources */ = {isa = PBXBuildFile; fileRef = C97BA74A1A4BB51E00F21819 /* unsorted_026.cp */; };
 		C97BA74E1A4BB51E00F21819 /* unsorted_026.rts in Resources */ = {isa = PBXBuildFile; fileRef = C97BA74C1A4BB51E00F21819 /* unsorted_026.rts */; };
 		C97C7E1D124282A600CDCD05 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C97C7E1B124282A600CDCD05 /* Foundation.framework */; };
@@ -744,6 +746,9 @@
 		C962429F11B6A20A00EE66F3 /* TNetworkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = TNetworkManager.h; path = Network/TNetworkManager.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		C965D3FF1970A47000348893 /* TJITGenericRetargetMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TJITGenericRetargetMap.cpp; sourceTree = "<group>"; };
 		C965D4001970A47000348893 /* TJITGenericRetargetMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TJITGenericRetargetMap.h; sourceTree = "<group>"; };
+		C96FB5AF1A4C8CB10041C2BC /* unsorted_027.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unsorted_027.cp; sourceTree = "<group>"; };
+		C96FB5B01A4C8CB10041C2BC /* unsorted_027.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unsorted_027.h; sourceTree = "<group>"; };
+		C96FB5B11A4C8CB10041C2BC /* unsorted_027.rts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = unsorted_027.rts; sourceTree = "<group>"; };
 		C97BA74A1A4BB51E00F21819 /* unsorted_026.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unsorted_026.cp; sourceTree = "<group>"; };
 		C97BA74B1A4BB51E00F21819 /* unsorted_026.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unsorted_026.h; sourceTree = "<group>"; };
 		C97BA74C1A4BB51E00F21819 /* unsorted_026.rts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = unsorted_026.rts; sourceTree = "<group>"; };
@@ -1474,6 +1479,9 @@
 				C97BA74A1A4BB51E00F21819 /* unsorted_026.cp */,
 				C97BA74B1A4BB51E00F21819 /* unsorted_026.h */,
 				C97BA74C1A4BB51E00F21819 /* unsorted_026.rts */,
+				C96FB5AF1A4C8CB10041C2BC /* unsorted_027.cp */,
+				C96FB5B01A4C8CB10041C2BC /* unsorted_027.h */,
+				C96FB5B11A4C8CB10041C2BC /* unsorted_027.rts */,
 			);
 			path = unsorted;
 			sourceTree = "<group>";
@@ -2324,6 +2332,7 @@
 				C98AB2B31A351EE6001BB1CD /* unsorted_002.rts in Resources */,
 				C98AB2D51A351EE6001BB1CD /* unsorted_019.rts in Resources */,
 				C98AB2CD1A351EE6001BB1CD /* unsorted_015.rts in Resources */,
+				C96FB5B31A4C8CB10041C2BC /* unsorted_027.rts in Resources */,
 				F115FF141A2EA415001F3D65 /* Einstein.xib in Resources */,
 				C95E6043198B76DC004C6CEF /* button_power_on.png in Resources */,
 				C95E6044198B76DC004C6CEF /* button_prefs.png in Resources */,
@@ -2651,6 +2660,7 @@
 				C95E608B198B76DC004C6CEF /* TDMAManager.cp in Sources */,
 				C9DB61801A37C42F00E5CC95 /* unsorted_025.cp in Sources */,
 				C95E608C198B76DC004C6CEF /* TEmulator.cp in Sources */,
+				C96FB5B21A4C8CB10041C2BC /* unsorted_027.cp in Sources */,
 				C95E608D198B76DC004C6CEF /* TFlash.cp in Sources */,
 				C95E608E198B76DC004C6CEF /* TInterruptManager.cp in Sources */,
 				C95E608F198B76DC004C6CEF /* TMemory.cp in Sources */,
