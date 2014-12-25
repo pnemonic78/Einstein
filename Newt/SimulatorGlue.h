@@ -130,6 +130,7 @@ KUInt32 const ptr_##name = (addr);
 #include "unsorted/unsorted_025.h"
 #include "unsorted/unsorted_026.h"
 #include "unsorted/unsorted_027.h"
+#include "unsorted/unsorted_028.h"
 
 #include "core/swi.h"
 
