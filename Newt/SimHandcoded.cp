@@ -8,6 +8,9 @@
 
 #include "SimHandcoded.h"
 
+#include "TInterruptManager.h"
+#include "TMemory.h"
+
 #ifdef IS_NEWT_SIM
 #include <stdlib.h>
 #endif
@@ -18,7 +21,23 @@
 
 // keep this empty if possible
 
+
 TARMProcessor *gCPU = 0;
+
+
+class InterruptObject;
+
+
+class TObject {
+public:
+	ObjectId GetId() { return (ObjectId)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x00); };
+private:
+	ObjectId	 fId;				// +00
+	TObject		*fNext;				// +04
+	ObjectId	 fOwnerId;			// +08
+	ObjectId	 fAssignedOwnerId;	// +0C
+	
+};
 
 
 class TEnvironment {
@@ -27,7 +46,7 @@ public:
 };
 
 
-class TTask {
+class TTask : public TObject {
 public:
 	KUInt32 GetRegister(KUInt32 r) { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x10+4*r); };
 	void SaveRegister(KUInt32 r, KUInt32 v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, (KUInt32(intptr_t(this)))+0x10+4*r, v); };
@@ -36,6 +55,8 @@ public:
 	TEnvironment *GetEnvironment() { return (TEnvironment*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x74); };
 	TEnvironment *GetSMemEnvironment() { return (TEnvironment*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x78); };
 	TTask *GetCurrentTask() { return (TTask*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x7C); };
+	void *GetGlobals() { return (void*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xA0); };
+	ObjectId GetMonitorId() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xD8); };
 };
 
 
@@ -112,19 +133,55 @@ KUInt32 GSchedule()
 	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C100FE4);
 }
 
-
 KUInt32 GWantSchedulerToRun()
 {
 	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C101A2C);
 }
 
+void GWantSchedulerToRun(KUInt32 v)
+{
+	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C101A2C, v);
+}
 
+void GSetCurrentTaskId(ObjectId id)
+{
+	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C101054, id);
+}
+
+void GSetCurrentGlobals(void *v)
+{
+	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C10105C, (uintptr_t)v);
+}
+
+void GSetCurrentMonitorId(ObjectId id)
+{
+	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C101058, id);
+}
+
+KUInt32 GSchedulerRunning()
+{
+	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C101A30);
+}
+
+void GSchedulerRunning(KUInt32 v)
+{
+	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C101A30, v);
+}
+
+InterruptObject *GGetSchedulerIntObj()
+{
+	return (InterruptObject*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C100E6C);
+}
+
+
+// This function calls many subroutines
 void DoDeferrals()
 {
 	return Func_0x00148298(gCPU, 0xFFFFFFFF); // DoDeferrals
 }
 
 
+// This is a beast of a function, possibly allocating memory, etc.
 TTask *Scheduler()
 {
 	Func_0x001CC1EC(gCPU, 0xFFFFFFFF); // Scheduler
@@ -132,14 +189,18 @@ TTask *Scheduler()
 }
 
 
-void StartScheduler()
+//// rt cjitr DisableInterrupt
+//SETPC(0x000E5890+4);
+//Func_0x000E5890(ioCPU, 0x001CC4D4);
+void DisableInterrupt(InterruptObject *obj)
 {
 	KUInt32 oldR0 = gCPU->mCurrentRegisters[0];
 	KUInt32 oldR2 = gCPU->mCurrentRegisters[2];
 	KUInt32 oldR3 = gCPU->mCurrentRegisters[3];
 	KUInt32 oldR12 = gCPU->mCurrentRegisters[12];
 	KUInt32 oldLR = gCPU->mCurrentRegisters[14];
-	Func_0x001CC4A8(gCPU, 0xFFFFFFFF); // StartScheduler
+	gCPU->mCurrentRegisters[0] = (uintptr_t)obj;
+	Func_0x000E5890(gCPU, 0xFFFFFFFF);
 	gCPU->mCurrentRegisters[0] = oldR0;
 	gCPU->mCurrentRegisters[2] = oldR2;
 	gCPU->mCurrentRegisters[3] = oldR3;
@@ -148,22 +209,91 @@ void StartScheduler()
 }
 
 
+//// rt cjitr QuickEnableInterrupt
+//SETPC(0x000E57BC+4);
+//Func_0x000E57BC(ioCPU, 0x001CC4FC);
+void QuickEnableInterrupt(InterruptObject *obj)
+{
+#if 1
+	KUInt32 oldR0 = gCPU->mCurrentRegisters[0];
+	KUInt32 oldR2 = gCPU->mCurrentRegisters[2];
+	KUInt32 oldR3 = gCPU->mCurrentRegisters[3];
+	KUInt32 oldR12 = gCPU->mCurrentRegisters[12];
+	KUInt32 oldLR = gCPU->mCurrentRegisters[14];
+	gCPU->mCurrentRegisters[0] = (uintptr_t)obj;
+	Func_0x000E57BC(gCPU, 0xFFFFFFFF);
+	gCPU->mCurrentRegisters[0] = oldR0;
+	gCPU->mCurrentRegisters[2] = oldR2;
+	gCPU->mCurrentRegisters[3] = oldR3;
+	gCPU->mCurrentRegisters[12] = oldR12;
+	gCPU->mCurrentRegisters[14] = oldLR;
+#else
+#endif
+}
+
+
+
+/**
+ * Start the scheduler and set a time for the next timer interrupt.
+ */
+void StartScheduler()
+{
+	TInterruptManager *interruptManager = gCPU->GetMemory()->GetInterruptManager();
+	if (!GSchedulerRunning())
+	{
+		DisableInterrupt( GGetSchedulerIntObj() );
+		KUInt32 time = interruptManager->GetTimer();
+		interruptManager->SetTimerMatchRegister( 3, time + 73720 ); // 73720/3686 = 20ms
+		GSchedulerRunning( 1 );
+		QuickEnableInterrupt( GGetSchedulerIntObj() );
+	}
+	GWantSchedulerToRun(0);
+}
+
+// Glue.
+void Func_0x001CC4A8(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	gCPU = ioCPU;
+	StartScheduler();
+	NEWT_RETURN;
+}
+T_ROM_SIMULATION3(0x001CC4A8, "StartScheduler", Func_0x001CC4A8)
+
+
+/**
+ * This function sets a few global variables according to the task at hand.
+ */
 void SwapInGlobals(TTask *task)
 {
-	gCPU->mCurrentRegisters[0] = (intptr_t)task;
-	Func_0x0025215C(gCPU, 0xFFFFFFFF); // SwapInGlobals
+	ObjectId id = task->GetId();
+	GSetCurrentTaskId( id );
+	
+	void *globals = task->GetGlobals();
+	GSetCurrentGlobals(globals);
+	
+	ObjectId monitorId = task->GetMonitorId();
+	GSetCurrentMonitorId(monitorId);
 }
+
+// Glue.
+void Func_0x0025215C(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	gCPU = ioCPU;
+	SwapInGlobals((TTask*)(uintptr_t)R0);
+	NEWT_RETURN;
+}
+T_ROM_SIMULATION3(0x0025215C, "SwapInGlobals", Func_0x0025215C)
 
 
 
 /**
  * This function is the common exit code for all SWI calls.
  *
- * This function handles task switching. The code below does pretty much the 
+ * This function handles task switching. The code below does pretty much the
  * same that the original code would do to switch tasks, only it does that
  * for the emulator directly.
- * 
- * A nativ version of this code would mainly contain SwapContext() or the 
+ *
+ * A nativ version of this code would mainly contain SwapContext() or the
  * corresponding function for the host Fiber system.
  *
  * This function is very important in handling memory access violations. When
@@ -195,7 +325,7 @@ void Func_0x003AD750(TARMProcessor* ioCPU, KUInt32 ret)
 	KUInt32 initialR11;
 	KUInt32 initialR12;
 	KUInt32 initialLR;
-
+	
 	// Make things easier by having this globally available
 	gCPU = ioCPU;
 	
@@ -278,7 +408,7 @@ void Func_0x003AD750(TARMProcessor* ioCPU, KUInt32 ret)
 				R11 = initialR11;
 				R12 = initialR12;
 				LR = initialLR;
-
+				
 				// This variable is related to the Memory Access Fault handling.
 				if (GCopyDone()==0)
 				{
@@ -627,7 +757,7 @@ skipTaskSwitcher:
 		return;
 	}
 	else
-	{		
+	{
 		GSetCopyDone(0);
 		
 		newTask = GCurrentTask();
@@ -648,13 +778,13 @@ skipTaskSwitcher:
 		if (env) {
 			taskDomainAccess |= env->GetDomainAccess();
 		}
-
+		
 		currentTask = newTask;
 		for (;;) {
 			currentTask = currentTask->GetCurrentTask();
 			if (!currentTask)
 				break;
-
+			
 			env = currentTask->GetEnvironment();
 			if (!env)
 				break;

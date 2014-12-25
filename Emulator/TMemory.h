@@ -107,6 +107,14 @@ public:
 	~TMemory( void );
 
 	///
+	/// Get the Interrup Manager pointer
+	///
+	TInterruptManager *GetInterruptManager()
+		{
+			return mInterruptManager;
+		}
+	
+	///
 	/// Set the emulator.
 	///
 	/// \param inEmulator emulator (access to hardware managers).

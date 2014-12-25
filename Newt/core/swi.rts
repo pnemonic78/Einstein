@@ -58,8 +58,8 @@ rt cjitr 003ADD7C
 
 rt cjit DoDeferrals
 rt cjit Scheduler
-rt cjit StartScheduler
-rt cjit SwapInGlobals
+#rt cjit StartScheduler
+#rt cjit SwapInGlobals
 rt cjit GetPortInfo
 rt cjit DoSemaphoreOp
 rt cjit PortSendKernelGlue

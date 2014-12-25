@@ -13,6 +13,8 @@
 
 // keep this empty if possible
 
+typedef KUInt32 ObjectId;
+
 class TTask;
 
 extern TARMProcessor *gCPU;
@@ -28,8 +30,10 @@ extern void GSetCopyDone(KUInt32 v);
 extern KUInt32 GWantDeferred();
 extern KUInt32 GSchedule();
 extern KUInt32 GWantSchedulerToRun();
+extern void GSetCurrentTaskId(ObjectId id);
+extern void GSetCurrentGlobals(void *v);
+extern void GSetCurrentMonitorId(ObjectId id);
 
-//extern void Func_0x003AD698(TARMProcessor* ioCPU, KUInt32 ret); // Func_0x003AD698
 extern void Func_0x003AD750(TARMProcessor* ioCPU, KUInt32 ret); // Func_0x003AD750
 
 #endif /* defined(__Einstein__SimHandcoded__) */

@@ -95,6 +95,13 @@ KUInt32 const ptr_##name = (addr);
 #define LR ioCPU->mCurrentRegisters[14]
 #define PC ioCPU->mCurrentRegisters[15]
 
+#define NEWT_RETURN \
+	KUInt32 Opnd2 = LR; \
+	const KUInt32 theResult = Opnd2; \
+	SETPC(theResult + 4); \
+	if (ret==0xFFFFFFFF) return; \
+	if (PC!=ret) __asm__("int $3\n" : : ); \
+	return
 
 #include "unsorted/unsorted_001.h"
 #include "unsorted/unsorted_002.h"
