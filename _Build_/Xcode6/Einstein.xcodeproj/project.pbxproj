@@ -675,13 +675,6 @@
 			remoteGlobalIDString = C98AB2361A351D20001BB1CD;
 			remoteInfo = retarget;
 		};
-		DA3FFFF31A3B2001001C9377 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8D1107260486CEB800E47090;
-			remoteInfo = Einstein;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -2185,7 +2178,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				DA3FFFF41A3B2001001C9377 /* PBXTargetDependency */,
 			);
 			name = EinsteinTests;
 			productName = "Einstein Tests";
@@ -2940,11 +2932,6 @@
 			target = C98AB2361A351D20001BB1CD /* retarget */;
 			targetProxy = C98AB2451A351E0B001BB1CD /* PBXContainerItemProxy */;
 		};
-		DA3FFFF41A3B2001001C9377 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8D1107260486CEB800E47090 /* Einstein */;
-			targetProxy = DA3FFFF31A3B2001001C9377 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -3627,9 +3614,7 @@
 					"$(SRCROOT)/../../libffi-osx",
 					"$(SRCROOT)/../../portaudio/pa_common/",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -3666,9 +3651,7 @@
 					"$(SRCROOT)/../../libffi-osx",
 					"$(SRCROOT)/../../portaudio/pa_common/",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3704,9 +3687,7 @@
 					"$(SRCROOT)/../../libffi-osx",
 					"$(SRCROOT)/../../portaudio/pa_common/",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3755,9 +3736,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Resources/Tests-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -3802,9 +3781,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Resources/Tests-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3848,9 +3825,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Resources/Tests-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
