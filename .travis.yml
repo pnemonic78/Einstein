@@ -2,4 +2,5 @@ language: objective-c
 xcode_project: _Build_/Xcode6/Einstein.xcodeproj
 xcode_scheme: Einstein
 osx_image: xcode611
-script: xctool -showTasks -project _Build_/Xcode6/Einstein.xcodeproj -scheme Einstein test -listTestsOnly
+script: "./list_tests_travis.sh"
+
