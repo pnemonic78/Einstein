@@ -460,7 +460,6 @@
 		DA0D944011B9A12D00835522 /* TTapNetwork.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA0D943E11B9A12D00835522 /* TTapNetwork.cp */; };
 		DA0D96DE11BAD15300835522 /* darwin64.S in Sources */ = {isa = PBXBuildFile; fileRef = DA0D96DD11BAD15300835522 /* darwin64.S */; };
 		DA4BA40D1A3A0160002BDB80 /* tests.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA4FF0B61A35E76400092B5A /* tests.cp */; };
-		DA4BA40E1A3A01F7002BDB80 /* UHostInfoTests.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA4FF0B81A35E76400092B5A /* UHostInfoTests.cp */; };
 		DA4BA40F1A3A01F7002BDB80 /* UMemoryTests.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA4FF0BA1A35E76400092B5A /* UMemoryTests.cp */; };
 		DA4BA4101A3A01F7002BDB80 /* UProcessorTests.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA4FF0BC1A35E76400092B5A /* UProcessorTests.cp */; };
 		DA4BA4121A3A028C002BDB80 /* TNativePrimitives.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E34C6111B7C08002165EC /* TNativePrimitives.cp */; };
@@ -483,7 +482,6 @@
 		DA4BA4261A3A02FD002BDB80 /* TPlatformManager.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E347B111B7C07002165EC /* TPlatformManager.cp */; };
 		DA4BA4271A3A02FD002BDB80 /* TNativeCalls.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E346A111B7C07002165EC /* TNativeCalls.cp */; };
 		DA4BA4281A3A02FD002BDB80 /* TVirtualizedCalls.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E346C111B7C07002165EC /* TVirtualizedCalls.cp */; };
-		DA4BA4291A3A02FD002BDB80 /* THostInfo.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E33F0111B7C07002165EC /* THostInfo.cp */; };
 		DA4BA42A1A3A02FD002BDB80 /* TLog.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E3464111B7C07002165EC /* TLog.cp */; };
 		DA4BA42B1A3A02FD002BDB80 /* TStdOutLog.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E3466111B7C07002165EC /* TStdOutLog.cp */; };
 		DA4BA42C1A3A02FD002BDB80 /* TJITGeneric.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E340F111B7C07002165EC /* TJITGeneric.cp */; };
@@ -521,9 +519,6 @@
 		DA4BA44E1A3A0372002BDB80 /* darwin64.S in Sources */ = {isa = PBXBuildFile; fileRef = DA0D96DD11BAD15300835522 /* darwin64.S */; };
 		DA4BA44F1A3A03C0002BDB80 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C99E374F111C1F0E002165EC /* Carbon.framework */; };
 		DA4BA4501A3A03C3002BDB80 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
-		DA4BA4511A3A03CF002BDB80 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C99E3703111C18D2002165EC /* AddressBook.framework */; };
-		DA4BA4521A3A03CF002BDB80 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C99E3705111C18D2002165EC /* AudioUnit.framework */; };
-		DA4BA4531A3A03CF002BDB80 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C99E36FD111C18A8002165EC /* CoreAudio.framework */; };
 		DA4BA4541A3A03EA002BDB80 /* TException.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E32BF111B7570002165EC /* TException.cp */; };
 		DA4BA4551A3A03EF002BDB80 /* TEOFException.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E32BB111B7570002165EC /* TEOFException.cp */; };
 		DA4BA4561A3A03EF002BDB80 /* TIOException.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E32BD111B7570002165EC /* TIOException.cp */; };
@@ -1179,11 +1174,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA4BA4531A3A03CF002BDB80 /* CoreAudio.framework in Frameworks */,
-				DA4BA4511A3A03CF002BDB80 /* AddressBook.framework in Frameworks */,
 				DA4BA4501A3A03C3002BDB80 /* Cocoa.framework in Frameworks */,
 				DA4BA44F1A3A03C0002BDB80 /* Carbon.framework in Frameworks */,
-				DA4BA4521A3A03CF002BDB80 /* AudioUnit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2766,7 +2758,6 @@
 				DA4BA4641A3A37F8002BDB80 /* TSoundManager.cp in Sources */,
 				DA4BA45F1A3A0407002BDB80 /* TMutex.cp in Sources */,
 				DA4BA41D1A3A028C002BDB80 /* TFlatROMImageWithREX.cp in Sources */,
-				DA4BA40E1A3A01F7002BDB80 /* UHostInfoTests.cp in Sources */,
 				DA4BA4261A3A02FD002BDB80 /* TPlatformManager.cp in Sources */,
 				DA4BA42C1A3A02FD002BDB80 /* TJITGeneric.cp in Sources */,
 				DA4BA4311A3A02FD002BDB80 /* TJITGeneric_DataProcessingPSRTransfer_MoveOp.cp in Sources */,
@@ -2820,7 +2811,6 @@
 				DA4BA44D1A3A0372002BDB80 /* darwin.S in Sources */,
 				DA4BA4121A3A028C002BDB80 /* TNativePrimitives.cp in Sources */,
 				DA4BA45E1A3A0407002BDB80 /* TCondVar.cp in Sources */,
-				DA4BA4291A3A02FD002BDB80 /* THostInfo.cp in Sources */,
 				DA4BA45A1A3A03F8002BDB80 /* TMappedFile.cp in Sources */,
 				DA4BA45B1A3A03FD002BDB80 /* TFileStream.cp in Sources */,
 				DA4BA42D1A3A02FD002BDB80 /* TJITGeneric_BlockDataTransfer.cp in Sources */,

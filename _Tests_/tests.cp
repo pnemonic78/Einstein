@@ -86,8 +86,10 @@ test( const char* inTestName, const char* inArgument )
 		UMemoryTests::ReadWriteRAMTest(&theLog);
 	} else if (::strcmp(inTestName, "flash") == 0) {
 		UMemoryTests::FlashTest(&theLog);
+#ifdef TRAVIS_TEST_DISABLED
 	} else if (::strcmp(inTestName, "host-info") == 0) {
 		UHostInfoTests::HostInfoTest(&theLog);
+#endif
 	} else {
 		(void) ::printf( "%s is an unknown test.\n", inTestName );
 	}
