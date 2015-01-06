@@ -459,6 +459,7 @@
 		C9E848EA11EDCD6C00F27330 /* x86-ffi64.c in Sources */ = {isa = PBXBuildFile; fileRef = C9E848E811EDCD6C00F27330 /* x86-ffi64.c */; };
 		DA0D944011B9A12D00835522 /* TTapNetwork.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA0D943E11B9A12D00835522 /* TTapNetwork.cp */; };
 		DA0D96DE11BAD15300835522 /* darwin64.S in Sources */ = {isa = PBXBuildFile; fileRef = DA0D96DD11BAD15300835522 /* darwin64.S */; };
+		DA40C6691A5BD463003DF356 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C99E36FD111C18A8002165EC /* CoreAudio.framework */; };
 		DA4BA40D1A3A0160002BDB80 /* tests.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA4FF0B61A35E76400092B5A /* tests.cp */; };
 		DA4BA40F1A3A01F7002BDB80 /* UMemoryTests.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA4FF0BA1A35E76400092B5A /* UMemoryTests.cp */; };
 		DA4BA4101A3A01F7002BDB80 /* UProcessorTests.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA4FF0BC1A35E76400092B5A /* UProcessorTests.cp */; };
@@ -1174,6 +1175,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA40C6691A5BD463003DF356 /* CoreAudio.framework in Frameworks */,
 				DA4BA4501A3A03C3002BDB80 /* Cocoa.framework in Frameworks */,
 				DA4BA44F1A3A03C0002BDB80 /* Carbon.framework in Frameworks */,
 			);
