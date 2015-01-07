@@ -457,6 +457,9 @@
 		C9DB61811A37C42F00E5CC95 /* unsorted_025.rts in Resources */ = {isa = PBXBuildFile; fileRef = C9DB617F1A37C42F00E5CC95 /* unsorted_025.rts */; };
 		C9E848E911EDCD6C00F27330 /* ffi_darwin.c in Sources */ = {isa = PBXBuildFile; fileRef = C9E848E711EDCD6C00F27330 /* ffi_darwin.c */; };
 		C9E848EA11EDCD6C00F27330 /* x86-ffi64.c in Sources */ = {isa = PBXBuildFile; fileRef = C9E848E811EDCD6C00F27330 /* x86-ffi64.c */; };
+		DA0771A31A5D8B1100DFE560 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C99E3703111C18D2002165EC /* AddressBook.framework */; };
+		DA0771A41A5D8B4E00DFE560 /* THostInfo.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E33F0111B7C07002165EC /* THostInfo.cp */; };
+		DA0771A51A5D8B5E00DFE560 /* UHostInfoTests.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA4FF0B81A35E76400092B5A /* UHostInfoTests.cp */; };
 		DA0D944011B9A12D00835522 /* TTapNetwork.cp in Sources */ = {isa = PBXBuildFile; fileRef = DA0D943E11B9A12D00835522 /* TTapNetwork.cp */; };
 		DA0D96DE11BAD15300835522 /* darwin64.S in Sources */ = {isa = PBXBuildFile; fileRef = DA0D96DD11BAD15300835522 /* darwin64.S */; };
 		DA40C6691A5BD463003DF356 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C99E36FD111C18A8002165EC /* CoreAudio.framework */; };
@@ -1177,6 +1180,7 @@
 			files = (
 				DA40C6691A5BD463003DF356 /* CoreAudio.framework in Frameworks */,
 				DA4BA4501A3A03C3002BDB80 /* Cocoa.framework in Frameworks */,
+				DA0771A31A5D8B1100DFE560 /* AddressBook.framework in Frameworks */,
 				DA4BA44F1A3A03C0002BDB80 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2783,6 +2787,7 @@
 				DA4BA41E1A3A028C002BDB80 /* TROMImage.cp in Sources */,
 				DA4BA4751A3A3B78002BDB80 /* TNullScreenManager.cp in Sources */,
 				DA4BA44B1A3A0372002BDB80 /* ffi_darwin.c in Sources */,
+				DA0771A51A5D8B5E00DFE560 /* UHostInfoTests.cp in Sources */,
 				DA4BA4321A3A02FD002BDB80 /* TJITGeneric_DataProcessingPSRTransfer_MRS.cp in Sources */,
 				DA4BA4141A3A028C002BDB80 /* TMMU.cp in Sources */,
 				DA4BA4541A3A03EA002BDB80 /* TException.cp in Sources */,
@@ -2794,6 +2799,7 @@
 				DA4BA41F1A3A028C002BDB80 /* TJITCache.cp in Sources */,
 				DA4BA4351A3A02FD002BDB80 /* TJITGeneric_Multiply.cp in Sources */,
 				DA4BA45C1A3A03FD002BDB80 /* TStream.cp in Sources */,
+				DA0771A41A5D8B4E00DFE560 /* THostInfo.cp in Sources */,
 				DA4BA42A1A3A02FD002BDB80 /* TLog.cp in Sources */,
 				DA4BA4151A3A028C002BDB80 /* TDMAManager.cp in Sources */,
 				DA4BA4371A3A02FD002BDB80 /* TJITGeneric_Other.cp in Sources */,

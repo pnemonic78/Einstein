@@ -39,7 +39,7 @@
 #include "TInterruptManager.h"
 #include "TMemory.h"
 #include "Emulator/Log/TLog.h"
-//#include "Emulator/Host/THostInfo.h"
+#include "Emulator/Host/THostInfo.h"
 #include "Emulator/Screen/TScreenManager.h"
 #include "Emulator/PCMCIA/TPCMCIAController.h"
 #include "Emulator/PCMCIA/TNE2000Card.h"
@@ -476,7 +476,6 @@ TPlatformManager::GetUserInfo(
 						KUInt32 inBufferSize,
 						KUInt32 outAddress ) const
 {
-#ifdef TRAVIS_TEST_DISABLES
 	const KUInt16* theString =
 		THostInfo::GetHostInfo()->GetUserInfo(inSelector);
 	size_t theSize = (UUTF16CStr::StrLen( theString ) + 1) * sizeof(KUInt16);
@@ -495,9 +494,6 @@ TPlatformManager::GetUserInfo(
 	}
 	
 	return (KUInt32) theSize;
-#else
-	return 0;
-#endif
 }
 
 // -------------------------------------------------------------------------- //
@@ -506,11 +502,7 @@ TPlatformManager::GetUserInfo(
 int
 TPlatformManager::GetHostTimeZone( void ) const
 {
-#ifdef TRAVIS_TEST_DISABLES
 	return THostInfo::GetHostInfo()->GetHostTimeZone();
-#else
-	return 0;
-#endif
 }
 
 // -------------------------------------------------------------------------- //
