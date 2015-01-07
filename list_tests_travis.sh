@@ -1,9 +1,10 @@
 #!/usr/bin/env sh
 
-echo "Overriding access restrictions on kTCCServiceAddressBook (can't believe it's as easy !)"
+echo "Overriding access restrictions on kTCCServiceAddressBook"
+echo "http://stackoverflow.com/questions/17693408/enable-access-for-assistive-devices-programmatically-on-10-9"
 
-if [ -e "Library/Application Support/com.apple.TCC/TCC.db"]; then
-    sqlite3 "Library/Application Support/com.apple.TCC/TCC.db" "INSERT INTO access_overrides VALUES ('kTCCServiceAddressBook');"
+if [ -e "${HOME}/Library/Application Support/com.apple.TCC/TCC.db" ]; then
+    sqlite3 "${HOME}/Library/Application Support/com.apple.TCC/TCC.db" "INSERT INTO access_overrides VALUES ('kTCCServiceAddressBook');"
 else
     echo "Could not find TCC.db !"
 fi
