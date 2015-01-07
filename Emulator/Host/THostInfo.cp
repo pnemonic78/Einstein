@@ -79,7 +79,7 @@ THostInfo::THostInfo( void )
 		mUserWorkFaxPhone( nil )
 {
 	// Fill the first and the last name of the user.
-	//RetrieveUserInfo();
+	RetrieveUserInfo();
 	
 	// Fill everything that couldn't be retrieved.
 	FillNullInfoWithEmptyStrings();
