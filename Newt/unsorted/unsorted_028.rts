@@ -2,38 +2,255 @@
 # Retarget functions as they appear
 #
 rt open unsorted_028
+
+rt cjit NSCallGlobalFn__FRC6RefVar
+rt cjit NSCall__FRC6RefVar
+rt cjit NSGetGlobalFn__FRC6RefVar
+
+rt cjit CommonSetKeyView__9TRootViewFP5TViewlT2
+rt cjit ContentsOrigin__5TViewFv
+rt cjit DerivedFrom__5TViewCFl
+rt cjit GetFirstNonFloater__FP9TViewList
+rt cjit Init__7TCursorFRC6RefVarPC7TCursor
+rt cjit IntegerString__FlPUs
+rt cjit LockHandle__FPPc
+rt cjit NextItem__13CListIteratorFv
+rt cjit PackageToIndex__19TROMDomainManager1KFUlPl
+rt cjit PushSelection__9TRootViewFP5TViewRC6RefVar
+rt cjit RestartTimerOverflowDetect__FPv
+rt cjit RunScript__5TViewFRC6RefVarT1UcPUc
+rt cjit SetContextSlot__5TViewFRC6RefVarT1
+rt cjit SwitchFramesForkGlobals__FUc
+rt cjit Ustrncpy
+rt cjit VisibleDeep__5TViewCFv
+rt cjit __ct__18TRectangularRegionFRC5TRect
+rt cjit __ct__9TAppWorldFv
+
+rt cjit Clear__6TArrayFv
+rt cjit Clone__7TCursorFv
+rt cjit DerivedFrom__9TEditViewCFl
+rt cjit Dirty__5TViewFPC5TRect
+rt cjit Dirty__9TRootViewFPC5TRect
+rt cjit DoCommand__5TViewFRC6RefVar
+rt cjit DomainParameter__13TXrWordDomainFUlN21
+rt cjit ForkSwitch__10TForkWorldFUc
+rt cjit ForkSwitch__10TNewtWorldFUc
+rt cjit GetNextElementFormat__FPUl
+rt cjit GetSelection__5TViewFv
+rt cjit MakeFork__10TNewtWorldFv
+rt cjit New__15TSerialEndpointFv
+rt cjit New__19TFramedAsyncServiceFv
+rt cjit Next__15TUnionSoupIndexFP4SKeyT1iN21
+rt cjit OffsetToCaret__9TEditViewFlP5TRect
+rt cjit SetSelection__5TViewFRC6RefVarPlT2
+rt cjit SetValue__5TViewFRC6RefVarT1
+rt cjit SetupForm__5TViewFv
+rt cjit Sizeof__13TPackageStoreSFv
+rt cjit TestItem__13CItemComparerCFPCv
+rt cjit TestItem__14SysEventTesterCFPCv
+rt cjit UserRequest__19TROMDomainManager1KFlPv
+
+rt cjit 0038415C-00384160 vt_0038415C
+rt cjit 00383390-00383394 vt_00383390
+rt cjit 00383348-0038334C vt_00383348
+rt cjit 00382D9C-00382DA0 vt_00382D9C
+rt cjit 00382D44-00382D48 vt_00382D44
+
+rt cjit 00020014-00020018 vt_00020014
+rt cjit 00020A9C-00020AA0 vt_00020A9C
+rt cjit 00020AA8-00020AAC vt_00020AA8
+rt cjit 00020B08-00020B0C vt_00020B08
+rt cjit 0002100C-00021010 vt_0002100C
+rt cjit 00021030-00021034 vt_00021030
+rt cjit 00021050-00021054 vt_00021050
+rt cjit 0002116C-00021170 vt_0002116C
+
+rt cjit 0001AB68-0001AB6C vt_0001AB68
+rt cjit 0001AB6C-0001AB70 vt_0001AB6C
+rt cjit 0001AE24-0001AE28 vt_0001AE24
+rt cjit 0001B18C-0001B190 vt_0001B18C
+rt cjit 0001B3AC-0001B3B0 vt_0001B3AC
+rt cjit 0001C048-0001C04C vt_0001C048
+rt cjit 0001C624-0001C628 vt_0001C624
+rt cjit 0001C838-0001C83C vt_0001C838
+rt cjit 0001C8BC-0001C8C0 vt_0001C8BC
+rt cjit 0001D084-0001D088 vt_0001D084
+rt cjit 0001D394-0001D398 vt_0001D394
+rt cjit 0001D428-0001D42C vt_0001D428
+rt cjit 0001D47C-0001D480 vt_0001D47C
+rt cjit 0001E160-0001E164 vt_0001E160
+rt cjit 0001E1DC-0001E1E0 vt_0001E1DC
+rt cjit 0001EE84-0001EE88 vt_0001EE84
+rt cjit 0001F760-0001F764 vt_0001F760
+rt cjit 0001F7B0-0001F7B4 vt_0001F7B0
+rt cjit 0001F7B4-0001F7B8 vt_0001F7B4
+rt cjit 0001F97C-0001F980 vt_0001F97C
+rt cjit 0001FB68-0001FB6C vt_0001FB68
+rt cjit 0001FBB8-0001FBBC vt_0001FBB8
+
+rt cjit GetNextElementType__FPUl
+rt cjit GetCaretPoint__9TRootViewFP6TPoint
+rt cjit LongDateString__5TDateFUlPUsT1
+rt cjit ShortDateString__5TDateFUlPUsT1
+rt cjit TimeString__5TDateFUlPUsT1
+rt cjit UpdateDefaultButtonAndCaretSlip__9TRootViewFv
+
+rt cjit FindDefaultButtonAndCaretSlip__9TRootViewFP5TViewPP5TViewT2
+rt cjit FirstItem__13CListIteratorFv
+rt cjit GetBatteryStatus__FlP16PowerPlantStatusUc
+rt cjit GetRemoteWriting__9TRootViewFv
+rt cjit IntlResources__Fv
+
+rt cjit ASCIIKeyCompare__10TSoupIndexFRC4SKeyT1
+rt cjit BatteryStatusHelper__FlUc
+rt cjit CaretEnabled__9TRootViewFv
+rt cjit FEventPause
+rt cjit FMinimumBatteryCheck
+rt cjit FastBlackSlab
+rt cjit FastWhiteSlab
+rt cjit GetCurrentLocale__Fv
+rt cjit GetPowerPort__Fv
+rt cjit PatCopySlab__FPUlT1UllN23
+rt cjit ReleaseMutex__10TForkWorldFv
+rt cjit SendRPCGoo__6TUPortFUlT1PUlPvN31UcT4N21P5TTime
+rt cjit __ct__13CListIteratorFP13CDynamicArray
+rt cjit __ct__14TAEventHandlerFv
+
+rt cjit CaretValid__9TRootViewFP6TPoint
+rt cjit DisposePattern__FPP8PixelMap
+rt cjit DrawSlab__FlN21PcT4P4RectPFPUlT1UllN23_v
+rt cjit EntryUniqueID__FRC6RefVar
+rt cjit GetCacheProto__5TViewFl
+rt cjit GetStorePSSInfo__11TPSSManagerCFPC6TStoreUc
+rt cjit Init__11TPMIteratorFv
+rt cjit IsROM__6TStoreFv
+rt cjit Search__5CListFP11CItemTesterRl
+rt cjit SendImmediate__14TUSoundChannelFUlN21P12TUSoundReplyT1
+rt cjit SetFormatResource__5TDateFRC6RefVarN21
+rt cjit SetTag__8TagsBitsFs
+rt cjit Unnamed_002D0DD0
+rt cjit __ct__14TUSoundChannelFv
+rt cjit __ct__20TObjTextDecompressorFv
+
+rt cjit BumpOval__FP7OvalRecl
+rt cjit CheckWriteProtect__FP6TStore
+rt cjit CheckWriteProtect__FRC6RefVar
+rt cjit CommandReceiver__FRC6RefVar
+rt cjit CommandSetFrameParameter__FRC6RefVarT1
+rt cjit DeleteRefStruct__FP9RefStruct
+rt cjit DrawLine__F5PointT1
+rt cjit EncodeTags__FRC6RefVarT1P8TagsBits
+rt cjit FastSlabMode__Fl
+rt cjit GetChildOrigin__5TViewFP6TPoint
+rt cjit GetResponder__FRC6RefVarT1
+rt cjit GetStorePSSInfo__FPC6TStore
+rt cjit LSeekMask__FlT1PUlT1P8RgnStateN25
+rt cjit NeedsUpdate__9TRootViewFv
+rt cjit ReplaceObject__6TStoreFUlPcl
+rt cjit ResolveEntryAliasInStores__FRC6RefVarT1
+rt cjit Reuse__10TNodeCacheFP10TSoupIndex
+rt cjit SetFormatResource__5TDateFRC6RefVar
+rt cjit SetVolume__14TUSoundChannelFl
+rt cjit SlabMode__FlT1
+rt cjit SoupGetSignature__FRC6RefVar
+rt cjit Stop__14TUSoundChannelFP10SoundBlockPl
+rt cjit TBCPollTablet__FPlT1PUlPUc
+rt cjit TestNumbers__21TGeneralizedTestFnVarFPlT1
+rt cjit UnpackBits__FPPcT1l
+rt cjit WithPermObjectTextDo__FP13TStoreWrapperUlPFPUslPv_UcPvPPv
+rt cjit __ct__10TObjectPtrFv
+rt cjit __ct__11TPMIteratorFv
+rt cjit __ct__13CItemComparerFPCvT1
+rt cjit __ct__18TFrameSoundChannelFv
+rt cjit kfNextDupID__10TSoupIndexFP8KeyField
+rt cjit kfReplaceFirstData__10TSoupIndexFP8KeyFieldPv
+rt cjit 00382D5C-00382D64 ClassInfo__19TFramedAsyncServiceSFv
+rt cjit 00383360-00383368 ClassInfo__15TSerialEndpointSFv
+
+
+rt cjitr __ct__18TAEHandlerComparerFv
+rt cjitr __ct__15TAEventComparerFv
+rt cjitr xHLock__FPPc
+rt cjitr __ct__13CItemComparerFv
+rt cjitr __ct__10TForkWorldFv
+rt cjitr DoProtoMessage__FRC6RefVarN21
+rt cjitr GetVar__5TViewCFRC6RefVar
+rt cjitr UpdateClock
+rt cjitr CleanSelectionStack__9TRootViewFP5TViewUc
+rt cjitr PtrToPtr__FPc
+rt cjitr __as__4SKeyFRC4SKey
+rt cjitr DerivedFrom__10TResponderCFl
+rt cjitr DoProtoMessageIfDefined__FRC6RefVarN21Pl
+rt cjitr KeyIn__FUlUcP5TView
+rt cjitr DoAutoShift__FP14TParagraphViewl
+rt cjitr XIPObjectHasMoved__19TROMDomainManager1KFP6TStoreUl
+rt cjitr GetObjectPtr__19TROMDomainManager1KFUl
+rt cjitr HasTransaction__20LOTransactionHandlerFv
+rt cjitr EndSession__19TROMDomainManager1KFlUc
+rt cjitr FlushCache__19TROMDomainManager1KFlUc
+rt cjitr ObjectToIndex__19TROMDomainManager1KFP6TStoreUlPl
+rt cjitr ResizeObject__19TROMDomainManager1KFPUlUllT3
+rt cjitr DoTransactionAgainstObject__19TROMDomainManager1KFlP12PackageChunkUli
+rt cjitr DoAcquireDatabase__19TROMDomainManager1KFUc
+rt cjitr FlushCache__19TROMDomainManager1KFP6TStoreUl
+rt cjitr FlushCache__19TROMDomainManager1KFUl
+rt cjitr ObjectToIndex__19TROMDomainManager1KFUlPl
+rt cjitr XIPInvalidateStore__19TROMDomainManager1KFP6TStore
+rt cjitr IsReadOnly__15TStoreCompanderFv
+rt cjitr EndSession__19TROMDomainManager1KFUl
+rt cjitr SetPackageId__19TROMDomainManager1KFP6TStoreUlT2
+rt cjitr FlushCacheByBase__19TROMDomainManager1KFUl
+rt cjitr AddPackage__19TROMDomainManager1KFP6TStoreUlUcPUl
+rt cjitr EndSession__19TROMDomainManager1KFP6TStoreUl
+rt cjitr GCSetUpRecTableAndCharset__FP7rc_typeUi
+rt cjitr UnlockHandle__FPPc
+rt cjitr GetNumVarsOfChar__FUcPv
+rt cjitr GetVariantState__FUcN21Pv
+rt cjitr SetXrWordRC__FUlP11XRWORDPARAM
+rt cjitr HWRStrLen__FPc
+rt cjitr GCUnlockDTEAndLearningData__FPvP13RcHandlesType
+rt cjitr AllocOrtographLearnInfo__Fv
+rt cjitr SetVariantState__FUcT1iT1Pv
+rt cjitr ORInitDB__FPvUl
+rt cjitr ORGetDBSize__Fv
+rt cjitr XRWDoLearning__FUlP11XRWORDPARAM
+rt cjitr RemoveDictFromChain__10TDictChainFPP15AirusAParmBlock
+rt cjitr PositionToHandle__10TDictChainFUl
+rt cjitr GetLearnInfoPtr__FPv
+rt cjitr GCLockDTEAndLearningData__FPvP13RcHandlesType
+rt cjitr AddDictToChain__10TDictChainFPP15AirusAParmBlock
+rt cjitr UnloadVoc__FPPv
+rt cjitr SetXrWordFieldSpeed__FUlP7rc_typeT1
+rt cjitr PrintFieldType__FUl
+rt cjitr SetUpVocAdders__FPP15AirusAParmBlockT1PPvPcs
+rt cjitr SetXrWordFieldType__FUlP7rc_type
+rt cjitr InitializeParamStruct__13TXrWordDomainFP11XRWORDPARAM
+rt cjitr HasVisRgn__5TViewCFv
+rt cjitr DateElementString__5TDateFUlT1PUsT1Uc
+rt cjitr SleepUntilNextWakeup__Fv
+rt cjitr KeyboardActive__9TRootViewFv
+rt cjitr cGetPackageBackupInfo__FUlPUsPUlT3PlP10SourceTypeT5N23
+rt cjitr AcquireMutex__10TForkWorldFv
+rt cjitr __ct__19TFrameSoundCallbackFv
+rt cjitr EachLargeObjectDo__18TStoreObjectReaderFPFP13TStoreWrapperUllPv_UcPv
+rt cjitr Decompress__20TObjTextDecompressorFP13TStoreWrapperUlPl
+rt cjitr TestNumsRealUtil__21TGeneralizedTestFnVarFPlT1
+rt cjitr AbortBusy__14TUSoundChannelFv
+rt cjitr FindNode__14TUSoundChannelFUl
+rt cjitr FastLine__F5PointT1P4RectlN24
 rt cjitr DrawCaret__9TRootViewF6TPoint
-rt cjitr CaretEnabled__9TRootViewFv
 rt cjitr Update__5TViewF11TBaseRegionP5TView
 rt cjitr EmptyRgn__FPP6Region
 rt cjitr RestoreBitsUnderCaret__9TRootViewFv
 rt cjitr GetCaretRect__9TRootViewFP5TRect
-rt cjitr NeedsUpdate__9TRootViewFv
-rt cjitr EncodeTags__FRC6RefVarT1P8TagsBits
-rt cjitr CaretValid__9TRootViewFP6TPoint
-rt cjitr UpdateDefaultButtonAndCaretSlip__9TRootViewFv
-rt cjitr Unnamed_002D0DD0
 rt cjitr __as__7DataPtrFl
-rt cjitr IntegerString__FlPUs
-rt cjitr CommonSetKeyView__9TRootViewFP5TViewlT2
-rt cjitr PushSelection__9TRootViewFP5TViewRC6RefVar
-rt cjitr ResolveEntryAliasInStores__FRC6RefVarT1
-rt cjitr TBCPollTablet__FPlT1PUlPUc
-rt cjitr SoupGetSignature__FRC6RefVar
 rt cjitr Open__18TFrameSoundChannelFiT1
 rt cjitr SPrintObject__FRC6RefVar
 rt cjitr MergeUtil__FPllT1T2T1P21TGeneralizedTestFnVar
 rt cjitr MergeSortUtil__FPlT1lT3P21TGeneralizedTestFnVar
-rt cjitr EntryUniqueID__FRC6RefVar
-rt cjitr GetChildOrigin__5TViewFP6TPoint
-rt cjitr GetStorePSSInfo__11TPSSManagerCFPC6TStoreUc
-rt cjitr __ct__18TFrameSoundChannelFv
 rt cjitr MakeGrayPattern__FRC6RefVar
 rt cjitr UnpackRGBvalues__FUlPUlN22
-rt cjitr Search__5CListFP11CItemTesterRl
-rt cjitr __ct__13CItemComparerFPCvT1
 rt cjitr StartTask__11TUTaskWorldFUcT1UlN33
-rt cjitr GetResponder__FRC6RefVarT1
 rt cjitr MeasureTextOnce__FPvlPP11StyleRecordPs6FPointP11TextOptionsP14TextBoundsInfo
 rt cjitr DeletePermObject__FP13TStoreWrapperUl
 rt cjitr ReplaceObjectRef__FlT1
@@ -41,23 +258,17 @@ rt cjitr DeleteEntryFromCache__FRC6RefVarT1
 rt cjitr AlterIndexes__FUcRC6RefVarT2Ul
 rt cjitr EntryDirty__Fl
 rt cjitr EachSoupCursorDo__FRC6RefVarlT1
-rt cjitr DrawLine__F5PointT1
 rt cjitr PutLine__F5PointT1PPcPlT4
 rt cjitr CommandResult__FRC6RefVar
 rt cjitr ErrorNotify__FlT1
-rt cjitr CommandReceiver__FRC6RefVar
 rt cjitr SafeEntryAdd__FRC6RefVarN21Uc
 rt cjitr Unnamed_0033E950
 rt cjitr Unnamed_0033E770
 rt cjitr Unnamed_0033E808
 rt cjitr __ct__13CDynamicArrayFlT1
-rt cjitr ReplaceObject__6TStoreFUlPcl
-rt cjitr TimeString__5TDateFUlPUsT1
-rt cjitr WithPermObjectTextDo__FP13TStoreWrapperUlPFPUslPv_UcPvPPv
 rt cjitr RecalcBounds__5TViewFv
 rt cjitr SetModalView__FP5TView
 rt cjitr Offset__5TViewF6TPoint
-rt cjitr GetCacheProto__5TViewFl
 rt cjitr InvalidateSlotCache__5TViewFl
 rt cjitr RestoreScalingRegions__9TQDScalerFv
 rt cjitr TestFeature__9TQDScalerFl
@@ -78,9 +289,7 @@ rt cjitr __ct__21TBackwardViewListLoopFP5CList
 rt cjitr InsertAt__5CListFlPv
 rt cjitr Remove__5CListFPv
 rt cjitr GetClipboard__9TRootViewFP5TView
-rt cjitr GetFirstNonFloater__FP9TViewList
 rt cjitr UnlinkIdleView__9TRootViewFP5TView
-rt cjitr CheckWriteProtect__FRC6RefVar
 rt cjitr CullPoints__FP5PointPl
 rt cjitr SortPoints__FP5Pointl
 rt cjitr Distance__5TViewF6TPointP6TPoint
@@ -90,17 +299,13 @@ rt cjitr StrHexDump__FRC6RefVarT1
 rt cjitr InsertRange__11TRichStringFRC11TRichStringUlN22
 rt cjitr Statistics__FPUlT1
 rt cjitr PutRgn__FPP6RegionPPcPlT3
-rt cjitr Reuse__10TNodeCacheFP10TSoupIndex
 rt cjitr rinttol
 rt cjitr Done__13TStrokePublicFv
 rt cjitr SetAlarm__15TURealTimeAlarmSFUl5TTimeN21PvlT1
 rt cjitr ArrayRemove__FRC6RefVarT1
 rt cjitr SetPopup__9TRootViewFP5TViewUc
-rt cjitr CommandSetFrameParameter__FRC6RefVarT1
-rt cjitr ContentsOrigin__5TViewFv
 rt cjitr Start__14TUSoundChannelFi
 rt cjitr Schedule__18TFrameSoundChannelFRC6RefVar
-rt cjitr Stop__14TUSoundChannelFP10SoundBlockPl
 rt cjitr CheckForCaretRemoval__9TRootViewFv
 rt cjitr Select__5TViewFUcT1
 rt cjitr RemoveModalSafeView__FP5TView
@@ -114,10 +319,6 @@ rt cjitr IsWhiteSpace__FUs
 rt cjitr NextPackage__11TPMIteratorFv
 rt cjitr IteratorToPackageFrame__FP11TPMIterator
 rt cjitr More__11TPMIteratorFv
-rt cjitr Init__11TPMIteratorFv
-rt cjitr __ct__11TPMIteratorFv
-rt cjitr GetCurrentLocale__Fv
-rt cjitr GetStorePSSInfo__FPC6TStore
 rt cjitr NumberStringSpec__FdPUsUlT3
 rt cjitr FirstPoint__13TStrokePublicFv
 rt cjitr FinalPoint__13TStrokePublicFv
@@ -134,13 +335,7 @@ rt cjitr ExtendedGestalt
 rt cjitr VersionString__FP18TGestaltSystemInfoPUs
 rt cjitr Gestalt__9TUGestaltFUlPvT1
 rt cjitr FPlaySoundIrregardless
-rt cjitr BatteryStatusHelper__FlUc
-rt cjitr GetPowerPort__Fv
 rt cjitr SlopeFromAngle__Fl
-rt cjitr FastSlabMode__Fl
-rt cjitr SlabMode__FlT1
-rt cjitr BumpOval__FP7OvalRecl
-rt cjitr DrawSlab__FlN21PcT4P4RectPFPUlT1UllN23_v
 rt cjitr __dt__10TStackPageFv
 rt cjitr ForgetMappings__13TStackManagerFP10TStackInfoUlP10TStackPage
 rt cjitr InsertUnique__5CListFPv
@@ -200,9 +395,6 @@ rt cjitr MapPaths__FPP5pathsP4RectT2
 rt cjitr CallPaths__FUcPP5paths
 rt cjitr TextCleanup__FP7PicPlayPc
 rt cjitr DrawPicText__FP7PicPlay
-rt cjitr SetFormatResource__5TDateFRC6RefVar
-rt cjitr LongDateString__5TDateFUlPUsT1
-rt cjitr ShortDateString__5TDateFUlPUsT1
 rt cjitr __dt__8TPatternFv
 rt cjitr PutPicVerb__FUc
 rt cjitr PutPicPoint__F5Point
@@ -212,7 +404,6 @@ rt cjitr SetClip__FPP6Region
 rt cjitr FrameArc__FP4RectlT2
 rt cjitr GetFontFamilySym__FRC6RefVar
 rt cjitr InvertRect__FP4Rect
-rt cjitr __ct__18TRectangularRegionFRC5TRect
 rt cjitr GetClip__FPP6Region
 rt cjitr PaintArc__FP4RectlT2
 rt cjitr GetFontFace__FRC6RefVar
@@ -231,11 +422,9 @@ rt cjitr UpdateStyleTable__FlT1
 rt cjitr RemapCharWidths__Fl
 rt cjitr VccOff__FiUl
 rt cjitr PutPicLong__Fl
-rt cjitr __ct__10TObjectPtrFv
 rt cjitr DoCharToPoint__FlN21
 rt cjitr DoPointToChar__FlN21
 rt cjitr __as__7DataPtrFRC7DataPtr
-rt cjitr LSeekMask__FlT1PUlT1P8RgnStateN25
 rt cjitr GrayShrink__18TPixelMapAntialiasFP8PixelMapT1P4RectT3PP6RegionN25
 rt cjitr PutPicData__FPcl
 rt cjitr PackBits__FPPcT1l
@@ -264,8 +453,6 @@ rt cjitr RGBtoGray__FUlN21lT4
 rt cjitr FindNextDupDataAdr__10TSoupIndexFPP13DupNodeHeaderPvPUc
 rt cjitr FirstDupDataAdr__10TSoupIndexFP13DupNodeHeader
 rt cjitr ReadADupNode__10TSoupIndexFUl
-rt cjitr kfNextDupID__10TSoupIndexFP8KeyField
-rt cjitr kfReplaceFirstData__10TSoupIndexFP8KeyFieldPv
 rt cjitr MessageStuff__12TCardMessageFUlN21
 rt cjitr VppRisingTime__11TCardSocketFv
 rt cjitr WriteEphemeralList__17TEphemeralTrackerFv
@@ -289,7 +476,6 @@ rt cjitr Add__10TSoupIndexFP4SKeyT1
 rt cjitr Delete__10TSoupIndexFP4SKeyT1
 rt cjitr GetEntrySKey__FRC6RefVarT1P4SKeyPUc
 rt cjitr UpdateTagsIndex__FRC6RefVarN31Ul
-rt cjitr CheckWriteProtect__FP6TStore
 rt cjitr EnsureEntryInternal__FRC6RefVar
 rt cjitr StorePermObject__FRC6RefVarP13TStoreWrapperRUlP13CDynamicArrayPUc
 rt cjitr FindPrior__18TAbstractSoupIndexFP4SKeyN21UcT4
@@ -302,7 +488,6 @@ rt cjitr FrontMost__5TViewFv
 rt cjitr GetFrontCommandKeyView__Fv
 rt cjitr SetFlags__5TViewFUl
 rt cjitr UpdateHardwareScreen__Fv
-rt cjitr DisposePattern__FPP8PixelMap
 rt cjitr BadWickedNaughtyNoot__Fl
 rt cjitr __as__4SKeyFCd
 rt cjitr __as__4SKeyFUs
@@ -311,7 +496,6 @@ rt cjitr AdjustParaSize__FUl
 rt cjitr GetDTELearnInfoHandle__FPv
 rt cjitr UnloadTrigram__FPPv
 rt cjitr UnloadData__FPPv
-rt cjitr SetVolume__14TUSoundChannelFl
 rt cjitr SetFlags__4SKeyFUc
 rt cjitr HWRMemoryFreeHandle__FUl
 rt cjitr GetWordsHints__FRC6RefVar
@@ -352,7 +536,6 @@ rt cjitr PutByteEnd__17TGeoPortDebugLinkFv
 rt cjitr GetBeaconMsg__17TGeoPortDebugLinkFPUcUl
 rt cjitr InitForHDLC__17TGeoPortDebugLinkFv
 rt cjitr ShortTimerDelay__17TGeoPortDebugLinkFUl
-rt cjitr SendRPCGoo__6TUPortFUlT1PUlPvN31UcT4N21P5TTime
 rt cjitr GetChipPtr__19PSerialChipRegistryFUl
 rt cjitr __ct__22THMOGeoPortDebugConfigFv
 rt cjitr ProcessOption__11TSerialChipFP7TOption
