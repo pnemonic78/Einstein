@@ -818,3 +818,113 @@ T_ROM_SIMULATION3(0x003AD750, "Func_0x003AD750", Func_0x003AD750)
 
 #endif
 
+
+// In the following code blocks, I try to understand which tasks are generated,
+// how many tasks we need, and if they have a certain life span.
+//
+// Hardware interrupts are a special kind of task that should go through the
+// scheduler as well. They could even be implemented as OS-level threads.
+//
+// I am still undecided if SWIs and FP emulation should be implemented with a
+// context switch, or if they remain part of the current task with better
+// privileges
+
+// Findings:
+// - The system creates 50 or so tasks and occasionally deletes them
+// - Codecs can create tasks (MainEventLoop__13TCodecChannelSFPP13TCodecChannel)
+// - we allocate 12 or so Monitor tasks for DataAbort management (MonitorEntryGlue)
+// - one task has an entry in the REx
+// - there is a screen update task (ScreenUpdateTask__FPvUlT2)
+// - most tasks launch through TaskEntry__11TUTaskWorldFUlT1
+
+// ScreenUpdateTask is a nice candidate. It's short and uses Semaphores and
+// Sleep. It also uses an Einstein driver.
+
+// TODO: TUTask (User Tasks) are not derived from TTask. Are they related, and how?
+//       How do we connect these two systems?
+//       At first look, User Tasks seem to be a subsystem to one specific
+//       System Task, having much less overhead, seemingly not even a stack.
+
+// 0x00252190: TTask::TTask(void)
+// 0x00252250: TTask::FreeStack(void)
+// 0x00252278: TTask::SetBequeathId(unsigned long)
+// 0x002522B0: TTask::Init(void (*)(void *, unsigned long, #12), unsigned long, void *, unsigned long, unsigned long, unsigned long, TEnvironment *)
+//             NewtonErr Init(TaskProcPtr inProc, size_t inStackSize, ObjectId inTaskId, ObjectId inDataId, ULong inPriority, ULong inName, CEnvironment * inEnvironment);
+// 0x002526E4: TTask::~TTask(void)
+
+// ioCPU->GetMemory()->GetFaultAddressRegister()
+
+#include "TSymbolList.h"
+
+T_ROM_INJECTION(0x00252190, "TTask::TTask(void)") {
+	fprintf(stderr, "TTask::TTask(void)\n");
+	return ioUnit;
+}
+
+T_ROM_INJECTION(0x002522B0, "TTask::Init(...)") {
+	char buf[1024];
+	KUInt32 r1 = ioCPU->GetRegister(1);
+	TSymbolList::List->GetSymbol(r1, buf, 0, 0);
+	KUInt32 sp = ioCPU->GetRegister(13);
+	KUInt32 a6 = 0; ioCPU->GetMemory()->Read(sp+8, a6);
+	// argument 6 is the name as a FourCC
+	fprintf(stderr, "TTask::Init(this=0x%08x, '%c%c%c%c', fn=0x%08x(%s))\n",
+			ioCPU->GetRegister(0),
+			a6>>24, a6>>16, a6>>8, a6,
+			r1,
+			buf
+			);
+	return ioUnit;
+}
+
+T_ROM_INJECTION(0x002526E4, "TTask::~TTask(void)") {
+	fprintf(stderr, "TTask::~TTask(this=0x%08x)\n",
+			ioCPU->GetRegister(0)
+			);
+	return ioUnit;
+}
+
+
+/** A list of tasks as they are created, their initial function call, and their fourCC name
+ 
+TTask::Init(this=0x0c108624, 'OBJM', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c1111d0, 'idle', fn=0x01b00078(OsBoot))
+TTask::Init(this=0x0c111404, 'user', fn=0x01b094a8(UserBoot__Fv))
+TTask::Init(this=0x0c1120ac, 'PMGR', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c1126d8, 'PTBL', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c112e00, 'STKF', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c113654, 'STKP', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c113dd8, 'STKU', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c118cd0, 'ROMF', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c119a54, 'ROMP', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c11aa88, 'ksrv', fn=0x01afde80(InitialKSRVTask__Fv))
+TTask::Init(this=0x0c11ad7c, 'mntr', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c119c74, 'name', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c118dd8, 'pckm', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c1180a8, 'drvl', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c115c00, 'drvr', fn=0x00800884(ROM$$Size))
+TTask::Init(this=0x0c115db4, 'alrt', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c113ee0, 'sndm', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c111720, 'cmgr', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c111ca0, 'cdfm', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c11b2c0, 'cdsv', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c11f450, 'cdpr', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c11f7f4, 'pg&e', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c120030, 'Tmux', fn=0x01a00024(MonitorEntryGlue))
+TTask::Init(this=0x0c12043c, 'pssm', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c120b60, 'main', fn=0x01aa52d8(UserMain__Fv))
+TTask::Init(this=0x0c120dfc, 'newt', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c1227f8, 'scrn', fn=0x01b4c600(ScreenUpdateTask__FPvUlT2))
+TTask::Init(this=0x0c122bac, 'inkr', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c123598, 'codc', fn=0x01b7ef08(MainEventLoop__13TCodecChannelSFPP13TCodecChannel))
+TTask::Init(this=0x0c12498c, 'newt', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c120b60, 'scpl', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c1218f0, 'fser', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c1218f0, 'fser', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c1252ec, 'fser', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c125dc0, 'fser', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+TTask::Init(this=0x0c125380, 'codc', fn=0x01b7ef08(MainEventLoop__13TCodecChannelSFPP13TCodecChannel))
+TTask::Init(this=0x0c1257a8, 'mnps', fn=0x01bdce7c(TaskEntry__11TUTaskWorldFUlT1))
+
+ */
+
