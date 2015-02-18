@@ -24,6 +24,8 @@
 
 TARMProcessor *gCPU = 0;
 
+// Disable this code temporarily for some TTask related testing
+#if 0
 
 class InterruptObject;
 
@@ -294,13 +296,13 @@ T_ROM_SIMULATION3(0x0025215C, "SwapInGlobals", Func_0x0025215C)
  * corresponding function for the host Fiber system.
  *
  * This function is very important in handling memory access violations. When
- * a DataBaort aoccurs, NewtonOS starts a Monitor (a Task that repairs the
+ * a DataAbort aoccurs, NewtonOS starts a Monitor (a Task that repairs the
  * memory access by another task) by raising the priority of the Monitor and
  * switching tasks. When the Monitor has fixed the issue, the original task
  * resumes at the instruction that caused the violation.
  *
  * This function calls other functions in NewtonOS that have no handcoded
- * version yet. The automati translations of these functions will have side
+ * version yet. The automatic translations of these functions will have side
  * effects on register.
  */
 void Func_0x003AD750(TARMProcessor* ioCPU, KUInt32 ret)
@@ -814,5 +816,5 @@ skipTaskSwitcher:
 
 T_ROM_SIMULATION3(0x003AD750, "Func_0x003AD750", Func_0x003AD750)
 
-
+#endif
 
