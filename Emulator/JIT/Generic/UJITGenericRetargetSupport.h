@@ -30,12 +30,20 @@ public:
 	//
 	// Read a word in memory and handle access violations if needed.
 	//
-	static KUInt32		ManagedMemoryReadAligned(TARMProcessor* ioCPU, KUInt32 inAddress);
-	static KUInt32		ManagedMemoryRead(TARMProcessor* ioCPU, KUInt32 inAddress);
-	static KUInt8		ManagedMemoryReadB(TARMProcessor* ioCPU, KUInt32 inAddress);
+	static KUInt32	ManagedMemoryReadAligned(TARMProcessor* ioCPU, KUInt32 inAddress);
+	static KUInt32	ManagedMemoryRead(TARMProcessor* ioCPU, KUInt32 inAddress);
+	static KUInt8	ManagedMemoryReadB(TARMProcessor* ioCPU, KUInt32 inAddress);
 	static void		ManagedMemoryWriteAligned(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData);
 	static void		ManagedMemoryWrite(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData);
 	static void		ManagedMemoryWriteB(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt8 inData);
+	
+	static KUInt32	NoAbortMemoryReadAligned(TARMProcessor* ioCPU, KUInt32 inAddress);
+	static KUInt32	NoAbortMemoryRead(TARMProcessor* ioCPU, KUInt32 inAddress);
+	static KUInt8	NoAbortMemoryReadB(TARMProcessor* ioCPU, KUInt32 inAddress);
+	static void		NoAbortMemoryWriteAligned(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData);
+	static void		NoAbortMemoryWrite(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData);
+	static void		NoAbortMemoryWriteB(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt8 inData);
+	
 	static void		UnexpectedPC(TARMProcessor* ioCPU);
 	static void		ReturnToEmulator(TARMProcessor* ioCPU, KUInt32 inPC);
 	static void		JumpToCalculatedAddress(TARMProcessor* ioCPU, KUInt32 inPC, KUInt32 ret=0xFFFFFFFF);	

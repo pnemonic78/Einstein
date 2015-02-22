@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #endif
 
+#include "native/TTask.h"
+
 // Dec 23rd, 2014
 // Perf:  13525 (Debug, Sim), 38000 (run mode)
 // Plain:  9300 (Debug)     , 26700 (run mode)
@@ -23,6 +25,7 @@
 
 
 TARMProcessor *gCPU = 0;
+
 
 // Disable this code temporarily for some TTask related testing
 #if 0
@@ -48,20 +51,6 @@ public:
 };
 
 
-class TTask : public TObject {
-public:
-	KUInt32 GetRegister(KUInt32 r) { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x10+4*r); };
-	void SaveRegister(KUInt32 r, KUInt32 v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, (KUInt32(intptr_t(this)))+0x10+4*r, v); };
-	KUInt32 GetPSR() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x50); };
-	void SavePSR(KUInt32 v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, (KUInt32(intptr_t(this)))+0x50, v); };
-	TEnvironment *GetEnvironment() { return (TEnvironment*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x74); };
-	TEnvironment *GetSMemEnvironment() { return (TEnvironment*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x78); };
-	TTask *GetCurrentTask() { return (TTask*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x7C); };
-	void *GetGlobals() { return (void*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xA0); };
-	ObjectId GetMonitorId() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xD8); };
-};
-
-
 class TParamBlock
 {
 public:
@@ -69,111 +58,6 @@ public:
 	KUInt32 Access() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xB0); };
 };
 
-
-TParamBlock* GParamBlockFromImage()
-{
-	return (TParamBlock*)0x0C008400;
-}
-
-
-TTask *GCurrentTask()
-{
-	return (TTask*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C100FF8);
-}
-
-
-void GSetCurrentTask(TTask *newTask)
-{
-	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C100FF8, (KUInt32)(uintptr_t)newTask);
-}
-
-
-KUInt32 GCopyDone()
-{
-	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C101040);
-}
-
-
-void GSetCopyDone(KUInt32 v)
-{
-	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C101040, v);
-}
-
-
-KUInt32 GAtomicFIQNestCountFast()
-{
-	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C100E58);
-}
-
-
-KUInt32 GAtomicIRQNestCountFast()
-{
-	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C100E5C);
-}
-
-
-KUInt32 GAtomicNestCount()
-{
-	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C100FE8);
-}
-
-
-KUInt32 GAtomicFIQNestCount()
-{
-	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C100FF0);
-}
-
-
-KUInt32 GWantDeferred()
-{
-	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C101028);
-}
-
-
-KUInt32 GSchedule()
-{
-	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C100FE4);
-}
-
-KUInt32 GWantSchedulerToRun()
-{
-	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C101A2C);
-}
-
-void GWantSchedulerToRun(KUInt32 v)
-{
-	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C101A2C, v);
-}
-
-void GSetCurrentTaskId(ObjectId id)
-{
-	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C101054, id);
-}
-
-void GSetCurrentGlobals(void *v)
-{
-	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C10105C, (uintptr_t)v);
-}
-
-void GSetCurrentMonitorId(ObjectId id)
-{
-	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C101058, id);
-}
-
-KUInt32 GSchedulerRunning()
-{
-	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C101A30);
-}
-
-void GSchedulerRunning(KUInt32 v)
-{
-	UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, 0x0C101A30, v);
-}
-
-InterruptObject *GGetSchedulerIntObj()
-{
-	return (InterruptObject*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C100E6C);
-}
 
 
 // This function calls many subroutines
@@ -845,6 +729,14 @@ T_ROM_SIMULATION3(0x003AD750, "Func_0x003AD750", Func_0x003AD750)
 //       At first look, User Tasks seem to be a subsystem to one specific
 //       System Task, having much less overhead, seemingly not even a stack.
 
+// Every task has a reference to an environment. Multiple tasks can share the same environment.
+// Every environment can referenc one or more domains (memory styles).
+// Domain Managers handle allocation and deallocation for one ore more domains
+// A domain manager has two Monitors and a Semaphore to synchronize them
+// One Monitor communicates with the Page Manager
+// The other Monitor communicates with the Fault Manager
+
+
 // 0x00252190: TTask::TTask(void)
 // 0x00252250: TTask::FreeStack(void)
 // 0x00252278: TTask::SetBequeathId(unsigned long)
@@ -884,6 +776,20 @@ T_ROM_INJECTION(0x002526E4, "TTask::~TTask(void)") {
 	return ioUnit;
 }
 
+
+/*
+ 
+ScreenUpdateTask__FPvUlT2
+ GetADCObject__Fv (minimal function)
+ SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
+  swi 0x0000000b
+   DoSemaphoreOp
+    Get__12TObjectTableFUl
+     SemOp__15TSemaphoreGroupFP16TSemaphoreOpList8SemFlagsP5TTask
+      BlockOnInc__10TSemaphoreFP5TTask8SemFlags
+       UnScheduleTask__FP5TTask
+    Add__10TTaskQueueFP5TTask17KernelObjectStateP14TTaskCont
+ */
 
 /** A list of tasks as they are created, their initial function call, and their fourCC name
  

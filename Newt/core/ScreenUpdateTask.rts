@@ -1,0 +1,26 @@
+#
+# Retarget functions related to teh ScreenUpdate task
+#
+
+rt open ScreenUpdateTask
+
+#rt cjit ScreenUpdateTask__FPvUlT2
+
+#rt cjit !SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
+#rt cjit !Acquire__18TULockingSemaphoreF8SemFlags
+#rt cjit !TimeFromNow
+#rt cjit !UpdateHardwareScreen__Fv
+#rt cjit !Release__18TULockingSemaphoreFv
+#rt cjit !GetGlobalTime
+#rt cjit !CompCompare
+#rt cjit !SleepTill__FP5TTime
+
+#rt cjit !BlitToScreens__FP8PixelMapP4RectT2l
+
+#rt cjit !Blit__13TScreenDriverFP8PixelMapP4RectT2l
+
+# rt cjit !GetADCObject__Fv
+# rt cjit !GetSample__4TADCF10ADCMuxTypeUlPFPvlUl_vPv
+
+
+rt close

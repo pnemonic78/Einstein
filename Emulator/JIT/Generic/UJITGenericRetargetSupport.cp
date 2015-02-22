@@ -176,6 +176,105 @@ UJITGenericRetargetSupport::ManagedMemoryWriteB(TARMProcessor* ioCPU, KUInt32 in
 }
 
 
+
+/**
+ * Read emulated memory from a virtual address.
+ * This function handles all exceptions that may happen during this process.
+ * The function may invoke the scheduler and switch tasks.
+ */
+KUInt32
+UJITGenericRetargetSupport::NoAbortMemoryReadAligned(TARMProcessor* ioCPU, KUInt32 inAddress)
+{
+    KUInt32 theData;
+    TMemory *theMemoryInterface = ioCPU->GetMemory();
+    if (theMemoryInterface->ReadAligned(inAddress, theData)) {
+        __asm__("int $3\n" : : );
+    }
+    return theData;
+}
+
+
+/**
+ * Read emulated memory from a virtual address.
+ * This function handles all exceptions that may happen during this process.
+ * The function may invoke the scheduler and switch tasks.
+ */
+KUInt32
+UJITGenericRetargetSupport::NoAbortMemoryRead(TARMProcessor* ioCPU, KUInt32 inAddress)
+{
+    KUInt32 theData;
+    TMemory *theMemoryInterface = ioCPU->GetMemory();
+    if (theMemoryInterface->Read(inAddress, theData)) {
+        __asm__("int $3\n" : : );
+    }
+    return theData;
+}
+
+
+/**
+ * Read emulated memory from a virtual address.
+ * This function handles all exceptions that may happen during this process.
+ * The function may invoke the scheduler and switch tasks.
+ */
+KUInt8
+UJITGenericRetargetSupport::NoAbortMemoryReadB(TARMProcessor* ioCPU, KUInt32 inAddress)
+{
+    KUInt8 theData;
+    TMemory *theMemoryInterface = ioCPU->GetMemory();
+    if (theMemoryInterface->ReadB(inAddress, theData)) {
+        __asm__("int $3\n" : : );
+    }
+    return theData;
+}
+
+
+/**
+ * Write emulated memory at a virtual address.
+ * This function handles all exceptions that may happen during this process.
+ * The function may invoke the scheduler and switch tasks.
+ */
+void
+UJITGenericRetargetSupport::NoAbortMemoryWriteAligned(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData)
+{
+    TMemory *theMemoryInterface = ioCPU->GetMemory();
+    if (theMemoryInterface->WriteAligned(inAddress, inData)) {
+        __asm__("int $3\n" : : );
+    }
+}
+
+
+/**
+ * Write emulated memory at a virtual address.
+ * This function handles all exceptions that may happen during this process.
+ * The function may invoke the scheduler and switch tasks.
+ */
+void
+UJITGenericRetargetSupport::NoAbortMemoryWrite(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData)
+{
+    TMemory *theMemoryInterface = ioCPU->GetMemory();
+    if (theMemoryInterface->Write(inAddress, inData)) {
+        __asm__("int $3\n" : : );
+    }
+}
+
+
+/**
+ * Write emulated memory at a virtual address.
+ * This function handles all exceptions that may happen during this process.
+ * The function may invoke the scheduler and switch tasks.
+ */
+void
+UJITGenericRetargetSupport::NoAbortMemoryWriteB(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt8 inData)
+{
+    TMemory *theMemoryInterface = ioCPU->GetMemory();
+    if (theMemoryInterface->WriteB(inAddress, inData)) {
+        __asm__("int $3\n" : : );
+    }
+}
+
+
+
+
 /**
  * Throw an exception if the simulation receives an unexpected program counter.
  */

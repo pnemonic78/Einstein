@@ -103,6 +103,40 @@ KUInt32 const ptr_##name = (addr);
 	if (PC!=ret) __asm__("int $3\n" : : ); \
 	return
 
+#define NEWT_GET_SET_W(offset, type, var) \
+	type p##var;\
+	type var() { return (type)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+offset); }; \
+	void Set##var(type v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, (KUInt32(intptr_t(this)))+offset, (KUInt32)(intptr_t)v); }
+
+#define NEWT_GET_SET_B(offset, type, var) \
+	type p##var;\
+	type var() { return (type)UJITGenericRetargetSupport::ManagedMemoryReadB(gCPU, (KUInt32(intptr_t(this)))+offset); }; \
+	void Set##var(type v) { UJITGenericRetargetSupport::ManagedMemoryWriteB(gCPU, (KUInt32(intptr_t(this)))+offset, (KUInt32)(intptr_t)v); }
+
+#define NEWT_GET_REF(offset, type, var) \
+	type p##var;\
+	type& var() { return *( (type*)((KUInt32(intptr_t(this)))+offset) ); }
+
+#define NEWT_GLOBAL_W_DEF(offset, type, var) \
+	extern type G##var(); \
+	extern void SetG##var(type);
+
+#define NEWT_GLOBAL_W_IMP(offset, type, var) \
+	type G##var() { return (type)(intptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, offset); } \
+	void SetG##var(type v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, offset, (KUInt32)(intptr_t)(v)); }
+
+#define NEWT_GLOBAL_B_DEF(offset, type, var) \
+	extern type G##var(); \
+	extern void SetG##var(type);
+
+#define NEWT_GLOBAL_B_IMP(offset, type, var) \
+	type G##var() { return (type)(intptr_t)UJITGenericRetargetSupport::ManagedMemoryReadB(gCPU, offset); } \
+	void SetG##var(type v) { UJITGenericRetargetSupport::ManagedMemoryWriteB(gCPU, offset, (KUInt32)(intptr_t)(v)); }
+
+
+extern TARMProcessor *gCPU;
+
+
 #include "unsorted/unsorted_001.h"
 #include "unsorted/unsorted_002.h"
 #include "unsorted/unsorted_003.h"
@@ -139,5 +173,7 @@ KUInt32 const ptr_##name = (addr);
 #include "classes/TSerialChipVoyager.h"
 
 #include "SimHandcoded.h"
+
+#include "native/TTask.h"
 
 #endif /* EINSTEIN_NEWT_SIMULATOR_GLUE_H */
