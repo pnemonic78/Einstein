@@ -33,14 +33,21 @@ extern KUInt32 GSchedulerRunning();
 extern void GSchedulerRunning(KUInt32 v);
 extern InterruptObject *GSchedulerIntObj();
 
-NEWT_GLOBAL_W_DEF(0x0C100FC4, TTask*,		IdleTask)
-NEWT_GLOBAL_W_DEF(0x0C100FD0, TScheduler*,	KernelScheduler)
-NEWT_GLOBAL_W_DEF(0x0C100FD4, KUInt32,		ScheduleRequested)
-NEWT_GLOBAL_W_DEF(0x0C100FD8, KUInt32,		HoldScheduleLevel)
-NEWT_GLOBAL_W_DEF(0x0C100FE4, KUInt32,		Schedule)
-NEWT_GLOBAL_W_DEF(0x0C100FF8, TTask*,		CurrentTask)
-NEWT_GLOBAL_W_DEF(0x0C101980, int,			TaskPriority)
-NEWT_GLOBAL_W_DEF(0x0C101A2C, BOOL,			WantSchedulerToRun)
+
+NEWT_GLOBAL_W_DEF(0x0C100FC4, TTask*,			IdleTask)
+NEWT_GLOBAL_W_DEF(0x0C100FC8, TObjectTable*,	ObjectTable)
+
+NEWT_GLOBAL_W_DEF(0x0C100FD0, TScheduler*,		KernelScheduler)
+NEWT_GLOBAL_W_DEF(0x0C100FD4, KUInt32,			ScheduleRequested)
+NEWT_GLOBAL_W_DEF(0x0C100FD8, KUInt32,			HoldScheduleLevel)
+
+NEWT_GLOBAL_W_DEF(0x0C100FE4, KUInt32,			Schedule)
+
+NEWT_GLOBAL_W_DEF(0x0C100FF8, TTask*,			CurrentTask)
+
+NEWT_GLOBAL_W_DEF(0x0C101980, int,				TaskPriority)
+
+NEWT_GLOBAL_W_DEF(0x0C101A2C, BOOL,				WantSchedulerToRun)
 
 
 #endif /* defined(_NEWT_GLOBALS_) */

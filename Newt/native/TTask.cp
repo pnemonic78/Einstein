@@ -387,14 +387,25 @@ TObject *TObjectTable::Get(ObjectId inId)
 		obj = obj->Next();
 	}
 	return NULL;
+}
+
+
+NewtonErr DoSemaphoreOp(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking, TTask *inTask)
+{
+	TSemaphoreGroup* semGroup = NULL;
+	if ( (inGroupId & 0x0f) == 7 )
+		semGroup = (TSemaphoreGroup*)GObjectTable()->Get(inGroupId);
+	if (!semGroup)
+		return -10022; // kOSErrBadSemaphoreGroupId
 	
-//	if (obj) {
-//		do {
-//			if (obj->fId == inId)
-//				return (obj->fId != kNoId) ? obj : NULL;
-//		} while ((obj = obj->fNext) != NULL);
-//	
-//	return NULL;
+	TSemaphoreOpList* opList = NULL;
+	if ( (inListId & 0x0f) == 6 )
+		opList = (TSemaphoreOpList*)GObjectTable()->Get(inListId);
+	
+	if (opList==NULL)
+		return -10023; // kOSErrBadSemaphoreOpListId
+	
+	return semGroup->SemOp(opList, inBlocking, inTask);
 }
 
 
@@ -402,18 +413,31 @@ TObject *TObjectTable::Get(ObjectId inId)
 //  GetADCObject__Fv (minimal function)
 //   SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
 //    swi 0x0000000b (COMPLEX!)
-//     DoSemaphoreOp ("leaf")
 
 
 /**
- * Transcoded function Get__12TObjectTableFUl
+ * DoSemaphoreOp
+ * ROM: 0x001D4CE4 - 0x001D4D98
+ */
+void Func_0x001D4CE4(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	ObjectId inGroupId = (ObjectId)(R0);
+	ObjectId inListId = (ObjectId)(R1);
+	SemFlags inBlocking = (SemFlags)(R2);
+	TTask *inTask = (TTask*)(R3);
+	R0 = (KUInt32)DoSemaphoreOp(inGroupId, inListId, inBlocking, inTask);
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x001D4CE4, "DoSemaphoreOp", Func_0x001D4CE4)
+
+/**
+ * Get__12TObjectTableFUl
  * ROM: 0x00319F14 - 0x00319F60
  */
 void Func_0x00319F14(TARMProcessor* ioCPU, KUInt32 ret)
 {
 	TObjectTable *This = (TObjectTable*)(R0);
 	ObjectId inId = (ObjectId)(R1);
-	This->Get(inId);
 	R0 = (KUInt32)This->Get(inId);
 	SETPC(LR+4);
 }

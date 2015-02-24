@@ -219,10 +219,9 @@ public:
 	void		WakeTasksOnZero();
 	void		WakeTasksOnInc();
 	
-	NEWT_GET_SET_W(0x014, long, Val);				// +14	semval in unix-speak
-	NEWT_GET_REF  (0x018, TTaskQueue, ZeroTasks);		// +18	tasks waiting for fValue to become zero
-	NEWT_GET_REF  (0x020, TTaskQueue, IncTasks);		// +20	tasks waiting for fValue to increase
-								//	size +28
+	NEWT_GET_SET_W(0x014, long, Val);				// semval in unix-speak
+	NEWT_GET_REF  (0x018, TTaskQueue, ZeroTasks);	// tasks waiting for fValue to become zero
+	NEWT_GET_REF  (0x020, TTaskQueue, IncTasks);	// tasks waiting for fValue to increase
 };
 
 
@@ -305,6 +304,7 @@ public:
 extern void WantSchedule();
 extern void ScheduleTask(TTask*);
 extern void UnScheduleTask(TTask *inTask);
+extern "C" NewtonErr DoSemaphoreOp(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking, TTask *inTask);
 
 
 #endif /* defined(_NEWT_TTASK_) */
