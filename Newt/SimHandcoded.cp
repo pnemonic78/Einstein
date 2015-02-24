@@ -777,19 +777,26 @@ T_ROM_INJECTION(0x002526E4, "TTask::~TTask(void)") {
 }
 
 
-/*
- 
-ScreenUpdateTask__FPvUlT2
- GetADCObject__Fv (minimal function)
- SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
-  swi 0x0000000b
-   DoSemaphoreOp
-    Get__12TObjectTableFUl
-     SemOp__15TSemaphoreGroupFP16TSemaphoreOpList8SemFlagsP5TTask
-      BlockOnInc__10TSemaphoreFP5TTask8SemFlags
-       UnScheduleTask__FP5TTask
-    Add__10TTaskQueueFP5TTask17KernelObjectStateP14TTaskCont
- */
+T_ROM_INJECTION(0x00000000, "Boot")
+{
+	gCPU = ioCPU;
+
+//	NEWT_ASSERT(sizeof(TEnvironment)==0x2C);
+	NEWT_ASSERT(sizeof(TObject)==0x10);
+	NEWT_ASSERT(sizeof(TTaskQItem)==8);
+	NEWT_ASSERT(sizeof(TTaskContainer)==4);
+//	NEWT_ASSERT(sizeof(TTask)==0x104);
+	NEWT_ASSERT(sizeof(TTaskQueue)==8);
+	NEWT_ASSERT(sizeof(TScheduler)==0x120);
+	NEWT_ASSERT(sizeof(TSemaphore)==0x28);
+	NEWT_ASSERT(sizeof(SemOp)==4);
+	NEWT_ASSERT(sizeof(TSemaphoreOpList)==0x18);
+	NEWT_ASSERT(sizeof(TSemaphoreGroup)==0x1C);
+	
+	return ioUnit;
+}
+
+
 
 /** A list of tasks as they are created, their initial function call, and their fourCC name
  

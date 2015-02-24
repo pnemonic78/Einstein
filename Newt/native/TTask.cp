@@ -3,6 +3,7 @@
 //  Einstein
 //
 //  Created by Matthias Melcher on 2/22/14.
+//  Code and Code Excerpts with kind permission from "Newton Research Group"
 //
 //
 
@@ -142,6 +143,9 @@ void ScheduleTask(TTask *inTask)
 }
 
 
+/**
+ * Wake all the tasks that wait for the semaphore to reach zero.
+ */
 void TSemaphore::WakeTasksOnZero()
 {
 	// Get the list of tasks to wake
@@ -166,6 +170,9 @@ void TSemaphore::WakeTasksOnZero()
 }
 
 
+/**
+ * Wake all the tasks that wait for the semaphore to be incrmented.
+ */
 void TSemaphore::WakeTasksOnInc()
 {
 	// Get the list of tasks to wake
@@ -190,28 +197,341 @@ void TSemaphore::WakeTasksOnInc()
 }
 
 
+/**
+ * Get the next task in this queue.
+ * \returns the next task, NULL if there is none
+ */
 TTask *TTaskQueue::Peek()
 {
 	return Head();
 }
 
 
-// UnScheduleTask__FP5TTask -> uses a virtual function or jump vector!
-// Remove__10TSchedulerFP5TTask (1AE3C)
-//  RemoveFromQueue__10TTaskQueueFP5TTask17KernelObjectState (leaf)
-//  UpdateCurrentBucket__10TSchedulerFv (leaf)
-
-
-
+/**
+ * Recalculate priorities by priority map.
+ */
+void TScheduler::UpdateCurrentBucket()
+{
+	for (int i = HighestPriority()-1; i > 0; i--) {
+		if (PriorityMask() & (1<<i)) {
+			SetHighestPriority(i);
+			return;
+		}
+	}
+	SetHighestPriority(0);
+}
 
 
 /**
- * Transcoded function Peek__10TTaskQueueFv
+ * Remove a specific task from a queue.
+ */
+BOOL TTaskQueue::RemoveFromQueue(TTask *inTask, KernelObjectState inState)
+{
+	if ( (inTask==0L) || ((inTask->State() & inState)==0) )	{
+		return 0;
+	}
+	
+	TTask *nextTask = inTask->TaskQItem().Next();
+	TTask *prevTask = inTask->TaskQItem().Prev();
+	if ( inTask == Head() ) {
+		if ( Head()!=Tail() ) {
+			SetHead(nextTask);
+			nextTask->TaskQItem().SetPrev(0L);
+		} else {
+			SetHead(0L);
+			SetTail(0L);
+		}
+	} else {
+		prevTask->TaskQItem().SetNext(nextTask);
+		if ( inTask != Tail() ) {
+			nextTask->TaskQItem().SetPrev(prevTask);
+		} else {
+			SetTail(prevTask);
+		}
+	}
+	
+	inTask->TaskQItem().SetNext(0L);
+	inTask->TaskQItem().SetPrev(0L);
+	inTask->SetState( inTask->State() & ~inState );
+	inTask->SetContainer(0L);
+	
+	return 1;
+}
+
+
+void TScheduler::Remove(TTask *inTask)
+{
+	if ( inTask ) {
+		if ( inTask == GCurrentTask() ) {
+			SetGCurrentTask(0L);
+			WantSchedule();
+			SetGWantSchedulerToRun(1);
+		} else {
+			int priority = inTask->Priority();
+			Task()[priority].RemoveFromQueue(inTask, 0x00020000);
+			if ( Task()[priority].Peek() == 0L )
+			{
+				SetPriorityMask( PriorityMask() & ~(1<<priority) );
+				if ( priority == HighestPriority() )
+					UpdateCurrentBucket();
+			}
+		}
+	}
+}
+
+
+void UnScheduleTask(TTask *inTask)
+{
+	TScheduler *kernelScheduler = GKernelScheduler();
+	kernelScheduler->Remove(inTask); // FIXME: a virtual function
+}
+
+
+void TSemaphore::BlockOnInc(TTask *inTask, SemFlags inFlags)
+{
+	if ( (inFlags&kNoWaitOnBlock)==0 ) {
+		UnScheduleTask(inTask);
+		IncTasks().Add(inTask, 0x00100000, (TTaskContainer*)this);
+	}
+}
+
+
+void TSemaphore::BlockOnZero(TTask *inTask, SemFlags inFlags)
+{
+	if ( (inFlags&kNoWaitOnBlock)==0 ) {
+		UnScheduleTask(inTask);
+		ZeroTasks().Add(inTask, 0x00100000, (TTaskContainer*)this);
+	}
+}
+
+
+void TSemaphoreGroup::UnwindOp(TSemaphoreOpList *inList, long index)
+{
+	while (index>0)
+	{
+		--index;
+		
+		class SemOp &semOp = inList->OpList()[index];
+		unsigned short ix = semOp.Num();
+		signed short op = semOp.Op();
+		if ( ix < Count() )
+		{
+			TSemaphore &sem = Group()[ix];
+			sem.SetVal( sem.Val()-op );
+		}
+	}
+}
+
+
+NewtonErr TSemaphoreGroup::SemOp(TSemaphoreOpList *inList, SemFlags inBlocking, TTask *inTask)
+{
+	int			index;
+	unsigned short semNum;
+	short		semOper;
+	
+	for (index = 0; index < inList->Count(); index++)
+	{
+		semNum  = inList->OpList()[index].Num();
+		semOper = inList->OpList()[index].Op();
+		if (semNum < Count())
+		{
+			TSemaphore &sem = Group()[semNum];
+			if (semOper == 0)
+			{
+				if (sem.Val() != 0)
+				{
+					Group()[semNum].BlockOnZero(inTask, inBlocking);
+					UnwindOp(inList, index);
+					return -10000-25; // kOSErrSemaphoreWouldCauseBlock;
+				}
+			}
+			else if (semOper > 0 || sem.Val() >= -semOper)	// - = abs
+				sem.SetVal( sem.Val() + semOper );
+			else
+			{
+				Group()[semNum].BlockOnInc(inTask, inBlocking);
+				UnwindOp(inList, index);
+				return -10000-25; // kOSErrSemaphoreWouldCauseBlock;
+			}
+		}
+	}
+	
+	// now all the semaphores have been updated, see if any tasks can be unblocked
+	for (index = 0; index < inList->Count(); index++)
+	{
+		semNum  = inList->OpList()[index].Num();
+		semOper = inList->OpList()[index].Op();
+		if (semNum <= Count())
+		{
+			TSemaphore &sem = Group()[semNum];
+			if (semOper > 0)
+				sem.WakeTasksOnInc();
+			else if (semOper == 0 && sem.Val() == 0)
+				sem.WakeTasksOnZero();
+		}
+	}
+	
+	return noErr;
+}
+
+
+TObject *TObjectTable::Get(ObjectId inId)
+{
+	TObject* obj = Entry( (inId>>4) & kObjectTableMask );
+	while (obj) {
+		if ( obj->Id() == inId ) {
+			if ( obj->Id()==0 )
+				return NULL;
+			return obj;
+		}
+		obj = obj->Next();
+	}
+	return NULL;
+	
+//	if (obj) {
+//		do {
+//			if (obj->fId == inId)
+//				return (obj->fId != kNoId) ? obj : NULL;
+//		} while ((obj = obj->fNext) != NULL);
+//	
+//	return NULL;
+}
+
+
+// ScreenUpdateTask__FPvUlT2
+//  GetADCObject__Fv (minimal function)
+//   SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
+//    swi 0x0000000b (COMPLEX!)
+//     DoSemaphoreOp ("leaf")
+
+
+/**
+ * Transcoded function Get__12TObjectTableFUl
+ * ROM: 0x00319F14 - 0x00319F60
+ */
+void Func_0x00319F14(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	TObjectTable *This = (TObjectTable*)(R0);
+	ObjectId inId = (ObjectId)(R1);
+	This->Get(inId);
+	R0 = (KUInt32)This->Get(inId);
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x00319F14, "Get__12TObjectTableFUl", Func_0x00319F14)
+
+/**
+ * SemOp__15TSemaphoreGroupFP16TSemaphoreOpList8SemFlagsP5TTask
+ * ROM: 0x001D4F38 - 0x001D5078
+ */
+void Func_0x001D4F38(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	TSemaphoreGroup *This = (TSemaphoreGroup*)(R0);
+	TSemaphoreOpList *inList = (TSemaphoreOpList*)(R1);
+	SemFlags inFlags = (SemFlags)(R2);
+	TTask *inTask = (TTask*)(R3);
+	R0 = (KUInt32)This->SemOp(inList, inFlags, inTask);
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x001D4F38, "SemOp__15TSemaphoreGroupFP16TSemaphoreOpList8SemFlagsP5TTask", Func_0x001D4F38)
+
+/**
+ * UnWindOp__15TSemaphoreGroupFP16TSemaphoreOpListl
+ * ROM: 0x001D4EE8 - 0x001D4F38
+ */
+void Func_0x001D4EE8(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	TSemaphoreGroup *This = (TSemaphoreGroup*)(R0);
+	TSemaphoreOpList *inList = (TSemaphoreOpList*)(R1);
+	long index = (long)(R2);
+	This->UnwindOp(inList, index);
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x001D4EE8, "UnWindOp__15TSemaphoreGroupFP16TSemaphoreOpListl", Func_0x001D4EE8)
+
+/**
+ * BlockOnZero__10TSemaphoreFP5TTask8SemFlags
+ * ROM: 0x001D5264 - 0x001D52A0
+ */
+void Func_0x001D5264(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	TSemaphore *This = (TSemaphore*)(R0);
+	TTask *inTask = (TTask*)(R1);
+	SemFlags inFlags = (SemFlags)(R2);
+	This->BlockOnZero(inTask, inFlags);
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x001D5264, "BlockOnZero__10TSemaphoreFP5TTask8SemFlags", Func_0x001D5264)
+
+/**
+ * BlockOnInc__10TSemaphoreFP5TTask8SemFlags
+ * ROM: 0x001D4D98 - 0x001D4DD4
+ */
+void Func_0x001D4D98(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	TSemaphore *This = (TSemaphore*)(R0);
+	TTask *inTask = (TTask*)(R1);
+	SemFlags inFlags = (SemFlags)(R2);
+	This->BlockOnInc(inTask, inFlags);
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x001D4D98, "BlockOnInc__10TSemaphoreFP5TTask8SemFlags", Func_0x001D4D98)
+
+/**
+ * Transcoded function UnScheduleTask__FP5TTask
+ * ROM: 0x001918FC - 0x00191914
+ */
+void Func_0x001918FC(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	UnScheduleTask((TTask*)(R0));
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x001918FC, "UnScheduleTask__FP5TTask", Func_0x001918FC)
+
+/**
+ * Remove__10TSchedulerFP5TTask
+ * ROM: 0x001CC5F8 - 0x001CC690
+ */
+void Func_0x001CC5F8(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	TScheduler *This = (TScheduler*)(R0);
+	TTask *inTask = (TTask*)(R1);
+	This->Remove(inTask);
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x001CC5F8, "Remove__10TSchedulerFP5TTask", Func_0x001CC5F8)
+
+/**
+ * RemoveFromQueue__10TTaskQueueFP5TTask17KernelObjectState
+ * ROM: 0x00359B5C - 0x00359BE0
+ */
+void Func_0x00359B5C(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	TTaskQueue *This = (TTaskQueue*)(R0);
+	TTask *inTask = (TTask*)(R1);
+	KernelObjectState inState = (KernelObjectState)(R2);
+	R0 = (KUInt32)This->RemoveFromQueue(inTask, inState);
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x00359B5C, "RemoveFromQueue__10TTaskQueueFP5TTask17KernelObjectState", Func_0x00359B5C)
+
+/**
+ * UpdateCurrentBucket__10TSchedulerFv
+ * ROM: 0x001CC1B0 - 0x001CC1EC
+ */
+void Func_0x001CC1B0(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	TScheduler *This = (TScheduler*)(R0);
+	This->UpdateCurrentBucket();
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x001CC1B0, "UpdateCurrentBucket__10TSchedulerFv", Func_0x001CC1B0)
+
+/**
+ * Peek__10TTaskQueueFv
  * ROM: 0x00359BE0 - 0x00359BE8
  */
 void Func_0x00359BE0(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	gCPU = ioCPU;
 	TTaskQueue *This = (TTaskQueue*)(R0);
 	R0 = (KUInt32)This->Peek();
 	SETPC(LR+4);
@@ -224,7 +544,6 @@ T_ROM_SIMULATION3(0x00359BE0, "Peek__10TTaskQueueFv", Func_0x00359BE0)
  */
 void Func_0x001D4DD4(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	gCPU = ioCPU;
 	TSemaphore *This = (TSemaphore*)(R0);
 	This->WakeTasksOnZero();
 	SETPC(LR+4);
@@ -237,7 +556,6 @@ T_ROM_SIMULATION3(0x001D4DD4, "WakeTasksOnZero__10TSemaphoreFv", Func_0x001D4DD4
  */
 void Func_0x001D4E18(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	gCPU = ioCPU;
 	TSemaphore *This = (TSemaphore*)(R0);
 	This->WakeTasksOnInc();
 	SETPC(LR+4);
@@ -250,7 +568,6 @@ T_ROM_SIMULATION3(0x001D4E18, "WakeTasksOnInc__10TSemaphoreFv", Func_0x001D4E18)
  */
 void Func_0x001918E8(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	gCPU = ioCPU;
 	TTask *inTask = (TTask*)(R0);
 	ScheduleTask(inTask);
 	SETPC(LR+4);
@@ -263,7 +580,6 @@ T_ROM_SIMULATION3(0x001918E8, "ScheduleTask__FP5TTask", Func_0x001918E8)
  */
 void Func_0x001CC5E0(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	gCPU = ioCPU;
 	TScheduler *This = (TScheduler*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	This->AddWhenNotCurrent(inTask);
@@ -277,7 +593,6 @@ T_ROM_SIMULATION3(0x001CC5E0, "AddWhenNotCurrent__10TSchedulerFP5TTask", Func_0x
  */
 void Func_0x001CC564(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	gCPU = ioCPU;
 	TScheduler *This = (TScheduler*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	This->Add(inTask);
@@ -291,7 +606,6 @@ T_ROM_SIMULATION3(0x001CC564, "Add__10TSchedulerFP5TTask", Func_0x001CC564)
  */
 void Func_0x00359AAC(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	gCPU = ioCPU;
 	TTaskQueue *This = (TTaskQueue*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	KernelObjectState inState = (KernelObjectState)(R2);
@@ -307,7 +621,6 @@ T_ROM_SIMULATION3(0x00359AAC, "Add__10TTaskQueueFP5TTask17KernelObjectStateP14TT
  */
 void Func_0x00359AA8(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	gCPU = ioCPU;
 	TTaskQueue *This = (TTaskQueue*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	This->CheckBeforeAdd(inTask);
@@ -321,7 +634,6 @@ T_ROM_SIMULATION3(0x00359AA8, "CheckBeforeAdd__10TTaskQueueFP5TTask", Func_0x003
  */
 void Func_0x001CC7F4(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	gCPU = ioCPU;
 	WantSchedule();
 	SETPC(LR+4);
 }
@@ -333,7 +645,6 @@ T_ROM_SIMULATION3(0x001CC7F4, "WantSchedule__Fv", Func_0x001CC7F4)
  */
 void Func_0x00359B14(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	gCPU = ioCPU;
 	TTaskQueue *This = (TTaskQueue*)(R0);
 	KernelObjectState inState = (KernelObjectState)(R1);
 	R0 = (KUInt32)This->Remove(inState);

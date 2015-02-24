@@ -346,4 +346,54 @@ UJITGenericRetargetSupport::JumpToCalculatedAddress(TARMProcessor* ioCPU, KUInt3
 	throw "JumpToCalculatedAddress";
 }
 
+
+
+/**
+ * Write emulated memory at a virtual address.
+ * This function handles all exceptions that may happen during this process.
+ * The function may invoke the scheduler and switch tasks.
+ */
+void
+UJITGenericRetargetSupport::ManagedMemoryWriteS(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt16 inData)
+{
+	KUInt32 rwAddr = (inAddress&0xFFFFFFFC);
+	KUInt32 data = ManagedMemoryRead(ioCPU, rwAddr);
+	if (inAddress&0x00000002) {
+		data = (data & 0xFFFF0000) | inData ;
+	} else {
+		data = (data & 0x0000FFFF) | (inData<<16) ;
+	}
+	ManagedMemoryWrite(ioCPU, rwAddr, data);
+}
+
+
+/**
+ * Read emulated memory from a virtual address.
+ * This function handles all exceptions that may happen during this process.
+ * The function may invoke the scheduler and switch tasks.
+ */
+KUInt16
+UJITGenericRetargetSupport::ManagedMemoryReadS(TARMProcessor* ioCPU, KUInt32 inAddress)
+{
+	KUInt32 theData;
+	TMemory *theMemoryInterface = ioCPU->GetMemory();
+#if HANDLE_DATA_ABORT_LOCALLY
+	while (theMemoryInterface->Read((inAddress&0xFFFFFFFC), theData)) {
+		//ManagedDataAbort();
+		fprintf(stderr, "PANIC: memory access failed in simulation\n");
+	}
+#else
+	if (theMemoryInterface->Read((inAddress&0xFFFFFFFC), theData)) {
+		ioCPU->DataAbort();
+		throw "DataAbort";
+	}
+#endif
+	if (inAddress&0x00000002)
+		return (theData & 0x0000FFFF);
+	else
+		return (theData>>16);
+}
+
+
+
 #endif

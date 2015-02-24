@@ -17,6 +17,7 @@ typedef KUInt32 ULong;
 typedef KUInt32 KernelObjectState;
 typedef void *	Heap;
 typedef KSInt8  BOOL;
+typedef KSInt32 NewtonErr;
 
 
 class TTask;
@@ -82,6 +83,9 @@ public:
 
 class TTaskContainer
 {
+public:
+	KUInt32 something;
+	// FIXME: contains a virtual Remove function
 };
 
 
@@ -148,8 +152,8 @@ public:
 //	CTaskQueue();
 //	void		checkBeforeAdd(CTask * inTask);
 //	CTask *	findAndRemove(ObjectId inId, KernelObjectState inState);
-//	BOOL		removeFromQueue(CTask * inTask, KernelObjectState inState);
 	
+	BOOL		RemoveFromQueue(TTask *inTask, KernelObjectState inState);
 	TTask*		Remove(KernelObjectState inState);
 	TTask*		Peek();
 	void		CheckBeforeAdd(TTask*);
@@ -168,20 +172,20 @@ class TScheduler : public TObject, TTaskContainer
 public:
 	void		Add(TTask *inTask);
 	void		AddWhenNotCurrent(TTask *inTask);
+	void		UpdateCurrentBucket();
+	/* FIXME: virtual*/ void Remove(TTask *inTask);
 
 //public:
 //	CScheduler();
 //	virtual	~CScheduler();
 //	
-//	virtual void		remove(CTask * inTask);
-//	
+//
 //	void		setCurrentTask(CTask * inTask);
 //	CTask *	schedule(void);
 //	
 //private:
 //	CTask *	removeHighestPriority(void);
-//	void		updateCurrentBucket(void);
-//	
+//
 //	friend class CSharedMemMsg;
 
 	NEWT_GET_SET_W(0x014, int, HighestPriority);
@@ -206,13 +210,12 @@ public:
 //	
 //	virtual void	remove(CTask * inTask);
 //	
-//	void		blockOnZero(CTask * inTask, SemFlags inBlocking);
 //
 //private:
 //	friend class CSemaphoreGroup;
 
-//	void		BlockOnInc(TTask *inTask, SemFlags inBlocking);
-	
+	void		BlockOnZero(TTask *inTask, SemFlags inBlocking);
+	void		BlockOnInc(TTask *inTask, SemFlags inBlocking);
 	void		WakeTasksOnZero();
 	void		WakeTasksOnInc();
 	
@@ -223,8 +226,85 @@ public:
 };
 
 
+class SemOp {
+public:
+	NEWT_GET_SET_S(0x000, unsigned short,	Num);	// index of Semaphore
+	NEWT_GET_SET_S(0x002, short,			Op);	// new value
+};
+
+
+class TSemaphoreOpList : public TObject
+{
+public:
+//	~CSemaphoreOpList();
+//	
+//	NewtonErr	init(ULong inNumOfOps, SemOp * inOps);
+//	
+//private:
+//	friend class CSemaphoreGroup;
+	
+	NEWT_GET_SET_W(0x010, SemOp*,	OpList);
+	NEWT_GET_SET_W(0x014, int,		Count);
+};
+
+
+class TSemaphoreGroup : public TObject
+{
+public:
+//	~CSemaphoreGroup();
+//	
+//	NewtonErr	init(ULong inCount);
+//	
+//
+//	void			setRefCon(void * inRefCon);
+//	void *		getRefCon(void) const;
+
+	void		UnwindOp(TSemaphoreOpList *inList, long index);
+	NewtonErr	SemOp(TSemaphoreOpList *inList, SemFlags inBlocking, TTask *inTask);
+	
+	NEWT_GET_SET_W(0x010, TSemaphore*,	Group);
+	NEWT_GET_SET_W(0x014, int,			Count);
+	NEWT_GET_SET_W(0x018, void*,		RefCon);
+};
+
+
+typedef void (*ScavengeProcPtr)(TObject *);
+typedef ScavengeProcPtr (*GetScavengeProcPtr)(TObject *, ULong);
+
+class TObjectTable
+{
+public:
+//	long				init(void);
+//	void				setScavengeProc(GetScavengeProcPtr inScavenger);
+//	void				scavenge(void);
+//	void				scavengeAll(void);
+//	void				reassignOwnership(ObjectId inFromOwner, ObjectId inToOwner);
+//	ObjectId			newId(KernelTypes inType);
+//	ObjectId			nextGlobalUniqueId(void);
+//	BOOL				exists(ObjectId inId);
+//	ObjectId			add(CObject * inObject, KernelTypes inType, ObjectId inOwnerId);
+//	long				remove(ObjectId inId);
+//	
+//private:
+//	friend class CObjectTableIterator;
+//	
+	static const int		kObjectTableSize = 0x80;		// 128
+	static const int		kObjectTableMask = 0x7F;
+
+	TObject*	Get(ObjectId inId);
+
+	NEWT_GET_SET_W(0x000, GetScavengeProcPtr, Scavenge);
+	NEWT_GET_SET_W(0x004, TObject*, ThisObj);
+	NEWT_GET_SET_W(0x008, TObject*, PrevObj);
+	NEWT_GET_SET_W(0x00C, int, Index);
+	NEWT_GET_ARR_W(0x010, TObject*, Entry, 0x80);	// Array of TObject*
+};
+
+
+
 extern void WantSchedule();
 extern void ScheduleTask(TTask*);
+extern void UnScheduleTask(TTask *inTask);
 
 
 #endif /* defined(_NEWT_TTASK_) */

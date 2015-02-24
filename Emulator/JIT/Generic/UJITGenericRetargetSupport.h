@@ -36,7 +36,10 @@ public:
 	static void		ManagedMemoryWriteAligned(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData);
 	static void		ManagedMemoryWrite(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData);
 	static void		ManagedMemoryWriteB(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt8 inData);
-	
+
+	static KUInt16	ManagedMemoryReadS(TARMProcessor* ioCPU, KUInt32 inAddress);
+	static void		ManagedMemoryWriteS(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt16 inData);
+
 	static KUInt32	NoAbortMemoryReadAligned(TARMProcessor* ioCPU, KUInt32 inAddress);
 	static KUInt32	NoAbortMemoryRead(TARMProcessor* ioCPU, KUInt32 inAddress);
 	static KUInt8	NoAbortMemoryReadB(TARMProcessor* ioCPU, KUInt32 inAddress);
