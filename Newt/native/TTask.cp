@@ -410,10 +410,110 @@ NewtonErr DoSemaphoreOp(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocki
 
 
 // ScreenUpdateTask__FPvUlT2
-//  GetADCObject__Fv (minimal function)
-//   SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
-//    swi 0x0000000b (COMPLEX!)
+//  SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
+//   _SemaphoreOpGlue
+//    swi 0x0000000B (COMPLEX!) calling DoSemaphoreOp at 0x003ADEF8
+//     003AD698-003AD74C SWIBoot
+//     Jump table dispatch from 003AD568
+//     003ADEE4
+//      DoSemaphoreOp
+//     At 003ADF14 (or later if Semaphore is blocking), jump to 003AD750 (task switch)
+//      DoDeferrals
+//       _EnterAtomicFast (leaf)
+//       _ExitAtomicFast (laef)
+//       PortDeferredSendNotify__Fv ?
+//       DeferredNotify__Fv ?
+//       DoDeferral__18TExtPageTrackerMgrFv ?
+//        Peek__17TDoubleQContainerFv ?
+//        DoDeferral__15TExtPageTrackerFv ?
+//         RemovePMappings__FUlT1 ?
+//          IsSuperMode ?
+//          PrimRemovePMappings__FUlT1 ?
+//          _GenericSWI ? (moan!)
+//         Remove__12TObjectTableFUl (leaf)
+//        GetNext__17TDoubleQContainerFPv (leaf)
+//      Scheduler ?
+//      SwapInGlobals ?
+//      StartScheduler ?
+//     exit to task at 003ADB10 (or wherever task switching leads us)
 
+// bl      VEC_SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags  @ 0x001CD160 0xEB6836F5 - .h6.
+// bl      VEC_SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags  @ 0x001CD194 0xEB6836E8 - .h6.
+// SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags: 0x0025A464-0x0025A470
+// SWIBoot: 0x003AD698-0x003ADBB4
+// SWI11_SemOp: 0x003ADEE4-0x003ADFAC
+
+/*
+SWI11_SemOp:
+        @ label = 'SWI11_SemOp'
+        ldmia   sp, {r0, r1}                    @ 0x003ADEE4 0xE89D0003 - ....
+        ldr     r3, L003ADEB8                   @ [ gCurrentTask (0x0C100FF8) ] 0x003ADEE8 0xE51F3038 - ..08
+        ldr     r3, [r3]                        @ 0x003ADEEC 0xE5933000 - ..0.
+ ;; get the current task and remember it for later
+        stmdb   sp!, {r2, r3}                   @ 0x003ADEF0 0xE92D000C - .-.. 
+        stmdb   sp!, {r10-r12, lr}              @ 0x003ADEF4 0xE92D5C00 - .-\. 
+ ;; call the semaphore operation according to the given Id's
+        bl      VEC_DoSemaphoreOp               @ 0x003ADEF8 0xEB5D2728 - .]'(
+        ldmia   sp!, {r10-r12, lr}              @ 0x003ADEFC 0xE8BD5C00 - ..\. 
+        ldmia   sp!, {r2, r3}                   @ 0x003ADF00 0xE8BD000C - .... 
+        ldr     r1, L003ADEB8                   @ [ gCurrentTask (0x0C100FF8) ] 0x003ADF04 0xE51F1054 - ...T
+        ldr     r1, [r1]                        @ 0x003ADF08 0xE5911000 - ....
+        cmp     r1, #0                          @ [ 0x00000000 ] 0x003ADF0C 0xE3510000 - .Q.. 
+ ;; if the current task was not blocked, continue with the usual cooperative task switching
+        addne   sp, sp, #8                      @ [ 0x00000008 ] 0x003ADF10 0x128DD008 - .... 
+        bne     L003AD750                       @ 0x003ADF14 0x1AFFFE0D - ....
+ ;; continue here if there is no longer a current task
+ ;; this happens, if the semaphore blocked the current task
+        sub     lr, lr, #4                      @ [ 0x00000004 ] 0x003ADF18 0xE24EE004 - .N.. 
+ ;; adjust the lr? Is that the return address? If so, do we decrement it to make up for the pipeline?
+        mov     r0, r3                          @ 0x003ADF1C 0xE1A00003 - ....
+        mrs     r1, spsr                        @ 0x003ADF20 0xE14F1000 - .O..
+        str     r1, [r0, #80]                   @ 0x003ADF24 0xE5801050 - ...P 
+        and     r1, r1, #31                     @ [ 0x0000001F ] 0x003ADF28 0xE201101F - .... 
+        cmp     r1, #27                         @ [ 0x0000001B ] 0x003ADF2C 0xE351001B - .Q.. 
+        add     r1, r0, #24                     @ [ 0x00000018 ] 0x003ADF30 0xE2801018 - .... 
+        stmdb   sp!, {r0}                       @ 0x003ADF34 0xE92D0001 - .-.. 
+        mrs     r0, cpsr                        @ 0x003ADF38 0xE10F0000 - ....
+;; figure out the callers CPU mode and save the registers in the previously current TTask class
+        msr     cpsr_ctl, #211                  @ [ 0x000000D3 ] 0x003ADF3C 0xE321F0D3 - .!.. 
+        nop                                     @ 0x003ADF40 0xE1A00000 - ....
+        nop                                     @ 0x003ADF44 0xE1A00000 - ....
+        stmneia r1!, {r2-r7}                    @ 0x003ADF48 0x18A100FC - .... 
+        stmneia r1, {r8-lr}^                    @ 0x003ADF4C 0x18C17F00 - ..^?.
+        nop                                     @ 0x003ADF50 0xE1A00000 - ....
+        msr     cpsr, r0                        @ 0x003ADF54 0xE129F000 - .)..
+        nop                                     @ 0x003ADF58 0xE1A00000 - ....
+        nop                                     @ 0x003ADF5C 0xE1A00000 - ....
+        ldmia   sp!, {r0}                       @ 0x003ADF60 0xE8BD0001 - .... 
+        bne     L003ADF98                       @ 0x003ADF64 0x1A00000B - ....
+        stmia   r1!, {r2-r12}                   @ 0x003ADF68 0xE8A11FFC - .... 
+        nop                                     @ 0x003ADF6C 0xE1A00000 - ....
+        mrs     r4, cpsr                        @ 0x003ADF70 0xE10F4000 - ..@.
+        mrs     r5, spsr                        @ 0x003ADF74 0xE14F5000 - .OP.
+        msr     cpsr, r5                        @ 0x003ADF78 0xE129F005 - .)..
+        nop                                     @ 0x003ADF7C 0xE1A00000 - ....
+        nop                                     @ 0x003ADF80 0xE1A00000 - ....
+        stmia   r1, {sp, lr}                    @ 0x003ADF84 0xE8816000 - ..`.
+        nop                                     @ 0x003ADF88 0xE1A00000 - ....
+        msr     cpsr, r4                        @ 0x003ADF8C 0xE129F004 - .)..
+        nop                                     @ 0x003ADF90 0xE1A00000 - ....
+        nop                                     @ 0x003ADF94 0xE1A00000 - ....
+L003ADF98:
+        add     r1, r0, #16                     @ [ 0x00000010 ] 0x003ADF98 0xE2801010 - .... 
+        str     lr, [r1, #60]                   @ 0x003ADF9C 0xE581E03C - ...< 
+        ldmia   sp!, {r2, r3}                   @ 0x003ADFA0 0xE8BD000C - .... 
+        stmia   r1, {r2, r3}                    @ 0x003ADFA4 0xE881000C - ....
+ ;; jump to the task switcher (currentTask is NULL, previously current task has all registers saved)
+        b       L003AD750                       @ 0x003ADFA8 0xEAFFFDE8 - ....
+*/
+
+T_ROM_PATCH(0x003ADEF8, "SWI Call to DoSemaphoreOp")
+{
+	R0 = (KUInt32)DoSemaphoreOp((ObjectId)(R0), (ObjectId)(R1), (SemFlags)(R2), (TTask*)(R3));
+	PC = PC + 4;
+	return ioUnit;
+	CALLNEXTUNIT;
+}
 
 /**
  * DoSemaphoreOp
