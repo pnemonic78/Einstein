@@ -510,10 +510,345 @@ L003ADF98:
 T_ROM_PATCH(0x003ADEF8, "SWI Call to DoSemaphoreOp")
 {
 	R0 = (KUInt32)DoSemaphoreOp((ObjectId)(R0), (ObjectId)(R1), (SemFlags)(R2), (TTask*)(R3));
-	PC = PC + 4;
-	return ioUnit;
+//	PC = PC + 4;
+//	return ioUnit;
 	CALLNEXTUNIT;
 }
+
+
+/**
+ * Transcoded function Func_0x003ADEE4
+ * ROM: 0x003ADEE4 - 0x003ADFAC
+ */
+T_ROM_PATCH(0x003ADEE4, "SWI_SemOp")
+//void Func_0x003ADEE4(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	// 003ADEE4: E89D0003  ldmea	r13, {r0-r1}
+	{
+		KUInt32 baseAddress = SP;
+		SETPC(0x003ADEE4+8);
+		R0 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		R1 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+	}
+	
+	// 003ADEE8: E51F3038  ldr	r3, 003ADEB8=SWIBoot+820
+	{
+		KUInt32 offset = 0x00000038;
+		KUInt32 theAddress = 0x003ADEE8 + 8 - offset;
+		SETPC(0x003ADEE8+8);
+		KUInt32 theData = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, theAddress);
+		R3 = theData;
+	}
+	
+	// 003ADEEC: E5933000  ldr	r3, [r3]
+	SETPC(0x003ADEEC+8);
+	R3 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R3);
+	
+	// 003ADEF0: E92D000C  stmfd	r13!, {r2-r3}
+	{
+		KUInt32 baseAddress = SP;
+		KUInt32 wbAddress = baseAddress - (2 * 4);
+		baseAddress -= (2 * 4);
+		SETPC(0x003ADEF0+8);
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R2); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R3); baseAddress += 4;
+		SP = wbAddress;
+	}
+	
+	// 003ADEF4: E92D5C00  stmfd	r13!, {r10-r12, lr}
+	{
+		KUInt32 baseAddress = SP;
+		KUInt32 wbAddress = baseAddress - (4 * 4);
+		baseAddress -= (4 * 4);
+		SETPC(0x003ADEF4+8);
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R10); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R11); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R12); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, LR); baseAddress += 4;
+		SP = wbAddress;
+	}
+	
+	R0 = (KUInt32)DoSemaphoreOp((ObjectId)(R0), (ObjectId)(R1), (SemFlags)(R2), (TTask*)(R3));
+	
+	// 003ADEFC: E8BD5C00  ldmea	r13!, {r10-r12, lr}
+	{
+		KUInt32 baseAddress = SP;
+		KUInt32 wbAddress = baseAddress + (4 * 4);
+		SETPC(0x003ADEFC+8);
+		R10 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		R11 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		R12 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		LR = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		SP = wbAddress;
+	}
+	
+	// 003ADF00: E8BD000C  ldmea	r13!, {r2-r3}
+	{
+		KUInt32 baseAddress = SP;
+		KUInt32 wbAddress = baseAddress + (2 * 4);
+		SETPC(0x003ADF00+8);
+		R2 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		R3 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		SP = wbAddress;
+	}
+	
+	// 003ADF04: E51F1054  ldr	r1, 003ADEB8=SWIBoot+820
+	{
+		KUInt32 offset = 0x00000054;
+		KUInt32 theAddress = 0x003ADF04 + 8 - offset;
+		SETPC(0x003ADF04+8);
+		KUInt32 theData = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, theAddress);
+		R1 = theData;
+	}
+	
+	// 003ADF08: E5911000  ldr	r1, [r1]
+	SETPC(0x003ADF08+8);
+	R1 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R1);
+	
+	// 003ADF0C: E3510000  cmp	r1, #0x00000000
+	{
+		KUInt32 Opnd2 = 0x00000000;
+		KUInt32 Opnd1 = R1;
+		const KUInt32 theResult = Opnd1 - Opnd2;
+		ioCPU->mCPSR_Z = (theResult==0);
+		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
+		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
+		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
+	}
+	
+	// 003ADF10: 128DD008  addne	r13, r13, #0x00000008
+	if (ioCPU->TestNE()) {
+		SP = SP + 0x00000008; // 8
+	}
+	
+	// 003ADF14: 1AFFFE0D  bne	003AD750=SWIBoot+B8
+	if (ioCPU->TestNE()) {
+		// rt cjitr 003AD750
+		SETPC(0x003AD750+4);
+		MMUCALLNEXT_AFTERSETPC
+	}
+	
+	// 003ADF18: E24EE004  sub	lr, lr, #0x00000004
+	LR = LR - 0x00000004; // 4
+	
+	// 003ADF1C: E1A00003  mov	r0, r3
+	R0 = R3;
+	
+	// 003ADF20: E14F1000  mrs	r1, spsr
+	R1 = ioCPU->GetSPSR();
+	
+	// 003ADF24: E5801050  str	r1, [r0, #0x050]
+	SETPC(0x003ADF24+8);
+	UJITGenericRetargetSupport::ManagedMemoryWrite(ioCPU, R0 + 0x0050, R1);
+	
+	// 003ADF28: E201101F  and	r1, r1, #0x0000001f
+	R1 = R1 & 0x0000001F;
+	
+	// 003ADF2C: E351001B  cmp	r1, #0x0000001b
+	{
+		KUInt32 Opnd2 = 0x0000001B;
+		KUInt32 Opnd1 = R1;
+		const KUInt32 theResult = Opnd1 - Opnd2;
+		ioCPU->mCPSR_Z = (theResult==0);
+		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
+		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
+		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
+	}
+	
+	// 003ADF30: E2801018  add	r1, r0, #0x00000018
+	R1 = R0 + 0x00000018; // 24
+	
+	// 003ADF34: E92D0001  stmfd	r13!, {r0}
+	{
+		KUInt32 baseAddress = SP;
+		KUInt32 wbAddress = baseAddress - (1 * 4);
+		baseAddress -= (1 * 4);
+		SETPC(0x003ADF34+8);
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R0); baseAddress += 4;
+		SP = wbAddress;
+	}
+	
+	// 003ADF38: E10F0000  mrs	r0, cpsr
+	R0 = ioCPU->GetCPSR();
+	
+	// 003ADF3C: E321F0D3  msr	cpsr_c, #0x000000d3
+	{
+		if (ioCPU->GetMode()==TARMProcessor::kUserMode) {
+			const KUInt32 oldValue = ioCPU->GetCPSR();
+			ioCPU->SetCPSR((0x000000D3 & 0xF0000000) | (oldValue & 0x0FFFFFFF));
+		} else {
+			ioCPU->SetCPSR(0x000000D3);
+		}
+	}
+	
+	// 003ADF40: E1A00000  mov	r0, r0
+	
+	// 003ADF44: E1A00000  mov	r0, r0
+	
+	// 003ADF48: 18A100FC  stmneia	r1!, {r2-r7}
+	if (ioCPU->TestNE()) {
+		KUInt32 baseAddress = R1;
+		KUInt32 wbAddress = baseAddress + (6 * 4);
+		SETPC(0x003ADF48+8);
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R2); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R3); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R4); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R5); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R6); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R7); baseAddress += 4;
+		R1 = wbAddress;
+	}
+	
+	// 003ADF4C: 18C17F00  stmneia	r1, {r8-lr}^
+	if (ioCPU->TestNE()) {
+		KUInt32 baseAddress = R1;
+		SETPC(0x003ADF4C+8);
+		if (ioCPU->GetMode() != TARMProcessor::kFIQMode) {
+			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R8); baseAddress += 4;
+			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R9); baseAddress += 4;
+			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R10); baseAddress += 4;
+			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R11); baseAddress += 4;
+			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R12); baseAddress += 4;
+		} else {
+			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR8_Bkup); baseAddress += 4;
+			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR9_Bkup); baseAddress += 4;
+			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR10_Bkup); baseAddress += 4;
+			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR11_Bkup); baseAddress += 4;
+			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR12_Bkup); baseAddress += 4;
+		}
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR13_Bkup); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR14_Bkup); baseAddress += 4;
+	}
+	
+	// 003ADF50: E1A00000  mov	r0, r0
+	
+	// 003ADF54: E129F000  msr	cpsr_cf, r0
+	{
+		if (ioCPU->GetMode()==TARMProcessor::kUserMode) {
+			const KUInt32 oldValue = ioCPU->GetCPSR();
+			ioCPU->SetCPSR((R0 & 0xF0000000) | (oldValue & 0x0FFFFFFF));
+		} else {
+			ioCPU->SetCPSR(R0);
+		}
+	}
+	
+	// 003ADF58: E1A00000  mov	r0, r0
+	
+	// 003ADF5C: E1A00000  mov	r0, r0
+	
+	// 003ADF60: E8BD0001  ldmea	r13!, {r0}
+	{
+		KUInt32 baseAddress = SP;
+		KUInt32 wbAddress = baseAddress + (1 * 4);
+		SETPC(0x003ADF60+8);
+		R0 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		SP = wbAddress;
+	}
+	
+	// 003ADF64: 1A00000B  bne	003ADF98=SWIBoot+900
+	if (ioCPU->TestNE()) {
+		SETPC(0x003ADF98+4);
+		goto L003ADF98;
+	}
+	
+	// 003ADF68: E8A11FFC  stmia	r1!, {r2-r12}
+	{
+		KUInt32 baseAddress = R1;
+		KUInt32 wbAddress = baseAddress + (11 * 4);
+		SETPC(0x003ADF68+8);
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R2); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R3); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R4); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R5); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R6); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R7); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R8); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R9); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R10); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R11); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R12); baseAddress += 4;
+		R1 = wbAddress;
+	}
+	
+	// 003ADF6C: E1A00000  mov	r0, r0
+	
+	// 003ADF70: E10F4000  mrs	r4, cpsr
+	R4 = ioCPU->GetCPSR();
+	
+	// 003ADF74: E14F5000  mrs	r5, spsr
+	R5 = ioCPU->GetSPSR();
+	
+	// 003ADF78: E129F005  msr	cpsr_cf, r5
+	{
+		if (ioCPU->GetMode()==TARMProcessor::kUserMode) {
+			const KUInt32 oldValue = ioCPU->GetCPSR();
+			ioCPU->SetCPSR((R5 & 0xF0000000) | (oldValue & 0x0FFFFFFF));
+		} else {
+			ioCPU->SetCPSR(R5);
+		}
+	}
+	
+	// 003ADF7C: E1A00000  mov	r0, r0
+	
+	// 003ADF80: E1A00000  mov	r0, r0
+	
+	// 003ADF84: E8816000  stmia	r1, {r13-lr}
+	{
+		KUInt32 baseAddress = R1;
+		SETPC(0x003ADF84+8);
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, SP); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, LR); baseAddress += 4;
+	}
+	
+	// 003ADF88: E1A00000  mov	r0, r0
+	
+	// 003ADF8C: E129F004  msr	cpsr_cf, r4
+	{
+		if (ioCPU->GetMode()==TARMProcessor::kUserMode) {
+			const KUInt32 oldValue = ioCPU->GetCPSR();
+			ioCPU->SetCPSR((R4 & 0xF0000000) | (oldValue & 0x0FFFFFFF));
+		} else {
+			ioCPU->SetCPSR(R4);
+		}
+	}
+	
+	// 003ADF90: E1A00000  mov	r0, r0
+	
+	// 003ADF94: E1A00000  mov	r0, r0
+	
+L003ADF98:
+	// 003ADF98: E2801010  add	r1, r0, #0x00000010
+	R1 = R0 + 0x00000010; // 16
+	
+	// 003ADF9C: E581E03C  str	lr, [r1, #0x03c]
+	SETPC(0x003ADF9C+8);
+	UJITGenericRetargetSupport::ManagedMemoryWrite(ioCPU, R1 + 0x003C, LR);
+	
+	// 003ADFA0: E8BD000C  ldmea	r13!, {r2-r3}
+	{
+		KUInt32 baseAddress = SP;
+		KUInt32 wbAddress = baseAddress + (2 * 4);
+		SETPC(0x003ADFA0+8);
+		R2 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		R3 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		SP = wbAddress;
+	}
+	
+	// 003ADFA4: E881000C  stmia	r1, {r2-r3}
+	{
+		KUInt32 baseAddress = R1;
+		SETPC(0x003ADFA4+8);
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R2); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R3); baseAddress += 4;
+	}
+	
+	// 003ADFA8: EAFFFDE8  b	003AD750=SWIBoot+B8
+	// rt cjitr 003AD750
+	SETPC(0x003AD750+4);
+	MMUCALLNEXT_AFTERSETPC
+}
+//T_ROM_SIMULATION3(0x003ADEE4, "Func_0x003ADEE4", Func_0x003ADEE4)
+
 
 /**
  * DoSemaphoreOp
