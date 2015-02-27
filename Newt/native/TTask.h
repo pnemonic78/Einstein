@@ -101,7 +101,7 @@ public:
 //    TTask *GetCurrentTask() { return (TTask*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x7C); };
 //    void *GetGlobals() { return (void*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xA0); };
 //    ObjectId GetMonitorId() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xD8); };
-//	ULong				fRegister[kNumOfRegisters];	// +10	processor registers
+	NEWT_GET_ARR_W(0x010, ULong, Register, 16);		// Processor Registers
 	NEWT_GET_SET_W(0x050, ULong, PSR);				// Processor Status Register
 //	ObjectId			f68;					// +68	set in init() but never referenced
 	NEWT_GET_SET_W(0x6C, KernelObjectState, State);

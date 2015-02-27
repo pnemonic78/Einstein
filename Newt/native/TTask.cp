@@ -444,91 +444,7 @@ NewtonErr DoSemaphoreOp(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocki
 // SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags: 0x0025A464-0x0025A470
 // _SemaphoreOpGlue
 // SWIBoot: 0x003AD698-0x003ADBB4
-// SWI11_SemOp: 0x003ADEE4-0x003ADFAC
 
-/*
-SWI11_SemOp:
-        @ label = 'SWI11_SemOp'
-        ldmia   sp, {r0, r1}                    @ 0x003ADEE4 0xE89D0003 - ....
-        ldr     r3, L003ADEB8                   @ [ gCurrentTask (0x0C100FF8) ] 0x003ADEE8 0xE51F3038 - ..08
-        ldr     r3, [r3]                        @ 0x003ADEEC 0xE5933000 - ..0.
- ;; get the current task and remember it for later
-        stmdb   sp!, {r2, r3}                   @ 0x003ADEF0 0xE92D000C - .-.. 
-        stmdb   sp!, {r10-r12, lr}              @ 0x003ADEF4 0xE92D5C00 - .-\. 
- ;; call the semaphore operation according to the given Id's
-        bl      VEC_DoSemaphoreOp               @ 0x003ADEF8 0xEB5D2728 - .]'(
-        ldmia   sp!, {r10-r12, lr}              @ 0x003ADEFC 0xE8BD5C00 - ..\. 
-        ldmia   sp!, {r2, r3}                   @ 0x003ADF00 0xE8BD000C - .... 
-        ldr     r1, L003ADEB8                   @ [ gCurrentTask (0x0C100FF8) ] 0x003ADF04 0xE51F1054 - ...T
-        ldr     r1, [r1]                        @ 0x003ADF08 0xE5911000 - ....
-        cmp     r1, #0                          @ [ 0x00000000 ] 0x003ADF0C 0xE3510000 - .Q.. 
- ;; if the current task was not blocked, continue with the usual cooperative task switching
-        addne   sp, sp, #8                      @ [ 0x00000008 ] 0x003ADF10 0x128DD008 - .... 
-        bne     L003AD750                       @ 0x003ADF14 0x1AFFFE0D - ....
- ;; continue here if there is no longer a current task
- ;; this happens, if the semaphore blocked the current task
-        sub     lr, lr, #4                      @ [ 0x00000004 ] 0x003ADF18 0xE24EE004 - .N.. 
- ;; adjust the lr? Is that the return address? If so, do we decrement it to make up for the pipeline?
-        mov     r0, r3                          @ 0x003ADF1C 0xE1A00003 - ....
-        mrs     r1, spsr                        @ 0x003ADF20 0xE14F1000 - .O..
-        str     r1, [r0, #80]                   @ 0x003ADF24 0xE5801050 - ...P 
-        and     r1, r1, #31                     @ [ 0x0000001F ] 0x003ADF28 0xE201101F - .... 
-        cmp     r1, #27                         @ [ 0x0000001B ] 0x003ADF2C 0xE351001B - .Q.. 
-        add     r1, r0, #24                     @ [ 0x00000018 ] 0x003ADF30 0xE2801018 - .... 
-        stmdb   sp!, {r0}                       @ 0x003ADF34 0xE92D0001 - .-.. 
-        mrs     r0, cpsr                        @ 0x003ADF38 0xE10F0000 - ....
-;; figure out the callers CPU mode and save the registers in the previously current TTask class
-        msr     cpsr_ctl, #211                  @ [ 0x000000D3 ] 0x003ADF3C 0xE321F0D3 - .!.. 
-        nop                                     @ 0x003ADF40 0xE1A00000 - ....
-        nop                                     @ 0x003ADF44 0xE1A00000 - ....
-        stmneia r1!, {r2-r7}                    @ 0x003ADF48 0x18A100FC - .... 
-        stmneia r1, {r8-lr}^                    @ 0x003ADF4C 0x18C17F00 - ..^?.
-        nop                                     @ 0x003ADF50 0xE1A00000 - ....
-        msr     cpsr, r0                        @ 0x003ADF54 0xE129F000 - .)..
-        nop                                     @ 0x003ADF58 0xE1A00000 - ....
-        nop                                     @ 0x003ADF5C 0xE1A00000 - ....
-        ldmia   sp!, {r0}                       @ 0x003ADF60 0xE8BD0001 - .... 
-        bne     L003ADF98                       @ 0x003ADF64 0x1A00000B - ....
-        stmia   r1!, {r2-r12}                   @ 0x003ADF68 0xE8A11FFC - .... 
-        nop                                     @ 0x003ADF6C 0xE1A00000 - ....
-        mrs     r4, cpsr                        @ 0x003ADF70 0xE10F4000 - ..@.
-        mrs     r5, spsr                        @ 0x003ADF74 0xE14F5000 - .OP.
-        msr     cpsr, r5                        @ 0x003ADF78 0xE129F005 - .)..
-        nop                                     @ 0x003ADF7C 0xE1A00000 - ....
-        nop                                     @ 0x003ADF80 0xE1A00000 - ....
-        stmia   r1, {sp, lr}                    @ 0x003ADF84 0xE8816000 - ..`.
-        nop                                     @ 0x003ADF88 0xE1A00000 - ....
-        msr     cpsr, r4                        @ 0x003ADF8C 0xE129F004 - .)..
-        nop                                     @ 0x003ADF90 0xE1A00000 - ....
-        nop                                     @ 0x003ADF94 0xE1A00000 - ....
-L003ADF98:
-        add     r1, r0, #16                     @ [ 0x00000010 ] 0x003ADF98 0xE2801010 - .... 
-        str     lr, [r1, #60]                   @ 0x003ADF9C 0xE581E03C - ...< 
-        ldmia   sp!, {r2, r3}                   @ 0x003ADFA0 0xE8BD000C - .... 
-        stmia   r1, {r2, r3}                    @ 0x003ADFA4 0xE881000C - ....
- ;; jump to the task switcher (currentTask is NULL, previously current task has all registers saved)
-        b       L003AD750                       @ 0x003ADFA8 0xEAFFFDE8 - ....
-*/
-
-#if 0
-
-T_ROM_PATCH(0x003ADEF8, "SWI Call to DoSemaphoreOp")
-{
-	R0 = (KUInt32)DoSemaphoreOp((ObjectId)(R0), (ObjectId)(R1), (SemFlags)(R2), (TTask*)(R3));
-//	PC = PC + 4;
-//	return ioUnit;
-	CALLNEXTUNIT;
-}
-
-// bl      VEC_SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags  @ 0x001CD160 0xEB6836F5 - .h6.
-T_ROM_PATCH(0x001CD160, "ScreenUpdateTask_CallToSemOp1")
-{
-	VEC_SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
-	CALLNEXTUNIT;
-}
-
-
-#else
 
 /**
  * Transcoded function Func_0x003ADEE4
@@ -536,229 +452,88 @@ T_ROM_PATCH(0x001CD160, "ScreenUpdateTask_CallToSemOp1")
  */
 void SWI11_SemOp(TARMProcessor* ioCPU)
 {
+	// parameters come on the stack
 	R0 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, SP);
 	R1 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, SP+4);
 	
+	// get the currently running task
 	TTask *task = GCurrentTask();
 	
+	// do the semaphore operation on it (all the code is native)
 	R0 = (KUInt32)DoSemaphoreOp((ObjectId)(R0), (ObjectId)(R1), (SemFlags)(R2), task);
 	
+	// if there is still a current task, purge the arguments from the stack and return
 	if ( GCurrentTask() ) {
-		SP = SP + 0x00000008; // 8
+		SP = SP + 8; // clean arguments from stack
 		return;
 	}
 	
-	// 003ADF18: E24EE004  sub	lr, lr, #0x00000004
-	LR = LR - 0x00000004; // 4
+	LR = LR - 0x00000004;
+	// TODO: in the following code, all registers are restored to the
+	// values before calling DoSemaphoreOp. The above call adjusts the LR/PC
+	// so that the same Semaphore Op is called again when this task is rescheduled.
+	// In native mode, we will have to implement some kind of loop.
 	
-	// 003ADF1C: E1A00003  mov	r0, r3
-	R0 = R3 = (KUInt32)task;
+	ULong savedPSR   = ioCPU->GetSPSR();
+	ULong currentPSR = ioCPU->GetCPSR();
 	
-	// 003ADF20: E14F1000  mrs	r1, spsr
-	ULong spsr = R1 = ioCPU->GetSPSR();
+	task->SetPSR( savedPSR );
 	
-	task->SetPSR( spsr );
-	
-	// 003ADF28: E201101F  and	r1, r1, #0x0000001f
-	R1 = R1 & 0x0000001F;
-	
-	// 003ADF2C: E351001B  cmp	r1, #0x0000001b
+	if ( (savedPSR&0x0000001F) != TARMProcessor::kUndefinedMode )
 	{
-		KUInt32 Opnd2 = 0x0000001B;
-		KUInt32 Opnd1 = R1;
-		const KUInt32 theResult = Opnd1 - Opnd2;
-		ioCPU->mCPSR_Z = (theResult==0);
-		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
-		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
-		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
-	}
-	
-	// 003ADF30: E2801018  add	r1, r0, #0x00000018
-	R1 = R0 + 0x00000018; // 24
-	
-	// 003ADF34: E92D0001  stmfd	r13!, {r0}
-	{
-		KUInt32 baseAddress = SP;
-		KUInt32 wbAddress = baseAddress - (1 * 4);
-		baseAddress -= (1 * 4);
-		SETPC(0x003ADF34+8);
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R0); baseAddress += 4;
-		SP = wbAddress;
-	}
-	
-	// 003ADF38: E10F0000  mrs	r0, cpsr
-	R0 = ioCPU->GetCPSR();
-	
-	// 003ADF3C: E321F0D3  msr	cpsr_c, #0x000000d3
-	{
-		if (ioCPU->GetMode()==TARMProcessor::kUserMode) {
-			const KUInt32 oldValue = ioCPU->GetCPSR();
-			ioCPU->SetCPSR((0x000000D3 & 0xF0000000) | (oldValue & 0x0FFFFFFF));
-		} else {
-			ioCPU->SetCPSR(0x000000D3);
-		}
-	}
-	
-	// 003ADF40: E1A00000  mov	r0, r0
-	
-	// 003ADF44: E1A00000  mov	r0, r0
-	
-	// 003ADF48: 18A100FC  stmneia	r1!, {r2-r7}
-	if (ioCPU->TestNE()) {
-		KUInt32 baseAddress = R1;
-		KUInt32 wbAddress = baseAddress + (6 * 4);
-		SETPC(0x003ADF48+8);
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R2); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R3); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R4); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R5); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R6); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R7); baseAddress += 4;
-		R1 = wbAddress;
-	}
-	
-	// 003ADF4C: 18C17F00  stmneia	r1, {r8-lr}^
-	if (ioCPU->TestNE()) {
-		KUInt32 baseAddress = R1;
-		SETPC(0x003ADF4C+8);
+		ioCPU->SetCPSR(0x000000D3);
+		
+		task->SetRegister( 2,  R2);
+		task->SetRegister( 3,  R3);
+		task->SetRegister( 4,  R4);
+		task->SetRegister( 5,  R5);
+		task->SetRegister( 6,  R6);
+		task->SetRegister( 7,  R7);
 		if (ioCPU->GetMode() != TARMProcessor::kFIQMode) {
-			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R8); baseAddress += 4;
-			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R9); baseAddress += 4;
-			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R10); baseAddress += 4;
-			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R11); baseAddress += 4;
-			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R12); baseAddress += 4;
+			task->SetRegister( 8,  R8);
+			task->SetRegister( 9,  R9);
+			task->SetRegister(10, R10);
+			task->SetRegister(11, R11);
+			task->SetRegister(12, R12);
 		} else {
-			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR8_Bkup); baseAddress += 4;
-			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR9_Bkup); baseAddress += 4;
-			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR10_Bkup); baseAddress += 4;
-			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR11_Bkup); baseAddress += 4;
-			UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR12_Bkup); baseAddress += 4;
+			task->SetRegister( 9,  ioCPU->mR8_Bkup);
+			task->SetRegister( 9,  ioCPU->mR9_Bkup);
+			task->SetRegister(10, ioCPU->mR10_Bkup);
+			task->SetRegister(11, ioCPU->mR11_Bkup);
+			task->SetRegister(12, ioCPU->mR12_Bkup);
 		}
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR13_Bkup); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, ioCPU->mR14_Bkup); baseAddress += 4;
+		task->SetRegister(13, ioCPU->mR13_Bkup);
+		task->SetRegister(14, ioCPU->mR14_Bkup);
+		
+		ioCPU->SetCPSR(currentPSR);
 	}
-	
-	// 003ADF50: E1A00000  mov	r0, r0
-	
-	// 003ADF54: E129F000  msr	cpsr_cf, r0
+	else
 	{
-		if (ioCPU->GetMode()==TARMProcessor::kUserMode) {
-			const KUInt32 oldValue = ioCPU->GetCPSR();
-			ioCPU->SetCPSR((R0 & 0xF0000000) | (oldValue & 0x0FFFFFFF));
-		} else {
-			ioCPU->SetCPSR(R0);
-		}
+		// untested code:
+		task->SetRegister( 2,  R2);
+		task->SetRegister( 3,  R3);
+		task->SetRegister( 4,  R4);
+		task->SetRegister( 5,  R5);
+		task->SetRegister( 6,  R6);
+		task->SetRegister( 7,  R7);
+		task->SetRegister( 8,  R8);
+		task->SetRegister( 9,  R9);
+		task->SetRegister(10, R10);
+		task->SetRegister(11, R11);
+		task->SetRegister(12, R12);
+		
+		ioCPU->SetCPSR( savedPSR );
+		task->SetRegister(13, SP);
+		task->SetRegister(14, LR);
+		ioCPU->SetCPSR( currentPSR );
 	}
 	
-	// 003ADF58: E1A00000  mov	r0, r0
+	task->SetRegister(15, LR);
+	task->SetRegister(0, UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, SP));
+	task->SetRegister(1, UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, SP+4));
 	
-	// 003ADF5C: E1A00000  mov	r0, r0
+	SP += 8;
 	
-	// 003ADF60: E8BD0001  ldmea	r13!, {r0}
-	{
-		KUInt32 baseAddress = SP;
-		KUInt32 wbAddress = baseAddress + (1 * 4);
-		SETPC(0x003ADF60+8);
-		R0 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
-		SP = wbAddress;
-	}
-	
-	// 003ADF64: 1A00000B  bne	003ADF98=SWIBoot+900
-	if (ioCPU->TestNE()) {
-		SETPC(0x003ADF98+4);
-		goto L003ADF98;
-	}
-	
-	// 003ADF68: E8A11FFC  stmia	r1!, {r2-r12}
-	{
-		KUInt32 baseAddress = R1;
-		KUInt32 wbAddress = baseAddress + (11 * 4);
-		SETPC(0x003ADF68+8);
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R2); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R3); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R4); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R5); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R6); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R7); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R8); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R9); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R10); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R11); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R12); baseAddress += 4;
-		R1 = wbAddress;
-	}
-	
-	// 003ADF6C: E1A00000  mov	r0, r0
-	
-	// 003ADF70: E10F4000  mrs	r4, cpsr
-	R4 = ioCPU->GetCPSR();
-	
-	// 003ADF74: E14F5000  mrs	r5, spsr
-	R5 = ioCPU->GetSPSR();
-	
-	// 003ADF78: E129F005  msr	cpsr_cf, r5
-	{
-		if (ioCPU->GetMode()==TARMProcessor::kUserMode) {
-			const KUInt32 oldValue = ioCPU->GetCPSR();
-			ioCPU->SetCPSR((R5 & 0xF0000000) | (oldValue & 0x0FFFFFFF));
-		} else {
-			ioCPU->SetCPSR(R5);
-		}
-	}
-	
-	// 003ADF7C: E1A00000  mov	r0, r0
-	
-	// 003ADF80: E1A00000  mov	r0, r0
-	
-	// 003ADF84: E8816000  stmia	r1, {r13-lr}
-	{
-		KUInt32 baseAddress = R1;
-		SETPC(0x003ADF84+8);
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, SP); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, LR); baseAddress += 4;
-	}
-	
-	// 003ADF88: E1A00000  mov	r0, r0
-	
-	// 003ADF8C: E129F004  msr	cpsr_cf, r4
-	{
-		if (ioCPU->GetMode()==TARMProcessor::kUserMode) {
-			const KUInt32 oldValue = ioCPU->GetCPSR();
-			ioCPU->SetCPSR((R4 & 0xF0000000) | (oldValue & 0x0FFFFFFF));
-		} else {
-			ioCPU->SetCPSR(R4);
-		}
-	}
-	
-	// 003ADF90: E1A00000  mov	r0, r0
-	
-	// 003ADF94: E1A00000  mov	r0, r0
-	
-L003ADF98:
-	// 003ADF98: E2801010  add	r1, r0, #0x00000010
-	R1 = R0 + 0x00000010; // 16
-	
-	// 003ADF9C: E581E03C  str	lr, [r1, #0x03c]
-	SETPC(0x003ADF9C+8);
-	UJITGenericRetargetSupport::ManagedMemoryWrite(ioCPU, R1 + 0x003C, LR);
-	
-	// 003ADFA0: E8BD000C  ldmea	r13!, {r2-r3}
-	{
-		KUInt32 baseAddress = SP;
-		KUInt32 wbAddress = baseAddress + (2 * 4);
-		SETPC(0x003ADFA0+8);
-		R2 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
-		R3 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
-		SP = wbAddress;
-	}
-	
-	// 003ADFA4: E881000C  stmia	r1, {r2-r3}
-	{
-		KUInt32 baseAddress = R1;
-		SETPC(0x003ADFA4+8);
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R2); baseAddress += 4;
-		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R3); baseAddress += 4;
-	}
 	return;
 }
 
@@ -767,9 +542,6 @@ T_ROM_PATCH(0x003ADEE4, "SWI_SemOp") {
 	SETPC(0x003AD750+4);
 	MMUCALLNEXT_AFTERSETPC
 }
-
-
-
 
 
 /**
@@ -2927,9 +2699,6 @@ void Func_0x003AE1FC(TARMProcessor* ioCPU, KUInt32 ret)
 	__asm__("int $3\n" : : ); // There was no return instruction found
 }
 T_ROM_SIMULATION3(0x003AE1FC, "_SemaphoreOpGlue", Func_0x003AE1FC)
-
-
-#endif
 
 
 /**
