@@ -22,5 +22,28 @@ rt open ScreenUpdateTask
 # rt cjit !GetADCObject__Fv
 # rt cjit !GetSample__4TADCF10ADCMuxTypeUlPFPvlUl_vPv
 
+rt cjit !StartScheduler
+rt cjit !SwapInGlobals
+rt cjit !DoDeferrals
+rt cjit !Scheduler
+rt cjit !Schedule__10TSchedulerFv
+rt cjit !RemoveHighestPriority__10TSchedulerFv
+rt cjit !StopScheduler__Fv
+
+
+rt cjitr DisableInterrupt
+rt cjitr QuickEnableInterrupt
+rt cjitr PublicEnterAtomic
+rt cjitr _ExitAtomic
+rt cjitr PortDeferredSendNotify__Fv
+rt cjitr DeferredNotify__Fv
+rt cjitr DoDeferral__18TExtPageTrackerMgrFv
+rt cjitr GetGlobalTime
+rt cjitr _Swap
+rt cjitr CompSub
+rt cjitr CompAdd
+# operator new (sigh!)
+rt cjitr __nw__FUi
+
 
 rt close

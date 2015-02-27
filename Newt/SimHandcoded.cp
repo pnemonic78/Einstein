@@ -748,6 +748,8 @@ T_ROM_SIMULATION3(0x003AD750, "Func_0x003AD750", Func_0x003AD750)
 
 #include "TSymbolList.h"
 
+#if 0
+
 T_ROM_INJECTION(0x00252190, "TTask::TTask(void)") {
 	fprintf(stderr, "TTask::TTask(void)\n");
 	return ioUnit;
@@ -776,6 +778,7 @@ T_ROM_INJECTION(0x002526E4, "TTask::~TTask(void)") {
 	return ioUnit;
 }
 
+#endif
 
 T_ROM_INJECTION(0x00000000, "Boot")
 {

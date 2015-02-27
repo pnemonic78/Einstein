@@ -92,20 +92,18 @@ public:
 class TTask : public TObject
 {
 public:
-    KUInt32 GetRegister(KUInt32 r) { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x10+4*r); };
-    void SaveRegister(KUInt32 r, KUInt32 v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, (KUInt32(intptr_t(this)))+0x10+4*r, v); };
-    KUInt32 GetPSR() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x50); };
-    void SavePSR(KUInt32 v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, (KUInt32(intptr_t(this)))+0x50, v); };
-    TEnvironment *GetEnvironment() { return (TEnvironment*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x74); };
-    TEnvironment *GetSMemEnvironment() { return (TEnvironment*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x78); };
-    TTask *GetCurrentTask() { return (TTask*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x7C); };
-    void *GetGlobals() { return (void*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xA0); };
-    ObjectId GetMonitorId() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xD8); };
-/*
-	ULong				fRegister[kNumOfRegisters];	// +10	processor registers
-	ULong				fPSR;					// +50	Processor Status Register
-	ObjectId			f68;					// +68	set in init() but never referenced
- */
+//    KUInt32 GetRegister(KUInt32 r) { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x10+4*r); };
+//    void SaveRegister(KUInt32 r, KUInt32 v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, (KUInt32(intptr_t(this)))+0x10+4*r, v); };
+//    KUInt32 GetPSR() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x50); };
+//    void SavePSR(KUInt32 v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, (KUInt32(intptr_t(this)))+0x50, v); };
+//    TEnvironment *GetEnvironment() { return (TEnvironment*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x74); };
+//    TEnvironment *GetSMemEnvironment() { return (TEnvironment*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x78); };
+//    TTask *GetCurrentTask() { return (TTask*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x7C); };
+//    void *GetGlobals() { return (void*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xA0); };
+//    ObjectId GetMonitorId() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xD8); };
+//	ULong				fRegister[kNumOfRegisters];	// +10	processor registers
+	NEWT_GET_SET_W(0x050, ULong, PSR);				// Processor Status Register
+//	ObjectId			f68;					// +68	set in init() but never referenced
 	NEWT_GET_SET_W(0x6C, KernelObjectState, State);
 	/*
 	CEnvironment * fEnvironment;		// +74
@@ -300,11 +298,78 @@ public:
 };
 
 
+class SingleObject
+{
+public:
+	// blank
+};
+
+
+class TUObject : public SingleObject
+{
+public:
+//	CUObject(ObjectId id = 0);
+//	CUObject(CUObject & inCopy);
+//	~CUObject();
+//	
+//	operator	ObjectId()	const;
+//	void		operator=(ObjectId id);
+//	void		operator=(const CUObject & inCopy);
+//	
+//	NewtonErr	makeObject(ObjectTypes inObjectType, struct ObjectMessage * inMsg, size_t inMsgSize);
+//	void		destroyObject(void);
+//	void		denyOwnership(void);
+//	BOOL		isExtPage(void);
+	
+//	friend	void MonitorExitAction(ObjectId inMonitorId, ULong inAction);
+//	friend	class CUMonitor;
+//	
+//	void		copyObject(const ObjectId inId);
+//	void		copyObject(const CUObject & inCopy);
+	
+	NEWT_GET_SET_W(0x000, ObjectId, Id);
+	NEWT_GET_SET_B(0x004, BOOL, ObjectCreatedByUs);
+};
+
+
+class TUSemaphoreOpList : public TUObject
+{
+public:
+//	NewtonErr	init(ULong inNumOfArgs, ...);
+};
+
+
+class TUSemaphoreGroup : public TUObject
+{
+public:
+//	NewtonErr	init(ULong inCount);
+//	
+//	NewtonErr	semOp(ObjectId inListId, SemFlags inBlocking);
+//	
+//	NewtonErr	setRefCon(void * inRefCon);
+//	NewtonErr	getRefCon(void ** outRefCon);
+
+	NewtonErr		semOp(TUSemaphoreOpList  inList, SemFlags inBlocking);
+
+	//protected:
+	NEWT_GET_SET_W(0x008, ULong*, RefCon);
+};
+
 
 extern void WantSchedule();
 extern void ScheduleTask(TTask*);
 extern void UnScheduleTask(TTask *inTask);
 extern "C" NewtonErr DoSemaphoreOp(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking, TTask *inTask);
+
+
+extern void Func_0x001CC7F4(TARMProcessor* ioCPU, KUInt32 ret); // WantSchedule__Fv
+extern void Func_0x001CC1B0(TARMProcessor* ioCPU, KUInt32 ret); // UpdateCurrentBucket__10TSchedulerFv
+extern void Func_0x00359AA8(TARMProcessor* ioCPU, KUInt32 ret); // CheckBeforeAdd__10TTaskQueueFP5TTask
+extern void Func_0x00359BE0(TARMProcessor* ioCPU, KUInt32 ret); // Peek__10TTaskQueueFv
+extern void Func_0x00359AAC(TARMProcessor* ioCPU, KUInt32 ret); // Add__10TTaskQueueFP5TTask17KernelObjectStateP14TTaskContainer
+extern void Func_0x00359B5C(TARMProcessor* ioCPU, KUInt32 ret); // RemoveFromQueue__10TTaskQueueFP5TTask17KernelObjectState
+extern void Func_0x001CC564(TARMProcessor* ioCPU, KUInt32 ret); // Add__10TSchedulerFP5TTask
+
 
 
 #endif /* defined(_NEWT_TTASK_) */
