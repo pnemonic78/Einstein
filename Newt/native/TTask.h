@@ -9,18 +9,12 @@
 #ifndef _NEWT_TTASK_
 #define _NEWT_TTASK_
 
+#include "Newt/native/types.h"
+
 #include "SimulatorGlue.h"
 
 
-typedef KUInt32 ObjectId;
-typedef KUInt32 ULong;
-typedef KUInt32 KernelObjectState;
-typedef void *	Heap;
-typedef KSInt8  BOOL;
-typedef KSInt32 NewtonErr;
 
-
-class TTask;
 
 
 class TEnvironment {

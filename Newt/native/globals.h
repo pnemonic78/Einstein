@@ -9,12 +9,11 @@
 #ifndef _NEWT_GLOBALS_
 #define _NEWT_GLOBALS_
 
+#include "Newt/native/types.h"
+
 #include "SimulatorGlue.h"
 
 
-class TParamBlock;
-class InterruptObject;
-class TScheduler;
 
 extern TParamBlock* GParamBlockFromImage();
 extern void SetGCurrentTask(TTask *newTask);

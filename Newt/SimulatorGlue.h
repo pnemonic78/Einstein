@@ -150,6 +150,9 @@ KUInt32 const ptr_##name = (addr);
 extern TARMProcessor *gCPU;
 
 
+#include "native/types.h"
+
+
 //#include "unsorted/unsorted_001.h"
 //#include "unsorted/unsorted_002.h"
 //#include "unsorted/unsorted_003.h"
@@ -179,14 +182,17 @@ extern TARMProcessor *gCPU;
 //#include "unsorted/unsorted_027.h"
 //#include "unsorted/unsorted_028.h"
 
-//#include "core/swi.h"
-
 #include "classes/TSingleQContainer.h"
 #include "classes/TInterpreter.h"
 #include "classes/TSerialChipVoyager.h"
 
+// hand coded files
+
+
 #include "SimHandcoded.h"
 
 #include "native/TTask.h"
+#include "native/globals.h"
+#include "native/swi.h"
 
 #endif /* EINSTEIN_NEWT_SIMULATOR_GLUE_H */
