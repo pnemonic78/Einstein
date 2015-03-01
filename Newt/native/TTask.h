@@ -132,29 +132,34 @@ public:
 	TTaskContainer	*pContainer;					///< 090 The container that handles this task
 	NEWT_GET_REF  (0x094, TTaskQItem, TaskQItem);
 	TTaskQItem		pTaskQItem;						///< 094 for tasks in scheduler queue
-/*
-	ObjectId			f9C;					// +9C	referenced in findAndRemove() but never set
-	void *			fGlobals;			// +A0
-	CTime				fTaskTime;			// +A4	time spent within this task
-	size_t			fTaskDataSize;		// +AC	size of task globals
-	long				fPtrsUsed;			// +B0
-	long				fHandlesUsed;		// +B4
-	long				fMemUsed;			// +B8	max memory (pointers + handles) used
-	CDoubleQItem	fCopyQItem;			// +BC	for tasks in queue for copy
-	CDoubleQItem	fMonitorQItem;		// +C8	for tasks in monitor queue
-	ObjectId			fMonitor;			// +D4	if task is running in a monitor, that monitor
-	ObjectId			fMonitorId;			// +D8	if this task is a monitor, its id
-	VAddr				fCopySavedPC;		// +DC	PC register saved during copy task
-	NewtonErr		fCopySavedErr;		// +E0	error code saved during copy task
-	size_t			fCopiedSize;		// +E4
-	ObjectId			fCopySavedMemId;	// +E8	CSharedMem object id saved during copy task
-	ObjectId			fCopySavedMemMsgId;//+EC	CSharedMemMsg object id saved during copy task
-	ObjectId			fSharedMem;			// +F0	shared mem object id
-	ObjectId			fSharedMemMsg;		// +F4	shared mem msg object id
-	VAddr				fTaskData;			// +F8	address of task globals (usually == this)
-	ObjectId			fBequeathId;		// +FC
-	ObjectId			fInheritedId;		// +100
- */
+	
+//	ObjectId			f9C;					// +9C	referenced in findAndRemove() but never set
+	
+	NEWT_GET_SET_W(0x0A0, void*, Globals);
+	void			*pGlobals;						///< 0A0 pointer to the globals variables specific to this task
+	
+//	CTime				fTaskTime;			// +A4	time spent within this task
+//	size_t			fTaskDataSize;		// +AC	size of task globals
+//	long				fPtrsUsed;			// +B0
+//	long				fHandlesUsed;		// +B4
+//	long				fMemUsed;			// +B8	max memory (pointers + handles) used
+//	CDoubleQItem	fCopyQItem;			// +BC	for tasks in queue for copy
+//	CDoubleQItem	fMonitorQItem;		// +C8	for tasks in monitor queue
+//	ObjectId			fMonitor;			// +D4	if task is running in a monitor, that monitor
+	
+	NEWT_GET_SET_W(0x0D8, ObjectId, MonitorId);
+	ObjectId			pMonitorId;			// 0D8 if this task is a monitor, this is its id
+	
+//	VAddr				fCopySavedPC;		// +DC	PC register saved during copy task
+//	NewtonErr		fCopySavedErr;		// +E0	error code saved during copy task
+//	size_t			fCopiedSize;		// +E4
+//	ObjectId			fCopySavedMemId;	// +E8	CSharedMem object id saved during copy task
+//	ObjectId			fCopySavedMemMsgId;//+EC	CSharedMemMsg object id saved during copy task
+//	ObjectId			fSharedMem;			// +F0	shared mem object id
+//	ObjectId			fSharedMemMsg;		// +F4	shared mem msg object id
+//	VAddr				fTaskData;			// +F8	address of task globals (usually == this)
+//	ObjectId			fBequeathId;		// +FC
+//	ObjectId			fInheritedId;		// +100
 };
 
 
@@ -398,9 +403,13 @@ public:
 extern void WantSchedule();
 extern void ScheduleTask(TTask*);
 extern void UnScheduleTask(TTask *inTask);
+extern void SwapInGlobals(TTask*);
+extern NewtonErr ClearInterrupt(class InterruptObject* interrupt);
+
 extern "C" NewtonErr DoSemaphoreOp(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking, TTask *inTask);
 
 
+extern void Func_0x0025215C(TARMProcessor* ioCPU, KUInt32 ret); // SwapInGlobals
 extern void Func_0x001CC7F4(TARMProcessor* ioCPU, KUInt32 ret); // WantSchedule__Fv
 extern void Func_0x001CC1B0(TARMProcessor* ioCPU, KUInt32 ret); // UpdateCurrentBucket__10TSchedulerFv
 extern void Func_0x00359AA8(TARMProcessor* ioCPU, KUInt32 ret); // CheckBeforeAdd__10TTaskQueueFP5TTask
@@ -408,6 +417,7 @@ extern void Func_0x00359BE0(TARMProcessor* ioCPU, KUInt32 ret); // Peek__10TTask
 extern void Func_0x00359AAC(TARMProcessor* ioCPU, KUInt32 ret); // Add__10TTaskQueueFP5TTask17KernelObjectStateP14TTaskContainer
 extern void Func_0x00359B5C(TARMProcessor* ioCPU, KUInt32 ret); // RemoveFromQueue__10TTaskQueueFP5TTask17KernelObjectState
 extern void Func_0x001CC564(TARMProcessor* ioCPU, KUInt32 ret); // Add__10TSchedulerFP5TTask
+extern void Func_0x000E5960(TARMProcessor* ioCPU, KUInt32 ret); // ClearInterrupt
 
 
 

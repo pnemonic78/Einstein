@@ -23,7 +23,7 @@ rt open ScreenUpdateTask
 # rt cjit !GetSample__4TADCF10ADCMuxTypeUlPFPvlUl_vPv
 
 rt cjit !StartScheduler
-rt cjit !SwapInGlobals
+#rt cjit SwapInGlobals
 rt cjit !DoDeferrals
 rt cjit !Scheduler
 rt cjit !Schedule__10TSchedulerFv

@@ -25,6 +25,89 @@
 #pragma mark - C and C++ Functions
 
 
+/**
+ * Transcoded function ClearInterrupt
+ * ROM: 0x000E5960 - 0x000E598C
+ */
+void Func_0x000E5960(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	// 000E5960: E5902008  ldr	r2, [r0, #0x008]
+	SETPC(0x000E5960+8);
+	R2 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R0 + 0x0008);
+	
+	// 000E5964: E3120040  tst	r2, #0x00000040
+	{
+		KUInt32 Opnd2 = 0x00000040;
+		KUInt32 Opnd1 = R2;
+		const KUInt32 theResult = Opnd1 & Opnd2;
+		ioCPU->mCPSR_Z = (theResult==0);
+		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
+	}
+	
+	// 000E5968: E3A01000  mov	r1, #0x00000000
+	R1 = 0x00000000; // 0
+	
+	// 000E596C: 05900000  ldreq	r0, [r0]
+	if (ioCPU->TestEQ()) {
+		SETPC(0x000E596C+8);
+		R0 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R0);
+	}
+	
+	// 000E5970: 059F2010  ldreq	r2, 000E5988=ClearInterrupt+28
+	if (ioCPU->TestEQ()) {
+		R2 = 0x0F183800; // kHdWr_IntClear
+	}
+	
+	// 000E5974: 05820000  streq	r0, [r2]
+	if (ioCPU->TestEQ()) {
+		SETPC(0x000E5974+8);
+		UJITGenericRetargetSupport::ManagedMemoryWrite(ioCPU, R2, R0);
+	}
+	
+	// 000E5978: 13C22C02  bicne	r2, r2, #0x00000200
+	if (ioCPU->TestNE()) {
+		R2 = R2 & 0xFFFFFDFF;
+	}
+	
+	// 000E597C: 15A02008  strne	r2, [r0, #0x008]!
+	if (ioCPU->TestNE()) {
+		KUInt32 offset = 0x00000008;
+		KUInt32 theAddress = R0 + offset;
+		KUInt32 theValue = R2;
+		SETPC(0x000E597C+8);
+		UJITGenericRetargetSupport::ManagedMemoryWrite(ioCPU, theAddress, theValue);
+		R0 = theAddress;
+	}
+	
+	// 000E5980: E1A00001  mov	r0, r1
+	R0 = R1;
+	
+	// 000E5984: E1A0F00E  mov	pc, lr
+	{
+		KUInt32 Opnd2 = LR;
+		const KUInt32 theResult = Opnd2;
+		SETPC(theResult + 4);
+		if (ret==0xFFFFFFFF)
+			return; // Return to emulator
+		if (PC!=ret)
+			__asm__("int $3\n" : : ); // Unexpected return address
+		return;
+	}
+	
+	// KUInt32 D_000E5988 = 0x0F183800; // kHdWr_IntClear
+	__asm__("int $3\n" : : ); // There was no return instruction found
+}
+T_ROM_SIMULATION3(0x000E5960, "ClearInterrupt", Func_0x000E5960)
+
+
+void SwapInGlobals(TTask *inTask)
+{
+	SetGCurrentTaskId( inTask->Id() );
+	SetGCurrentGlobals( inTask->Globals() );
+	SetGCurrentMonitorId( inTask->MonitorId() );
+}
+
+
 NewtonErr DoSemaphoreOp(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking, TTask *inTask)
 {
 	TSemaphoreGroup* semGroup = NULL;
@@ -751,3 +834,15 @@ void Func_0x00359B14(TARMProcessor* ioCPU, KUInt32 ret)
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x00359B14, "Remove__10TTaskQueueF17KernelObjectState", Func_0x00359B14)
+
+/**
+ * SwapInGlobals
+ * ROM: 0x0025215C - 0x00252190
+ */
+void Func_0x0025215C(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	SwapInGlobals((TTask*)R0);
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x0025215C, "SwapInGlobals", Func_0x0025215C)
+
