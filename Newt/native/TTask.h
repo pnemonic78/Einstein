@@ -19,60 +19,58 @@ enum SemFlags
 };
 
 
-
 #include "SimulatorGlue.h"
 
 
-
-
-
-class TEnvironment {
+class TEnvironment
+{
 public:
-	KUInt32 GetDomainAccess() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x10); };
-
-//public:
-//	~CEnvironment();
-//	
-//	NewtonErr	init(Heap inHeap);
-//	NewtonErr	add(CDomain * inDomain, BOOL inIsManager, BOOL inHasStack, BOOL inHasHeap);
-//	NewtonErr	remove(CDomain * inDomain);
-//	NewtonErr	hasDomain(CDomain * inDomain, BOOL * outHasDomain, BOOL * outIsManager);
-//	void			incrRefCount(void);
-//	BOOL			decrRefCount(void);
+//	TEnvironment();
+//	~TEnvironment();
+	KUInt32			GetDomainAccess() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x10); };
+//	NewtonErr		Init(Heap inHeap);
+//	NewtonErr		Add(TDomain* inDomain, BOOL inIsManager, BOOL inHasStack, BOOL inHasHeap);
+//	NewtonErr		Remove(TDomain* inDomain);
+//	NewtonErr		HasDomain(TDomain* inDomain, BOOL* outHasDomain, BOOL* outIsManager);
+//	void			IncrRefCount();
+//	BOOL			DecrRefCount();
 	
-	NEWT_GET_SET_W(0x10, ULong, DomainAccess);
-	NEWT_GET_SET_W(0x14, Heap,  fHeap);
-	NEWT_GET_SET_W(0x18, ObjectId, StackDomainId);
-	NEWT_GET_SET_W(0x1c, ObjectId, HeapDomainId);
-	NEWT_GET_SET_W(0x20, KSInt32, RefCount);
-	NEWT_GET_SET_B(0x24, BOOL, Unknown24);
-	NEWT_GET_SET_W(0x28, TEnvironment*, NextEnvironment);
+	NEWT_GET_SET_W(0x010, ULong, DomainAccess);
+	ULong			pDomainAccess;					///< 010 domain access rights bitmap
+	NEWT_GET_SET_W(0x014, Heap, MyHeap);
+	Heap			pMyHeap;						///< 014 heap information for this environment
+	NEWT_GET_SET_W(0x018, ObjectId, StackDomainId);
+	ObjectId		pStackDomainId;					///< 018
+	NEWT_GET_SET_W(0x01c, ObjectId, HeapDomainId);
+	ObjectId		pHeapDomainId;					///< 01C
+	NEWT_GET_SET_W(0x020, KSInt32, RefCount);
+	KSInt32			pRefCount;						///< 020
+	NEWT_GET_SET_B(0x024, BOOL, Unknown24);
+	BOOL			pUnknown24;						///< 024
+	NEWT_GET_SET_W(0x028, TEnvironment*, NextEnvironment);
+	TEnvironment	*pNextEnvironment;				///< 028
 };
 
 
 class TObject
 {
 public:
-/*
-    CObject(ObjectId id = 0)			{ fId = id; }
-    CObject(const CObject & inCopy)	{ fId = inCopy.fId; }
-    
-    operator	ObjectId()	const			{ return fId; }
-    
-    void			setOwner(ObjectId id)				{ fOwnerId = id; }
-    ObjectId		owner(void)				const			{ return fOwnerId; }
-    
-    void			assignToTask(ObjectId id)			{ fAssignedOwnerId = id; }
-    ObjectId		assignedOwner(void)	const			{ return fAssignedOwnerId; }
-*/
-	//protected:
-    //    friend class CObjectTable;
-    //    friend class CObjectTableIterator;
+//    CObject(ObjectId id = 0)			{ fId = id; }
+//    CObject(const CObject & inCopy)	{ fId = inCopy.fId; }
+//    operator	ObjectId()	const			{ return fId; }
+//    void			setOwner(ObjectId id)				{ fOwnerId = id; }
+//    ObjectId		owner(void)				const			{ return fOwnerId; }
+//    void			assignToTask(ObjectId id)			{ fAssignedOwnerId = id; }
+//    ObjectId		assignedOwner(void)	const			{ return fAssignedOwnerId; }
 	
 	NEWT_GET_SET_W(0x000, ObjectId, Id);
+	ObjectId		pId;							///< 000
 	NEWT_GET_SET_W(0x004, TObject*, Next);
+	TObject			*pNext;							///< 004
 	NEWT_GET_SET_W(0x008, ObjectId, OwnerId);
+	ObjectId		pOwnerId;						///< 008
 	NEWT_GET_SET_W(0x00C, ObjectId, AssignedOwnerId);
+	ObjectId		pAssignedOwnerId;				///< 00C
 };
 
 
@@ -80,7 +78,9 @@ class TTaskQItem
 {
 public:
 	NEWT_GET_SET_W(0x000, TTask*, Next);
+	TTask			*pNext;							///< 000
 	NEWT_GET_SET_W(0x004, TTask*, Prev);
+	TTask			*pPrev;							///< 004
 };
 
 
@@ -107,21 +107,31 @@ public:
 //    TTask *GetCurrentTask() { return (TTask*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0x7C); };
 //    void *GetGlobals() { return (void*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xA0); };
 //    ObjectId GetMonitorId() { return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+0xD8); };
-	NEWT_GET_ARR_W(0x010, ULong, Register, 16);		// Processor Registers
-	NEWT_GET_SET_W(0x050, ULong, PSR);				// Processor Status Register
+	
+	NEWT_GET_ARR_W(0x010, ULong, Register, 16);
+	ULong			pRegister[16];					///< 010 Processor Registers
+	NEWT_GET_SET_W(0x050, ULong, PSR);
+	ULong			pPSR;							///< 050 Processor Status Register
 //	ObjectId			f68;					// +68	set in init() but never referenced
 	NEWT_GET_SET_W(0x06C, KernelObjectState, State);
+	KernelObjectState pState;						///< 06C
 	NEWT_GET_SET_W(0x074, TEnvironment*, Environment);
+	TEnvironment	*pEnvironment;					///< 074
 	NEWT_GET_SET_W(0x078, TEnvironment*, SMemEnvironment);
-	NEWT_GET_SET_W(0x07C, TTask*, CurrentTask);		// if this task is a monitor, the task it’s running
+	TEnvironment	*pSMemEnvironment;				///< 078
+	NEWT_GET_SET_W(0x07C, TTask*, CurrentTask);
+	TTask			*pCurrentTask;					///< 07C if this task is a monitor, the task it’s running
 	NEWT_GET_SET_W(0x080, int, Priority);
+	int				pPriority;						///< 080
 	/*
 	ULong				fName;				// +84
 	VAddr				fStackTop;			// +88
 	VAddr				fStackBase;			// +8C
 	 */
-	NEWT_GET_SET_W(0x090, TTaskContainer*, Container);	///< +090 The container that handles this task
-	NEWT_GET_REF  (0x094, TTaskQItem, TaskQItem);			// +94	for tasks in scheduler queue
+	NEWT_GET_SET_W(0x090, TTaskContainer*, Container)
+	TTaskContainer	*pContainer;					///< 090 The container that handles this task
+	NEWT_GET_REF  (0x094, TTaskQItem, TaskQItem);
+	TTaskQItem		pTaskQItem;						///< 094 for tasks in scheduler queue
 /*
 	ObjectId			f9C;					// +9C	referenced in findAndRemove() but never set
 	void *			fGlobals;			// +A0
@@ -162,7 +172,9 @@ public:
 	void		Add(TTask *inTask, KernelObjectState inState, TTaskContainer *inContainer);
 	
 	NEWT_GET_SET_W(0x000, TTask*, Head);
+	TTask			*pHead;							///< 000 first task in list
 	NEWT_GET_SET_W(0x004, TTask*, Tail);
+	TTask			*pTail;							///< 004 last task in list
 };
 
 
@@ -191,9 +203,13 @@ public:
 //	friend class CSharedMemMsg;
 
 	NEWT_GET_SET_W(0x014, int, HighestPriority);
+	int				pHighestPriority;				///< 014 the highes priority of any task in this scheduler
 	NEWT_GET_SET_W(0x018, ULong, PriorityMask);
+	ULong			pPriorityMask;					///< 018 a mask of any task priority pending
 	NEWT_GET_REF  (0x01C, TTaskQueueArray, Task);
+	TTaskQueueArray	pTask;							///< 01C multiple queues sorted by priority
 	NEWT_GET_SET_W(0x11C, TTask*, CurrentTask);
+	TTask			*pCurrentTask;					///< 11C the currently running task
 };
 
 
@@ -214,16 +230,21 @@ public:
 	void		WakeTasksOnZero();
 	void		WakeTasksOnInc();
 	
-	NEWT_GET_SET_W(0x014, long, Val);				// semval in unix-speak
-	NEWT_GET_REF  (0x018, TTaskQueue, ZeroTasks);	// tasks waiting for fValue to become zero
-	NEWT_GET_REF  (0x020, TTaskQueue, IncTasks);	// tasks waiting for fValue to increase
+	NEWT_GET_SET_W(0x014, long, Value);
+	long			pValue;							///< 014 semval in unix-speak
+	NEWT_GET_REF  (0x018, TTaskQueue, ZeroTasks);
+	TTaskQueue		pZeroTasks;						///< 018 tasks waiting for fValue to become zero
+	NEWT_GET_REF  (0x020, TTaskQueue, IncTasks);
+	TTaskQueue		pIncTasks;						///< 020 tasks waiting for fValue to increase
 };
 
 
 class SemOp {
 public:
-	NEWT_GET_SET_S(0x000, unsigned short,	Num);	// index of Semaphore
-	NEWT_GET_SET_S(0x002, short,			Op);	// new value
+	NEWT_GET_SET_S(0x000, unsigned short,	Num);
+	unsigned short	pNum;							///< 000 index of Semaphore
+	NEWT_GET_SET_S(0x002, short,			Op);
+	short			pOp;							///< 002 new value
 };
 
 
@@ -238,7 +259,9 @@ public:
 //	friend class CSemaphoreGroup;
 	
 	NEWT_GET_SET_W(0x010, SemOp*,	OpList);
+	SemOp			*pOpList;						///< 010
 	NEWT_GET_SET_W(0x014, int,		Count);
+	int				pCount;							///< 014
 };
 
 
@@ -257,8 +280,11 @@ public:
 	NewtonErr	SemOp(TSemaphoreOpList *inList, SemFlags inBlocking, TTask *inTask);
 	
 	NEWT_GET_SET_W(0x010, TSemaphore*,	Group);
+	TSemaphore		*pGroup;						///< 010
 	NEWT_GET_SET_W(0x014, int,			Count);
+	int				pCount;							///< 014
 	NEWT_GET_SET_W(0x018, void*,		RefCon);
+	void			*pRefCon;						///< 018
 };
 
 
@@ -288,10 +314,15 @@ public:
 	TObject*	Get(ObjectId inId);
 
 	NEWT_GET_SET_W(0x000, GetScavengeProcPtr, Scavenge);
+	GetScavengeProcPtr pScavenge;					///< 000
 	NEWT_GET_SET_W(0x004, TObject*, ThisObj);
+	TObject				*pThisObj;					///< 004
 	NEWT_GET_SET_W(0x008, TObject*, PrevObj);
+	TObject				*pPrevObj;					///< 008
 	NEWT_GET_SET_W(0x00C, int, Index);
-	NEWT_GET_ARR_W(0x010, TObject*, Entry, 0x80);	// Array of TObject*
+	int					pIndex;						///< 00C
+	NEWT_GET_ARR_W(0x010, TObject*, Entry, 0x80);
+	TObject				*pEntry[0x80];				///< 010 Array of TObject*
 };
 
 
@@ -325,7 +356,9 @@ public:
 //	void		copyObject(const CUObject & inCopy);
 	
 	NEWT_GET_SET_W(0x000, ObjectId, Id);
+	ObjectId		pId;							///< 000
 	NEWT_GET_SET_B(0x004, BOOL, ObjectCreatedByUs);
+	BOOL			pObjectCreatedByUs;				///< 004
 };
 
 
@@ -350,6 +383,15 @@ public:
 
 	//protected:
 	NEWT_GET_SET_W(0x008, ULong*, RefCon);
+	ULong			*pRefCon;						///< 008
+};
+
+
+class TParamBlock
+{
+public:
+	NEWT_GET_SET_W(0x0B0, ULong, DomainAccess);
+	ULong			pDomainAccess;					///< 0B0
 };
 
 

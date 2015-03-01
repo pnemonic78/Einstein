@@ -15,7 +15,6 @@
 
 
 
-extern TParamBlock* GParamBlockFromImage();
 extern void SetGCurrentTask(TTask *newTask);
 extern KUInt32 GCopyDone();
 extern void SetGCopyDone(KUInt32 v);
@@ -33,6 +32,8 @@ extern void GSchedulerRunning(KUInt32 v);
 extern InterruptObject *GSchedulerIntObj();
 
 
+NEWT_GLOBAL_W_REF(0x0C008400, TParamBlock*,		ParamBlockFromImage)
+
 NEWT_GLOBAL_W_DEF(0x0C100FC4, TTask*,			IdleTask)
 NEWT_GLOBAL_W_DEF(0x0C100FC8, TObjectTable*,	ObjectTable)
 
@@ -47,6 +48,7 @@ NEWT_GLOBAL_W_DEF(0x0C100FF8, TTask*,			CurrentTask)
 NEWT_GLOBAL_W_DEF(0x0C101980, int,				TaskPriority)
 
 NEWT_GLOBAL_W_DEF(0x0C101A2C, BOOL,				WantSchedulerToRun)
+
 
 
 #endif /* defined(_NEWT_GLOBALS_) */

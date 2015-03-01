@@ -22,6 +22,106 @@
 #endif
 
 
+#pragma mark - C and C++ Functions
+
+
+NewtonErr DoSemaphoreOp(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking, TTask *inTask)
+{
+	TSemaphoreGroup* semGroup = NULL;
+	if ( (inGroupId & 0x0f) == 7 )
+		semGroup = (TSemaphoreGroup*)GObjectTable()->Get(inGroupId);
+	if (!semGroup)
+		return -10022; // kOSErrBadSemaphoreGroupId
+	
+	TSemaphoreOpList* opList = NULL;
+	if ( (inListId & 0x0f) == 6 )
+		opList = (TSemaphoreOpList*)GObjectTable()->Get(inListId);
+	
+	if (opList==NULL)
+		return -10023; // kOSErrBadSemaphoreOpListId
+	
+	return semGroup->SemOp(opList, inBlocking, inTask);
+}
+
+
+void UnScheduleTask(TTask *inTask)
+{
+	TScheduler *kernelScheduler = GKernelScheduler();
+	kernelScheduler->Remove(inTask); // FIXME: a virtual function
+}
+
+
+/**
+ * Tell the scheduler that we changed something in the task lists.
+ */
+void WantSchedule()
+{
+	if (GHoldScheduleLevel()==0) {
+		SetGSchedule(1);
+	} else {
+		SetGScheduleRequested(1);
+	}
+}
+
+
+/**
+ * Schedule a tesk for execution.
+ */
+void ScheduleTask(TTask *inTask)
+{
+	GKernelScheduler()->AddWhenNotCurrent(inTask);
+}
+
+
+#pragma mark - TTaskQueue
+
+
+/**
+ * Get the next task in this queue.
+ * \returns the next task, NULL if there is none
+ */
+TTask *TTaskQueue::Peek()
+{
+	return Head();
+}
+
+
+/**
+ * Remove a specific task from a queue.
+ */
+BOOL TTaskQueue::RemoveFromQueue(TTask *inTask, KernelObjectState inState)
+{
+	if ( (inTask==0L) || ((inTask->State() & inState)==0) )	{
+		return 0;
+	}
+	
+	TTask *nextTask = inTask->TaskQItem().Next();
+	TTask *prevTask = inTask->TaskQItem().Prev();
+	if ( inTask == Head() ) {
+		if ( Head()!=Tail() ) {
+			SetHead(nextTask);
+			nextTask->TaskQItem().SetPrev(0L);
+		} else {
+			SetHead(0L);
+			SetTail(0L);
+		}
+	} else {
+		prevTask->TaskQItem().SetNext(nextTask);
+		if ( inTask != Tail() ) {
+			nextTask->TaskQItem().SetPrev(prevTask);
+		} else {
+			SetTail(prevTask);
+		}
+	}
+	
+	inTask->TaskQItem().SetNext(0L);
+	inTask->TaskQItem().SetPrev(0L);
+	inTask->SetState( inTask->State() & ~inState );
+	inTask->SetContainer(0L);
+	
+	return 1;
+}
+
 
 /**
  * Remove the first task from this queue.
@@ -59,19 +159,6 @@ void TTaskQueue::CheckBeforeAdd(TTask*)
 
 
 /**
- * Tell the scheduler that we changed something in the task lists.
- */
-void WantSchedule()
-{
-	if (GHoldScheduleLevel()==0) {
-		SetGSchedule(1);
-	} else {
-		SetGScheduleRequested(1);
-	}
-}
-
-
-/**
  * Add the give task to the end of this queue.
  * The task must not be part of this or another queue.
  */
@@ -92,6 +179,9 @@ void TTaskQueue::Add(TTask *inTask, KernelObjectState inState, TTaskContainer *i
 	inTask->SetState( inTask->State() | inState );
 	inTask->SetContainer( inContainer );
 }
+
+
+#pragma mark - TScheduler
 
 
 /**
@@ -138,12 +228,42 @@ void TScheduler::AddWhenNotCurrent(TTask *inTask)
 
 
 /**
- * Schedule a tesk for execution.
+ * Recalculate priorities by priority map.
  */
-void ScheduleTask(TTask *inTask)
+void TScheduler::UpdateCurrentBucket()
 {
-	GKernelScheduler()->AddWhenNotCurrent(inTask);
+	for (int i = HighestPriority()-1; i > 0; i--) {
+		if (PriorityMask() & (1<<i)) {
+			SetHighestPriority(i);
+			return;
+		}
+	}
+	SetHighestPriority(0);
 }
+
+
+void TScheduler::Remove(TTask *inTask)
+{
+	if ( inTask ) {
+		if ( inTask == GCurrentTask() ) {
+			SetGCurrentTask(0L);
+			WantSchedule();
+			SetGWantSchedulerToRun(1);
+		} else {
+			int priority = inTask->Priority();
+			Task()[priority].RemoveFromQueue(inTask, 0x00020000);
+			if ( Task()[priority].Peek() == 0L )
+			{
+				SetPriorityMask( PriorityMask() & ~(1<<priority) );
+				if ( priority == HighestPriority() )
+					UpdateCurrentBucket();
+			}
+		}
+	}
+}
+
+
+#pragma mark - TSemaphore
 
 
 /**
@@ -200,96 +320,6 @@ void TSemaphore::WakeTasksOnInc()
 }
 
 
-/**
- * Get the next task in this queue.
- * \returns the next task, NULL if there is none
- */
-TTask *TTaskQueue::Peek()
-{
-	return Head();
-}
-
-
-/**
- * Recalculate priorities by priority map.
- */
-void TScheduler::UpdateCurrentBucket()
-{
-	for (int i = HighestPriority()-1; i > 0; i--) {
-		if (PriorityMask() & (1<<i)) {
-			SetHighestPriority(i);
-			return;
-		}
-	}
-	SetHighestPriority(0);
-}
-
-
-/**
- * Remove a specific task from a queue.
- */
-BOOL TTaskQueue::RemoveFromQueue(TTask *inTask, KernelObjectState inState)
-{
-	if ( (inTask==0L) || ((inTask->State() & inState)==0) )	{
-		return 0;
-	}
-	
-	TTask *nextTask = inTask->TaskQItem().Next();
-	TTask *prevTask = inTask->TaskQItem().Prev();
-	if ( inTask == Head() ) {
-		if ( Head()!=Tail() ) {
-			SetHead(nextTask);
-			nextTask->TaskQItem().SetPrev(0L);
-		} else {
-			SetHead(0L);
-			SetTail(0L);
-		}
-	} else {
-		prevTask->TaskQItem().SetNext(nextTask);
-		if ( inTask != Tail() ) {
-			nextTask->TaskQItem().SetPrev(prevTask);
-		} else {
-			SetTail(prevTask);
-		}
-	}
-	
-	inTask->TaskQItem().SetNext(0L);
-	inTask->TaskQItem().SetPrev(0L);
-	inTask->SetState( inTask->State() & ~inState );
-	inTask->SetContainer(0L);
-	
-	return 1;
-}
-
-
-void TScheduler::Remove(TTask *inTask)
-{
-	if ( inTask ) {
-		if ( inTask == GCurrentTask() ) {
-			SetGCurrentTask(0L);
-			WantSchedule();
-			SetGWantSchedulerToRun(1);
-		} else {
-			int priority = inTask->Priority();
-			Task()[priority].RemoveFromQueue(inTask, 0x00020000);
-			if ( Task()[priority].Peek() == 0L )
-			{
-				SetPriorityMask( PriorityMask() & ~(1<<priority) );
-				if ( priority == HighestPriority() )
-					UpdateCurrentBucket();
-			}
-		}
-	}
-}
-
-
-void UnScheduleTask(TTask *inTask)
-{
-	TScheduler *kernelScheduler = GKernelScheduler();
-	kernelScheduler->Remove(inTask); // FIXME: a virtual function
-}
-
-
 void TSemaphore::BlockOnInc(TTask *inTask, SemFlags inFlags)
 {
 	if ( (inFlags&kNoWaitOnBlock)==0 ) {
@@ -308,6 +338,8 @@ void TSemaphore::BlockOnZero(TTask *inTask, SemFlags inFlags)
 }
 
 
+#pragma mark - TSemaphoreGroup
+
 void TSemaphoreGroup::UnwindOp(TSemaphoreOpList *inList, long index)
 {
 	while (index>0)
@@ -320,7 +352,7 @@ void TSemaphoreGroup::UnwindOp(TSemaphoreOpList *inList, long index)
 		if ( ix < Count() )
 		{
 			TSemaphore &sem = Group()[ix];
-			sem.SetVal( sem.Val()-op );
+			sem.SetValue( sem.Value()-op );
 		}
 	}
 }
@@ -341,15 +373,15 @@ NewtonErr TSemaphoreGroup::SemOp(TSemaphoreOpList *inList, SemFlags inBlocking, 
 			TSemaphore &sem = Group()[semNum];
 			if (semOper == 0)
 			{
-				if (sem.Val() != 0)
+				if (sem.Value() != 0)
 				{
 					Group()[semNum].BlockOnZero(inTask, inBlocking);
 					UnwindOp(inList, index);
 					return -10000-25; // kOSErrSemaphoreWouldCauseBlock;
 				}
 			}
-			else if (semOper > 0 || sem.Val() >= -semOper)	// - = abs
-				sem.SetVal( sem.Val() + semOper );
+			else if (semOper > 0 || sem.Value() >= -semOper)	// - = abs
+				sem.SetValue( sem.Value() + semOper );
 			else
 			{
 				Group()[semNum].BlockOnInc(inTask, inBlocking);
@@ -369,13 +401,16 @@ NewtonErr TSemaphoreGroup::SemOp(TSemaphoreOpList *inList, SemFlags inBlocking, 
 			TSemaphore &sem = Group()[semNum];
 			if (semOper > 0)
 				sem.WakeTasksOnInc();
-			else if (semOper == 0 && sem.Val() == 0)
+			else if (semOper == 0 && sem.Value() == 0)
 				sem.WakeTasksOnZero();
 		}
 	}
 	
 	return noErr;
 }
+
+
+#pragma mark - TObjectTable
 
 
 TObject *TObjectTable::Get(ObjectId inId)
@@ -393,24 +428,7 @@ TObject *TObjectTable::Get(ObjectId inId)
 }
 
 
-NewtonErr DoSemaphoreOp(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking, TTask *inTask)
-{
-	TSemaphoreGroup* semGroup = NULL;
-	if ( (inGroupId & 0x0f) == 7 )
-		semGroup = (TSemaphoreGroup*)GObjectTable()->Get(inGroupId);
-	if (!semGroup)
-		return -10022; // kOSErrBadSemaphoreGroupId
-	
-	TSemaphoreOpList* opList = NULL;
-	if ( (inListId & 0x0f) == 6 )
-		opList = (TSemaphoreOpList*)GObjectTable()->Get(inListId);
-	
-	if (opList==NULL)
-		return -10023; // kOSErrBadSemaphoreOpListId
-	
-	return semGroup->SemOp(opList, inBlocking, inTask);
-}
-
+#pragma mark - Still to do:
 
 // ScreenUpdateTask__FPvUlT2
 //  SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags

@@ -104,28 +104,36 @@ KUInt32 const ptr_##name = (addr);
 	return
 
 #define NEWT_GET_SET_W(offset, type, var) \
-	type p##var;\
 	type var() { return (type)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+offset); }; \
 	void Set##var(type v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, (KUInt32(intptr_t(this)))+offset, (KUInt32)(intptr_t)v); }
+#define NEWT_GET_SET_W_V(offset, type, var) NEWT_GET_SET_W(offset, type, var)\
+	type p##var;
 
 #define NEWT_GET_SET_S(offset, type, var) \
-	type p##var;\
 	type var() { return (type)UJITGenericRetargetSupport::ManagedMemoryReadS(gCPU, (KUInt32(intptr_t(this)))+offset); }; \
 	void Set##var(type v) { UJITGenericRetargetSupport::ManagedMemoryWriteS(gCPU, (KUInt32(intptr_t(this)))+offset, (KUInt32)(intptr_t)v); }
+#define NEWT_GET_SET_S_V(offset, type, var) NEWT_GET_SET_S(offset, type, var)\
+	type p##var;
 
 #define NEWT_GET_SET_B(offset, type, var) \
-	type p##var;\
 	type var() { return (type)UJITGenericRetargetSupport::ManagedMemoryReadB(gCPU, (KUInt32(intptr_t(this)))+offset); }; \
 	void Set##var(type v) { UJITGenericRetargetSupport::ManagedMemoryWriteB(gCPU, (KUInt32(intptr_t(this)))+offset, (KUInt8)v); }
+#define NEWT_GET_SET_B_V(offset, type, var) NEWT_GET_SET_B(offset, type, var)\
+	type p##var;
 
 #define NEWT_GET_REF(offset, type, var) \
-	type p##var;\
 	type& var() { return *( (type*)((KUInt32(intptr_t(this)))+offset) ); }
+#define NEWT_GET_REF_V(offset, type, var) NEWT_GET_REF(offset, type, var)\
+	type p##var;
 
 #define NEWT_GET_ARR_W(offset, type, var, n) \
-	type p##var[n];\
 	type var(int ix) { return (type)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32(intptr_t(this)))+offset+4*ix); }; \
 	void Set##var(int ix, type v) { UJITGenericRetargetSupport::ManagedMemoryWrite(gCPU, (KUInt32(intptr_t(this)))+offset+4*ix, (KUInt32)(intptr_t)v); }
+#define NEWT_GET_ARR_W_V(offset, type, var, n) NEWT_GET_ARR_W_V(offset, type, var, n)\
+	type p##var[n];
+
+#define NEWT_GLOBAL_W_REF(offset, type, var) \
+	inline type G##var() { return (type)offset; }
 
 #define NEWT_GLOBAL_W_DEF(offset, type, var) \
 	extern type G##var(); \

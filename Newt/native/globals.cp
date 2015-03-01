@@ -9,11 +9,6 @@
 #include "globals.h"
 
 
-TParamBlock* GParamBlockFromImage()
-{
-	return (TParamBlock*)0x0C008400;
-}
-
 KUInt32 GCopyDone()
 {
 	return UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C101040);
@@ -85,6 +80,8 @@ InterruptObject *GSchedulerIntObj()
 	return (InterruptObject*)(uintptr_t)UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, 0x0C100E6C);
 }
 
+
+//  _GLOBAL_W_REF(0x0C008400, TParamBlock*,		ParamBlockFromImage)
 
 NEWT_GLOBAL_W_IMP(0x0C100FC4, TTask*,			IdleTask)
 NEWT_GLOBAL_W_IMP(0x0C100FC8, TObjectTable*,	ObjectTable)
