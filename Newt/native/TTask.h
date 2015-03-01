@@ -9,7 +9,16 @@
 #ifndef _NEWT_TTASK_
 #define _NEWT_TTASK_
 
+
 #include "Newt/native/types.h"
+
+enum SemFlags
+{
+	kWaitOnBlock,				// ok if we need to block
+	kNoWaitOnBlock				// don't wait if need to block
+};
+
+
 
 #include "SimulatorGlue.h"
 
@@ -83,6 +92,9 @@ public:
 };
 
 
+/**
+ * A cooperative mutitasking task unit.
+ */
 class TTask : public TObject
 {
 public:
@@ -98,19 +110,17 @@ public:
 	NEWT_GET_ARR_W(0x010, ULong, Register, 16);		// Processor Registers
 	NEWT_GET_SET_W(0x050, ULong, PSR);				// Processor Status Register
 //	ObjectId			f68;					// +68	set in init() but never referenced
-	NEWT_GET_SET_W(0x6C, KernelObjectState, State);
-	/*
-	CEnvironment * fEnvironment;		// +74
-	CEnvironment *	fSMemEnvironment;	// +78	for copying to/from shared memory
-	CTask *			fCurrentTask;		// +7C	if this task is a monitor, the task it’s running (ever referenced?)
-	 */
+	NEWT_GET_SET_W(0x06C, KernelObjectState, State);
+	NEWT_GET_SET_W(0x074, TEnvironment*, Environment);
+	NEWT_GET_SET_W(0x078, TEnvironment*, SMemEnvironment);
+	NEWT_GET_SET_W(0x07C, TTask*, CurrentTask);		// if this task is a monitor, the task it’s running
 	NEWT_GET_SET_W(0x080, int, Priority);
 	/*
 	ULong				fName;				// +84
 	VAddr				fStackTop;			// +88
 	VAddr				fStackBase;			// +8C
 	 */
-	NEWT_GET_SET_W(0x090, TTaskContainer*, Container);
+	NEWT_GET_SET_W(0x090, TTaskContainer*, Container);	///< +090 The container that handles this task
 	NEWT_GET_REF  (0x094, TTaskQItem, TaskQItem);			// +94	for tasks in scheduler queue
 /*
 	ObjectId			f9C;					// +9C	referenced in findAndRemove() but never set
@@ -184,13 +194,6 @@ public:
 	NEWT_GET_SET_W(0x018, ULong, PriorityMask);
 	NEWT_GET_REF  (0x01C, TTaskQueueArray, Task);
 	NEWT_GET_SET_W(0x11C, TTask*, CurrentTask);
-};
-
-
-enum SemFlags
-{
-	kWaitOnBlock,				// ok if we need to block
-	kNoWaitOnBlock				// don't wait if need to block
 };
 
 

@@ -9,6 +9,7 @@
 
 #include "SWI.h"
 
+#include "globals.h"
 #include "ScreenUpdateTask.h"
 
 // ScreenUpdateTask__FPvUlT2
@@ -45,6 +46,12 @@
 // _SemaphoreOpGlue
 // SWIBoot: 0x003AD698-0x003ADBB4
 
+
+NewtonErr UndefinedSWI()
+{
+	fprintf(stderr, "SYSTEM PANIC: Undefiend SWI\n\n");
+	return -1;
+}
 
 /**
  * Transcoded function Func_0x003ADEE4
@@ -132,7 +139,7 @@ void SWI11_SemOp(TARMProcessor* ioCPU)
 	task->SetRegister(0, UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, SP));
 	task->SetRegister(1, UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, SP+4));
 	
-	SP += 8;
+	SP += 8; // clean up emulator stack
 	
 	return;
 }
@@ -150,6 +157,10 @@ T_ROM_PATCH(0x003ADEE4, "SWI_SemOp") {
  */
 void Func_0x003AD698(TARMProcessor* ioCPU, KUInt32 ret, KUInt32 inSWI)
 {
+	TTask *task;
+	TEnvironment *env;
+
+	
 	// 003AD698: E92D0003  stmfd	r13!, {r0-r1}
 	{
 		KUInt32 baseAddress = SP;
@@ -242,17 +253,7 @@ void Func_0x003AD698(TARMProcessor* ioCPU, KUInt32 ret, KUInt32 inSWI)
 		//		return Func_0x003AD660(ioCPU, ret);
 	}
 	
-	// 003AD6CC: E3A01055  mov	r1, #0x00000055
-	R1 = 0x00000055; // 85
-	
-	// 003AD6D0: E2811C55  add	r1, r1, #0x00005500
-	R1 = R1 + 0x00005500; // 21760
-	
-	// 003AD6D4: E2811855  add	r1, r1, #0x00550000
-	R1 = R1 + 0x00550000; // 5570560
-	
-	// 003AD6D8: E2811455  add	r1, r1, #0x55000000
-	R1 = R1 + 0x55000000; // 1426063360
+	R1 = 0x55555555;
 	
 	// 003AD6DC: E92D0003  stmfd	r13!, {r0-r1}
 	{
@@ -285,156 +286,19 @@ void Func_0x003AD698(TARMProcessor* ioCPU, KUInt32 ret, KUInt32 inSWI)
 		SP = wbAddress;
 	}
 	
-	// 003AD6F0: EE031F13  mcr	p15, 0, r1, c3, c3, 0
-	SETPC(0x003AD6F0+8);
-	ioCPU->SystemCoprocRegisterTransfer(0xEE031F13);
+	ioCPU->GetMemory()->SetDomainAccessControl( R1 );
 	
-	// 003AD6F4: E59F17A0  ldr	r1, 003ADE9C=SWIBoot+804
-	R1 = 0x0C100E58; // gAtomicFIQNestCountFast
-	
-	// 003AD6F8: E5911000  ldr	r1, [r1]
-	SETPC(0x003AD6F8+8);
-	R1 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R1);
-	
-	// 003AD6FC: E3510000  cmp	r1, #0x00000000
+	if (   GAtomicFIQNestCountFast()
+		|| GAtomicIRQNestCountFast()
+		|| GAtomicNestCount()
+		|| GAtomicFIQNestCount())
 	{
-		KUInt32 Opnd2 = 0x00000000;
-		KUInt32 Opnd1 = R1;
-		const KUInt32 theResult = Opnd1 - Opnd2;
-		ioCPU->mCPSR_Z = (theResult==0);
-		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
-		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
-		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
-	}
-	
-	// 003AD700: 059F1798  ldreq	r1, 003ADEA0=SWIBoot+808
-	if (ioCPU->TestEQ()) {
-		R1 = 0x0C100E5C; // gAtomicIRQNestCountFast
-	}
-	
-	// 003AD704: 05911000  ldreq	r1, [r1]
-	if (ioCPU->TestEQ()) {
-		SETPC(0x003AD704+8);
-		R1 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R1);
-	}
-	
-	// 003AD708: 03510000  cmpeq	r1, #0x00000000
-	if (ioCPU->TestEQ()) {
-		KUInt32 Opnd2 = 0x00000000;
-		KUInt32 Opnd1 = R1;
-		const KUInt32 theResult = Opnd1 - Opnd2;
-		ioCPU->mCPSR_Z = (theResult==0);
-		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
-		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
-		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
-	}
-	
-	// 003AD70C: 059F1790  ldreq	r1, 003ADEA4=SWIBoot+80C
-	if (ioCPU->TestEQ()) {
-		R1 = 0x0C100FE8; // gAtomicNestCount
-	}
-	
-	// 003AD710: 05911000  ldreq	r1, [r1]
-	if (ioCPU->TestEQ()) {
-		SETPC(0x003AD710+8);
-		R1 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R1);
-	}
-	
-	// 003AD714: 03510000  cmpeq	r1, #0x00000000
-	if (ioCPU->TestEQ()) {
-		KUInt32 Opnd2 = 0x00000000;
-		KUInt32 Opnd1 = R1;
-		const KUInt32 theResult = Opnd1 - Opnd2;
-		ioCPU->mCPSR_Z = (theResult==0);
-		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
-		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
-		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
-	}
-	
-	// 003AD718: 059F1788  ldreq	r1, 003ADEA8=SWIBoot+810
-	if (ioCPU->TestEQ()) {
-		R1 = 0x0C100FF0; // gAtomicFIQNestCount
-	}
-	
-	// 003AD71C: 05911000  ldreq	r1, [r1]
-	if (ioCPU->TestEQ()) {
-		SETPC(0x003AD71C+8);
-		R1 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R1);
-	}
-	
-	// 003AD720: 03510000  cmpeq	r1, #0x00000000
-	if (ioCPU->TestEQ()) {
-		KUInt32 Opnd2 = 0x00000000;
-		KUInt32 Opnd1 = R1;
-		const KUInt32 theResult = Opnd1 - Opnd2;
-		ioCPU->mCPSR_Z = (theResult==0);
-		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
-		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
-		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
-	}
-	
-	// 003AD724: CA000002  bgt	003AD734=SWIBoot+9C
-	if (ioCPU->TestGT()) {
-		SETPC(0x003AD734+4);
-		goto L003AD734;
-	}
-	
-	// 003AD728: E321F013  msr	cpsr_c, #0x00000013
-	{
-		if (ioCPU->GetMode()==TARMProcessor::kUserMode) {
-			const KUInt32 oldValue = ioCPU->GetCPSR();
-			ioCPU->SetCPSR((0x00000013 & 0xF0000000) | (oldValue & 0x0FFFFFFF));
-		} else {
-			ioCPU->SetCPSR(0x00000013);
-		}
-	}
-	
-	// 003AD72C: E1A00000  mov	r0, r0
-	
-	// 003AD730: E1A00000  mov	r0, r0
-	
-L003AD734:
-	// 003AD734: E1A0100E  mov	r1, lr
-	R1 = LR;
-	
-	// 003AD738: E5111004  ldr	r1, [r1, -#0x004]
-	SETPC(0x003AD738+8);
-	R1 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R1 - 0x0004);
-	
-	// 003AD73C: E3C114FF  bic	r1, r1, #0xff000000
-	R1 = R1 & 0x00FFFFFF;
-	
-	//	// 003AD740: E3510023  cmp	r1, #0x00000023
-	//	{
-	//		KUInt32 Opnd2 = 0x00000023;
-	//		KUInt32 Opnd1 = R1;
-	//		const KUInt32 theResult = Opnd1 - Opnd2;
-	//		ioCPU->mCPSR_Z = (theResult==0);
-	//		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
-	//		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
-	//		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
-	//	}
-	//
-	//	// 003AD744: AA000181  bge	003ADD50=SWIBoot+6B8
-	//	if (ioCPU->TestGE()) {
-	//		// rt cjitr 003ADD50
-	//		SETPC(0x003ADD50+4);
-	//		return Func_0x003ADD50(ioCPU, ret);
-	//	}
-	
-	// 003AD748: E51F01E8  ldr	r0, 003AD568=FlushEntireTLB+20
-	{
-		KUInt32 offset = 0x000001E8;
-		KUInt32 theAddress = 0x003AD748 + 8 - offset;
-		SETPC(0x003AD748+8);
-		KUInt32 theData = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, theAddress);
-		R0 = theData;
+		ioCPU->SetCPSR(0x00000013);
 	}
 	
 	switch (inSWI) {
 		case 0x0000000B: SWI11_SemOp(ioCPU); break;
-		default:
-			NEWT_ASSERT(0==1);
+		default: R0 = (KUInt32)UndefinedSWI(); break;
 	}
 	
 	// 003AD74C: E790F101  ldr	pc, [r0, r1, lsl #2]
@@ -495,19 +359,7 @@ L003AD734:
 		SP = wbAddress;
 	}
 	
-	// 003AD754: E321F0D3  msr	cpsr_c, #0x000000d3
-	{
-		if (ioCPU->GetMode()==TARMProcessor::kUserMode) {
-			const KUInt32 oldValue = ioCPU->GetCPSR();
-			ioCPU->SetCPSR((0x000000D3 & 0xF0000000) | (oldValue & 0x0FFFFFFF));
-		} else {
-			ioCPU->SetCPSR(0x000000D3);
-		}
-	}
-	
-	// 003AD758: E1A00000  mov	r0, r0
-	
-	// 003AD75C: E1A00000  mov	r0, r0
+	ioCPU->SetCPSR(0x000000D3);
 	
 	// 003AD760: E59F1734  ldr	r1, 003ADE9C=SWIBoot+804
 	R1 = 0x0C100E58; // gAtomicFIQNestCountFast
@@ -1865,67 +1717,20 @@ L003ADA74:
 		SP = wbAddress;
 	}
 	
-	// 003ADAA4: E59F140C  ldr	r1, 003ADEB8=SWIBoot+820
-	R1 = 0x0C100FF8; // gCurrentTask
-	
-	// 003ADAA8: E5911000  ldr	r1, [r1]
-	SETPC(0x003ADAA8+8);
-	R1 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R1);
-	
-	// 003ADAAC: E3A00000  mov	r0, #0x00000000
 	R0 = 0x00000000; // 0
-	
-	// 003ADAB0: E5912074  ldr	r2, [r1, #0x074]
-	SETPC(0x003ADAB0+8);
-	R2 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R1 + 0x0074);
-	
-	// 003ADAB4: E3520000  cmp	r2, #0x00000000
-	{
-		KUInt32 Opnd2 = 0x00000000;
-		KUInt32 Opnd1 = R2;
-		const KUInt32 theResult = Opnd1 - Opnd2;
-		ioCPU->mCPSR_Z = (theResult==0);
-		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
-		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
-		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
+
+	task = GCurrentTask();
+	env = task->Environment();
+	if (env) {
+		R0 = R0 | env->DomainAccess();
 	}
 	
-	// 003ADAB8: 15922010  ldrne	r2, [r2, #0x010]
-	if (ioCPU->TestNE()) {
-		SETPC(0x003ADAB8+8);
-		R2 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R2 + 0x0010);
+	env = task->SMemEnvironment();
+	if (env) {
+		R0 = R0 | env->DomainAccess();
 	}
-	
-	// 003ADABC: 11800002  orrne	r0, r0, r2
-	if (ioCPU->TestNE()) {
-		R0 = R0 | R2;
-	}
-	
-	// 003ADAC0: E5912078  ldr	r2, [r1, #0x078]
-	SETPC(0x003ADAC0+8);
-	R2 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R1 + 0x0078);
-	
-	// 003ADAC4: E3520000  cmp	r2, #0x00000000
-	{
-		KUInt32 Opnd2 = 0x00000000;
-		KUInt32 Opnd1 = R2;
-		const KUInt32 theResult = Opnd1 - Opnd2;
-		ioCPU->mCPSR_Z = (theResult==0);
-		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
-		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
-		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
-	}
-	
-	// 003ADAC8: 15922010  ldrne	r2, [r2, #0x010]
-	if (ioCPU->TestNE()) {
-		SETPC(0x003ADAC8+8);
-		R2 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R2 + 0x0010);
-	}
-	
-	// 003ADACC: 11800002  orrne	r0, r0, r2
-	if (ioCPU->TestNE()) {
-		R0 = R0 | R2;
-	}
+
+	R1 = (KUInt32)GCurrentTask();
 	
 L003ADAD0:
 	// 003ADAD0: E591107C  ldr	r1, [r1, #0x07c]
@@ -2222,8 +2027,6 @@ L003ADB94:
 		SP = wbAddress;
 	}
 	
-	// 003ADB98: E1A00000  mov	r0, r0
-	
 	// 003ADB9C: E59F12F4  ldr	r1, 003ADE98=SWIBoot+800
 	R1 = 0x0C008400; // gParamBlockFromImage
 	
@@ -2273,6 +2076,7 @@ L003ADB94:
 }
 //T_ROM_SIMULATION3(0x003AD698, "SWIBoot", Func_0x003AD698)
 
+
 /**
  * Transcoded function _SemaphoreOpGlue
  * ROM: 0x003AE1FC - 0x003AE204
@@ -2299,4 +2103,23 @@ void Func_0x003AE1FC(TARMProcessor* ioCPU, KUInt32 ret)
 	__asm__("int $3\n" : : ); // There was no return instruction found
 }
 T_ROM_SIMULATION3(0x003AE1FC, "_SemaphoreOpGlue", Func_0x003AE1FC)
+
+
+/**
+ * Atomically swap a memory location with a new value.
+ * \param inGroupId semaphore group
+ * \param inListId semaphore op list
+ * \param inBlocking should we wait if the semphore is blocked?
+ * \return error code
+ */
+NewtonErr SemaphoreOpGlue(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking)
+{
+	gCPU->SetRegister(0, inGroupId);
+	gCPU->SetRegister(1, inListId);
+	gCPU->SetRegister(2, inBlocking);
+	gCPU->DoSWI();
+	Func_0x003AD698(gCPU, -1, 0x0000000B);
+	return gCPU->GetRegister(0);
+}
+
 

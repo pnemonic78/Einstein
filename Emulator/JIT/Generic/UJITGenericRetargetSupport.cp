@@ -59,8 +59,13 @@ UJITGenericRetargetSupport::ManagedMemoryReadAligned(TARMProcessor* ioCPU, KUInt
 
 /**
  * Read emulated memory from a virtual address.
+ *
  * This function handles all exceptions that may happen during this process.
  * The function may invoke the scheduler and switch tasks.
+ *
+ * \param ioCPU a pointer to the current CPU
+ * \param inAddress the virtual address that we want to read
+ * \return the word at the given address in native byte order
  */
 KUInt32
 UJITGenericRetargetSupport::ManagedMemoryRead(TARMProcessor* ioCPU, KUInt32 inAddress)

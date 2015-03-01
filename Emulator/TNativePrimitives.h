@@ -70,7 +70,6 @@ public:
 	///
 	/// \param inLog		interface for logging.
 	/// \param inMemory		interface to the memory.
-	/// \param inEmulator	interface with the emulator.
 	///
 	TNativePrimitives(
 				TLog* inLog,

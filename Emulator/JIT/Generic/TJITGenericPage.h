@@ -103,9 +103,10 @@ public:
 	///
 	/// Subroutine to translate an instruction.
 	///
-	/// \param ioUnit	unit to translate.
-	/// \param inPAddr	physical address of the instruction.
+	/// \param inMemoryIntf		Memory access interface.
+	/// \param ioUnitCrsr		unit to translate.
 	/// \param inInstruction	instruction to translate.
+	/// \param inVAddr			base address for translation.
 	///
 	void Translate(
 				   TMemory* inMemoryIntf,
@@ -137,7 +138,8 @@ protected:
 	///
 	/// End of page.
 	///
-	/// \param inInstruction	current instruction.
+	/// \param ioUnit	current instruction.
+	/// \param ioObject current CPU
 	///
 	static JITUnit* EndOfPage(
 					JITUnit* ioUnit,
@@ -146,7 +148,8 @@ protected:
 	///
 	/// Halt (used for stepping).
 	///
-	/// \param inInstruction	current instruction.
+	/// \param ioUnit	current instruction.
+	/// \param ioObject current CPU
 	///
 	static JITUnit* Halt(
 					JITUnit* ioUnit,
@@ -155,9 +158,9 @@ protected:
 	///
 	/// Subroutine to put the test in the units table.
 	///
-	/// \param inInstruction	instruction to translate.
-	/// \param ioUnitCrsr		cursor in the unit table.
-	/// \return the kind of test.
+	/// \param inUnitCrsr		cursor in the unit table.
+	/// \param inDelta			number of JIT units to skip if test is true.
+	/// \param inTest			ARM condition code (highes nibble, shifted to 0..15)
 	///
 	void PutTest(
 				KUInt16 inUnitCrsr,
@@ -168,9 +171,9 @@ protected:
 	/// Subroutine to translate an instruction and replace the unit.
 	/// Called when first two bits are 00.
 	///
-	/// \param inInstruction	instruction to translate.
 	/// \param ioUnitCrsr		cursor in the unit table.
-	/// \param ioUnit			unit to fill.
+	/// \param inInstruction	instruction to translate.
+	/// \param inVAddr			original address of instruction.
 	///
 	void DoTranslate_00(
 					KUInt16* ioUnitCrsr,
@@ -181,9 +184,10 @@ protected:
 	/// Subroutine to translate an instruction and replace the unit.
 	/// Called when first two bits are 01.
 	///
-	/// \param inInstruction	instruction to translate.
+	/// \param inMemoryIntf		Memory access interface.
 	/// \param ioUnitCrsr		cursor in the unit table.
-	/// \param ioUnit			unit to fill.
+	/// \param inInstruction	instruction to translate.
+	/// \param inVAddr			original address of instruction.
 	///
 	void DoTranslate_01(
 					TMemory* inMemoryIntf,
@@ -197,7 +201,7 @@ protected:
 	///
 	/// \param inInstruction	instruction to translate.
 	/// \param ioUnitCrsr		cursor in the unit table.
-	/// \param ioUnit			unit to fill.
+	/// \param inVAddr			original address of instruction.
 	///
 	void DoTranslate_10(
 					KUInt16* ioUnitCrsr,
@@ -210,7 +214,7 @@ protected:
 	///
 	/// \param inInstruction	instruction to translate.
 	/// \param ioUnitCrsr		cursor in the unit table.
-	/// \param ioUnit			unit to fill.
+	/// \param inVAddr			original address of instruction.
 	///
 	void DoTranslate_11(
 					KUInt16* ioUnitCrsr,

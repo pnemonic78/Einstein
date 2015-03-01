@@ -116,7 +116,7 @@ public:
 	/// This method MUST be called from the current thread.
 	/// Decrease the wake up counter or sleep if it's zero.
 	///
-	/// \param inMillisecs		time to sleep.
+	/// \param inMilliseconds		time to sleep.
 	/// \return	\c true if we slept all the time, \c false otherwise.
 	///
 	Boolean Sleep( KUInt32 inMilliseconds = kForever );

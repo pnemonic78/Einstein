@@ -75,9 +75,9 @@ public:
 	///
 	/// Erase flash (write FF)
 	///
-	/// \param inAddress	flash address of the block.
 	/// \param inBlockSize  number of bytes to erase (block size).
-	/// \return true if the address couldn't be accessed for writing.
+	/// \param inOffset		where to erase the block
+	/// \param inBank		bank.
 	///
 	void		Erase(
 					KUInt32 inBlockSize,

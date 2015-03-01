@@ -144,7 +144,7 @@ public:
 	/// Set the memory interface.
 	/// This method is called once the memory interface is created.
 	///
-	/// \param inManager	reference to the memory interface
+	/// \param inMemory	reference to the memory interface
 	///
 	void	SetMemory( TMemory* inMemory )
 		{
@@ -155,7 +155,7 @@ public:
 	/// Set the platform manager.
 	/// This method is called once the platform manager is created.
 	///
-	/// \param inManager	reference to the platform manager.
+	/// \param inPlatformManager	reference to the platform manager.
 	///
 	void	SetPlatformManager( TPlatformManager* inPlatformManager )
 		{
@@ -376,7 +376,7 @@ public:
 	///
 	/// Notify that some screen bits changed.
 	///
-	/// \param inUpdateRect	rectangle of the bits that changed.
+	/// \param inUpdatedRect	rectangle of the bits that changed.
 	///
 	virtual void	UpdateScreenRect( SRect* inUpdatedRect ) = 0;
 

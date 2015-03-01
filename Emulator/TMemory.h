@@ -76,8 +76,8 @@ public:
 	///
 	/// \param inLog				interface for logging.
 	/// \param inROMImageBuffer		pointer to the ROM Image (not copied).
-	/// \param inRAMSize			size of the RAM installed (in bytes)
-	/// \param inEmulator			interface to hardware.
+	/// \param inFlashPath			file path in the host file system.
+	/// \param inRAMSize			size of the RAM installed (in bytes).
 	///
 	TMemory(
 			TLog* inLog,
@@ -91,8 +91,8 @@ public:
 	///
 	/// \param inLog				interface for logging.
 	/// \param inROMImage			ROM Image.
-	/// \param inRAMSize			size of the RAM installed (in bytes)
-	/// \param inEmulator			interface to hardware.
+	/// \param inFlashPath			file path in the host file system.
+	/// \param inRAMSize			size of the RAM installed (in bytes).
 	///
 	TMemory(
 			TLog* inLog,
@@ -171,7 +171,7 @@ public:
 	/// Get a direct pointer to a buffer in RAM
 	///
 	/// \param inAddress the address the device seeks
-	/// \param outPTR the actual address in the RAM buffer
+	/// \param outPtr the actual address in the RAM buffer
 	/// \return true if the address couldn't be accessed.
 	///
 	Boolean		GetDirectPointerToRAM( VAddr inAddress, KUInt8** outPtr );
@@ -180,7 +180,7 @@ public:
 	/// Get a direct pointer to a buffer in RAM or ROM.
 	///
 	/// \param inAddress the address the device seeks
-	/// \param outPTR the actual address in the RAM buffer or in the ROM buffer.
+	/// \param outPtr the actual address in the RAM buffer or in the ROM buffer.
 	/// \return true if the address couldn't be accessed.
 	///
 	Boolean		GetDirectPointerToROMRAM( VAddr inAddress, const KUInt8** outPtr );

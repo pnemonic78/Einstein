@@ -367,14 +367,14 @@ public:
 	///
 	/// Save the state to a file.
 	///
-	/// \return an error code if a problem occurred.
+	/// \param inPath Path to the state file
 	///
 	void		SaveState( const char* inPath );
 	
 	///
 	/// Load the state from a file.
 	///
-	/// \return an error code if a problem occurred.
+	/// \param inPath Path to the state file
 	///
 	void		LoadState( const char* inPath );
 

@@ -48,10 +48,7 @@ public:
 	/// RAM base and the RAM size.
 	///
 	/// \param inMemoryIntf	interface to memory.
-	/// \param inROMBase	base of ROM bank
-	/// \param inROMSize	size of ROM bank
-	/// \param inRAMBase	base of RAM bank
-	/// \param inRAMSize	size of RAM bank
+	/// \param inMMUIntf	interface to MMU.
 	///
 	TJIT(
 		TMemory* inMemoryIntf,

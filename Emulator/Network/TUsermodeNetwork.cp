@@ -748,7 +748,7 @@ public:
 	 * At this point, no active handler was able to handle the packet. If this
 	 * is a generic TCP/IP packet request to open a socket, we will handle it.
 	 * \param packet the Newton packet that could be sent
-	 * \param n the network interface
+	 * \param net the network interface
 	 * \return 0 if we can not handle this packet
 	 * \return 1 if we can handled it and it need not to be propagated any further
 	 * \return -1 if an error occurred an no other handler should handle this packet
@@ -940,7 +940,7 @@ public:
 	 * on the same port.
 	 *
 	 * \param packet the Newton packet that could be sent
-	 * \param n the network interface
+	 * \param net the network interface
 	 * \return 0 if we can not handle this packet
 	 * \return 1 if we can handled it and it need not to be propagated any further
 	 * \return -1 if an error occurred an no other handler should handle this packet
@@ -985,7 +985,7 @@ public:
 	 * itself to the handler list, but answers the request immediatly.
 	 *
 	 * \param packet the Newton packet that could be sent
-	 * \param n the network interface
+	 * \param net the network interface
 	 * \return 0 if we can not handle this packet
 	 * \return 1 if we can handled it and it need not to be propagated any further
 	 * \return -1 if an error occurred an no other handler should handle this packet
@@ -1081,7 +1081,7 @@ public:
 	 * of the host, we can reply to these requests immediatly.
 	 *
 	 * \param packet the Newton packet that could be sent
-	 * \param n the network interface
+	 * \param net the network interface
 	 * \return 0 if we can not handle this packet
 	 * \return 1 if we can handled it and it need not to be propagated any further
 	 * \return -1 if an error occurred an no other handler should handle this packet

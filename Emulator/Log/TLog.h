@@ -60,7 +60,7 @@ public:
 	///
 	/// Log a line (synchronously).
 	///
-	/// \param inFormat	format to log stuff to.
+	/// \param inLine	format to log stuff to.
 	///
 	void	FLogLine( const char* inLine, ... );
 

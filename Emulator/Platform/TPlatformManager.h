@@ -76,7 +76,7 @@ public:
 	/// Set the memory interface.
 	/// This method is called once the memory interface is created.
 	///
-	/// \param inManager	reference to the memory interface
+	/// \param inMemory	reference to the memory interface
 	///
 	void	SetMemory( TMemory* inMemory )
 		{
@@ -116,7 +116,7 @@ public:
 	///
 	/// \param inSelector	selector for the user info to retrieve.
 	/// \param inBufferSize	size of the buffer.
-	/// \param outData		on output, user info.
+	/// \param outAddress	on output, user info.
 	/// \return the number of bytes written.
 	///
 	KUInt32	GetUserInfo(

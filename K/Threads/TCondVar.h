@@ -110,7 +110,7 @@ public:
 	/// Wait for a limited time for the conditional variable to be freed.
 	///
 	/// \param inMutex			mutex to unlock.
-	/// \param inRelTime	time to wait (amount).
+	/// \param inAbsTime	time to wait (amount).
 	/// \return \c true if the system time didn't reach now+inRelTime, \c false
 	///			otherwise.
 	///

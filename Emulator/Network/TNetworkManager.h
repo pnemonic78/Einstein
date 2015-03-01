@@ -67,7 +67,7 @@ public:
 	/// Set the memory interface.
 	/// This method is called once the memory interface is created.
 	///
-	/// \param inManager	reference to the memory interface
+	/// \param inMemory	reference to the memory interface
 	///
 	void	SetMemory( TMemory* inMemory )
 	{

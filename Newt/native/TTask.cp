@@ -470,6 +470,9 @@ void Func_0x0025A464(TARMProcessor* ioCPU, KUInt32 ret)
 }
 T_ROM_SIMULATION3(0x0025A464, "SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags", Func_0x0025A464)
 
+
+#pragma mark - Stubs for all the functions above
+
 /**
  * DoSemaphoreOp
  * ROM: 0x001D4CE4 - 0x001D4D98

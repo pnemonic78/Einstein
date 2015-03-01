@@ -120,14 +120,14 @@ protected:
 	/**
 	 * Subroutine to put the beginning of the test into the target.
 	 *
-	 * \param the kind of test.
+	 * \param inTest kind of test.
 	 */
 	void PutTestBegin( int inTest );
 	
 	/**
 	 * Subroutine to put the end of the test into the target.
 	 *
-	 * \param the kind of test.
+	 * \param inTest kind of test.
 	 */
 	void PutTestEnd( int inTest );
 

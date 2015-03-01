@@ -128,7 +128,6 @@ public:
 	/// \param inChannel	ID of the channel
 	/// \param inRegister	id of the register
 	/// \param inValue		word to write to the register.
-	/// \return the value of the register.
 	///
 	void	WriteChannel1Register(
 					KUInt32 inChannel,
@@ -150,7 +149,6 @@ public:
 	/// \param inChannel	ID of the channel
 	/// \param inRegister	id of the register
 	/// \param inValue		word to write to the register.
-	/// \return the value of the register.
 	///
 	void	WriteChannel2Register(
 					KUInt32 inChannel,

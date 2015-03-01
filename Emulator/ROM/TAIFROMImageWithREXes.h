@@ -45,7 +45,7 @@ public:
 	///
 	/// Constructor from three file paths.
 	///
-	/// \param inAIFPath	path to the AIF file.
+	/// \param inROMPath	path to the AIF file.
 	/// \param inREX0Path	path to the REX0 file.
 	/// \param inREX1Path	path to the REX1 file.
 	///

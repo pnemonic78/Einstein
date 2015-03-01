@@ -68,9 +68,8 @@ public:
 	/// Perform address translation for an instruction.
 	/// Determine in which bank of executable code the instruction is.
 	///
-	/// \param inAddress			virtual address to read 32 bits from.
-	/// \param outBankNumber		bank index (0 for ROM or 1 for RAM)
-	/// \param outOffsetInBank		offset in the bank (address - base).
+	/// \param inVAddress			virtual address to read 32 bits from.
+	/// \param outPAddress			physical address.
 	/// \return true if the address couldn't be accessed for reading.
 	///		
 	Boolean		TranslateInstruction(

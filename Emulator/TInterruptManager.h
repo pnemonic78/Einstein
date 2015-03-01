@@ -317,7 +317,7 @@ public:
 	///
 	/// Selector on the FIQ mask.
 	///
-	/// \param inMask	new mask with the interrupts that should be FIQ.
+	/// \param inValue	new mask with the interrupts that should be FIQ.
 	///
 	void	SetFIQMask( KUInt32 inValue )
 		{

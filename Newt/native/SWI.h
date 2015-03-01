@@ -25,5 +25,7 @@ extern void Func_0x001CC564(TARMProcessor* ioCPU, KUInt32 ret); // Add__10TSched
 extern void Func_0x003AE1FC(TARMProcessor* ioCPU, KUInt32 ret); // _SemaphoreOpGlue
 
 
+NewtonErr SemaphoreOpGlue(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking);
+
 
 #endif /* defined(_NEWT_SWI_) */

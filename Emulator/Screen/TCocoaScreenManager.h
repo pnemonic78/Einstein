@@ -133,7 +133,7 @@ public:
 	///
 	/// Notify that some screen bits changed.
 	///
-	/// \param inUpdateRect	rectangle of the bits that changed.
+	/// \param inUpdatedRect	rectangle of the bits that changed.
 	///
 	virtual void	UpdateScreenRect( SRect* inUpdatedRect );
 
