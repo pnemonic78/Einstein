@@ -14,25 +14,13 @@
 #include "SimulatorGlue.h"
 
 
-
-extern void SetGCurrentTask(TTask *newTask);
-extern KUInt32 GCopyDone();
-extern void SetGCopyDone(KUInt32 v);
-extern KUInt32 GAtomicFIQNestCountFast();
-extern KUInt32 GAtomicIRQNestCountFast();
-extern KUInt32 GAtomicNestCount();
-extern KUInt32 GAtomicFIQNestCount();
-extern KUInt32 GWantDeferred();
-extern KUInt32 GSchedule();
-extern void SetGCurrentTaskId(ObjectId id);
-extern void SetGCurrentGlobals(void *v);
-extern void SetGCurrentMonitorId(ObjectId id);
-extern KUInt32 GSchedulerRunning();
-extern void GSchedulerRunning(KUInt32 v);
-extern InterruptObject *GSchedulerIntObj();
-
-
 NEWT_GLOBAL_W_REF(0x0C008400, TParamBlock*,		ParamBlockFromImage)
+
+NEWT_GLOBAL_W_DEF(0x0C100E54, ULong,			IntMaskShadowReg)
+NEWT_GLOBAL_W_DEF(0x0C100E58, KUInt32,			AtomicFIQNestCountFast)
+NEWT_GLOBAL_W_DEF(0x0C100E5C, KUInt32,			AtomicIRQNestCountFast)
+
+NEWT_GLOBAL_W_DEF(0x0C100E6C, InterruptObject*, SchedulerIntObj)
 
 NEWT_GLOBAL_W_DEF(0x0C100FC4, TTask*,			IdleTask)
 NEWT_GLOBAL_W_DEF(0x0C100FC8, TObjectTable*,	ObjectTable)
@@ -42,13 +30,25 @@ NEWT_GLOBAL_W_DEF(0x0C100FD4, KUInt32,			ScheduleRequested)
 NEWT_GLOBAL_W_DEF(0x0C100FD8, KUInt32,			HoldScheduleLevel)
 
 NEWT_GLOBAL_W_DEF(0x0C100FE4, KUInt32,			Schedule)
+NEWT_GLOBAL_W_DEF(0x0C100FE8, KUInt32,			AtomicNestCount)
+
+NEWT_GLOBAL_W_DEF(0x0C100FF0, KUInt32,			AtomicFIQNestCount)
 
 NEWT_GLOBAL_W_DEF(0x0C100FF8, TTask*,			CurrentTask)
+
+NEWT_GLOBAL_W_DEF(0x0C101028, KUInt32,			WantDeferred)
+
+NEWT_GLOBAL_W_DEF(0x0C101040, KUInt32,			CopyDone)
+
+NEWT_GLOBAL_W_DEF(0x0C101054, ObjectId,			CurrentTaskId)
+NEWT_GLOBAL_W_DEF(0x0C101058, ObjectId,			CurrentMonitorId)
+NEWT_GLOBAL_W_DEF(0x0C10105C, void*,			CurrentGlobals)
 
 NEWT_GLOBAL_W_DEF(0x0C101980, int,				TaskPriority)
 
 NEWT_GLOBAL_W_DEF(0x0C101A2C, BOOL,				WantSchedulerToRun)
 
+NEWT_GLOBAL_W_DEF(0x0C101A30, KUInt32,			SchedulerRunning)
 
 
 #endif /* defined(_NEWT_GLOBALS_) */

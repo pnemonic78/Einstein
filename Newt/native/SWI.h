@@ -14,6 +14,9 @@
 #include "SimulatorGlue.h"
 
 
+extern void Func_0x00392AC0(TARMProcessor* ioCPU, KUInt32 ret); // PublicEnterAtomic
+
+
 extern void Func_0x001CC7F4(TARMProcessor* ioCPU, KUInt32 ret); // WantSchedule__Fv
 extern void Func_0x001CC1B0(TARMProcessor* ioCPU, KUInt32 ret); // UpdateCurrentBucket__10TSchedulerFv
 extern void Func_0x00359AA8(TARMProcessor* ioCPU, KUInt32 ret); // CheckBeforeAdd__10TTaskQueueFP5TTask

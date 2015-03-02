@@ -109,8 +109,8 @@
 		C901E530132656710074513E /* TEOFException.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E32BB111B7570002165EC /* TEOFException.cp */; };
 		C901E551132659120074513E /* TCircleBuffer.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E3321111B7570002165EC /* TCircleBuffer.cp */; };
 		C901E552132659140074513E /* TMappedFile.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E3324111B7570002165EC /* TMappedFile.cp */; };
-		C90240BD1A992C25009C5506 /* ScreenUpdateTask.cp in Sources */ = {isa = PBXBuildFile; fileRef = C90240BA1A992C25009C5506 /* ScreenUpdateTask.cp */; };
-		C90240BE1A992C25009C5506 /* ScreenUpdateTask.rts in Resources */ = {isa = PBXBuildFile; fileRef = C90240BC1A992C25009C5506 /* ScreenUpdateTask.rts */; };
+		C90240BD1A992C25009C5506 /* ScreenUpdateTaskSupport.cp in Sources */ = {isa = PBXBuildFile; fileRef = C90240BA1A992C25009C5506 /* ScreenUpdateTaskSupport.cp */; };
+		C90240BE1A992C25009C5506 /* ScreenUpdateTaskSupport.rts in Resources */ = {isa = PBXBuildFile; fileRef = C90240BC1A992C25009C5506 /* ScreenUpdateTaskSupport.rts */; };
 		C90240C21A9A01D6009C5506 /* TTask.cp in Sources */ = {isa = PBXBuildFile; fileRef = C90240C01A9A01D6009C5506 /* TTask.cp */; };
 		C90240C51A9A2566009C5506 /* globals.cp in Sources */ = {isa = PBXBuildFile; fileRef = C90240C31A9A2566009C5506 /* globals.cp */; };
 		C932824711D0CF0A003B93C3 /* button_network_in.png in Resources */ = {isa = PBXBuildFile; fileRef = C932824511D0CF0A003B93C3 /* button_network_in.png */; };
@@ -422,6 +422,7 @@
 		C9B4ABC1123D6D5300D8D2C7 /* TLinearCard.cp in Sources */ = {isa = PBXBuildFile; fileRef = C99E3472111B7C07002165EC /* TLinearCard.cp */; };
 		C9B4ABC2123D6D5400D8D2C7 /* TNE2000Card.cp in Sources */ = {isa = PBXBuildFile; fileRef = C932C4C011A1AB5D00F6A7E4 /* TNE2000Card.cp */; };
 		C9B4ABC9123D709D00D8D2C7 /* TNetworkManager.cp in Sources */ = {isa = PBXBuildFile; fileRef = C962429E11B6A20A00EE66F3 /* TNetworkManager.cp */; };
+		C9B72B3F1AA50FEE00559524 /* ScreenUpdateTask.cp in Sources */ = {isa = PBXBuildFile; fileRef = C9B72B3D1AA50FEE00559524 /* ScreenUpdateTask.cp */; };
 		C9BE33D0133E64F60052EA2F /* TJITPerformance.cp in Sources */ = {isa = PBXBuildFile; fileRef = C9BE33CF133E64F60052EA2F /* TJITPerformance.cp */; };
 		C9BE33D1133E64F60052EA2F /* TJITPerformance.cp in Sources */ = {isa = PBXBuildFile; fileRef = C9BE33CF133E64F60052EA2F /* TJITPerformance.cp */; };
 		C9CEB43F19601CA3002198A7 /* TJITGenericRetarget.cp in Sources */ = {isa = PBXBuildFile; fileRef = C9CEB43D19601CA3002198A7 /* TJITGenericRetarget.cp */; };
@@ -705,9 +706,9 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D1107320486CEB800E47090 /* Einstein.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Einstein.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C90240BA1A992C25009C5506 /* ScreenUpdateTask.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScreenUpdateTask.cp; sourceTree = "<group>"; };
-		C90240BB1A992C25009C5506 /* ScreenUpdateTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenUpdateTask.h; sourceTree = "<group>"; };
-		C90240BC1A992C25009C5506 /* ScreenUpdateTask.rts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ScreenUpdateTask.rts; sourceTree = "<group>"; };
+		C90240BA1A992C25009C5506 /* ScreenUpdateTaskSupport.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScreenUpdateTaskSupport.cp; sourceTree = "<group>"; };
+		C90240BB1A992C25009C5506 /* ScreenUpdateTaskSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenUpdateTaskSupport.h; sourceTree = "<group>"; };
+		C90240BC1A992C25009C5506 /* ScreenUpdateTaskSupport.rts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ScreenUpdateTaskSupport.rts; sourceTree = "<group>"; };
 		C90240C01A9A01D6009C5506 /* TTask.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TTask.cp; path = native/TTask.cp; sourceTree = "<group>"; };
 		C90240C11A9A01D6009C5506 /* TTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TTask.h; path = native/TTask.h; sourceTree = "<group>"; };
 		C90240C31A9A2566009C5506 /* globals.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = globals.cp; path = native/globals.cp; sourceTree = "<group>"; };
@@ -1081,6 +1082,8 @@
 		C9B4AA33123D474800D8D2C7 /* iEinsteinViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = iEinsteinViewController.xib; sourceTree = "<group>"; };
 		C9B4AA35123D474800D8D2C7 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
 		C9B4AA49123D480900D8D2C7 /* iEinsteinView.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = iEinsteinView.h; path = Classes/iEinsteinView.h; sourceTree = "<group>"; tabWidth = 4; };
+		C9B72B3D1AA50FEE00559524 /* ScreenUpdateTask.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScreenUpdateTask.cp; path = native/ScreenUpdateTask.cp; sourceTree = "<group>"; };
+		C9B72B3E1AA50FEE00559524 /* ScreenUpdateTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenUpdateTask.h; path = native/ScreenUpdateTask.h; sourceTree = "<group>"; };
 		C9BE33CE133E64F60052EA2F /* TJITPerformance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = TJITPerformance.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		C9BE33CF133E64F60052EA2F /* TJITPerformance.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = TJITPerformance.cp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		C9CEB43D19601CA3002198A7 /* TJITGenericRetarget.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TJITGenericRetarget.cp; sourceTree = "<group>"; };
@@ -1311,6 +1314,8 @@
 				C90240C11A9A01D6009C5506 /* TTask.h */,
 				C9D8E9AA1AA1D7F3006788C7 /* SWI.cp */,
 				C9D8E9AB1AA1D7F3006788C7 /* SWI.h */,
+				C9B72B3D1AA50FEE00559524 /* ScreenUpdateTask.cp */,
+				C9B72B3E1AA50FEE00559524 /* ScreenUpdateTask.h */,
 			);
 			name = native;
 			sourceTree = "<group>";
@@ -1390,9 +1395,9 @@
 		C98AB2571A351EE6001BB1CD /* core */ = {
 			isa = PBXGroup;
 			children = (
-				C90240BA1A992C25009C5506 /* ScreenUpdateTask.cp */,
-				C90240BB1A992C25009C5506 /* ScreenUpdateTask.h */,
-				C90240BC1A992C25009C5506 /* ScreenUpdateTask.rts */,
+				C90240BA1A992C25009C5506 /* ScreenUpdateTaskSupport.cp */,
+				C90240BB1A992C25009C5506 /* ScreenUpdateTaskSupport.h */,
+				C90240BC1A992C25009C5506 /* ScreenUpdateTaskSupport.rts */,
 			);
 			path = core;
 			sourceTree = "<group>";
@@ -2325,7 +2330,7 @@
 				C98AB2AA1A351EE6001BB1CD /* TSerialChipVoyager.rts in Resources */,
 				C98AB2D71A351EE6001BB1CD /* unsorted_020.rts in Resources */,
 				C98AB2D11A351EE6001BB1CD /* unsorted_017.rts in Resources */,
-				C90240BE1A992C25009C5506 /* ScreenUpdateTask.rts in Resources */,
+				C90240BE1A992C25009C5506 /* ScreenUpdateTaskSupport.rts in Resources */,
 				C98AB2B91A351EE6001BB1CD /* unsorted_005.rts in Resources */,
 				C95E6040198B76DC004C6CEF /* button_backlight_on.png in Resources */,
 				C95E6041198B76DC004C6CEF /* button_install.png in Resources */,
@@ -2581,6 +2586,7 @@
 			files = (
 				C95E604B198B76DC004C6CEF /* TMonitor.cp in Sources */,
 				C95E604E198B76DC004C6CEF /* TSymbolList.cp in Sources */,
+				C9B72B3F1AA50FEE00559524 /* ScreenUpdateTask.cp in Sources */,
 				C95E604F198B76DC004C6CEF /* UDisasm.cp in Sources */,
 				C95E6050198B76DC004C6CEF /* TCondVar.cp in Sources */,
 				C95E6051198B76DC004C6CEF /* TJITGenericRetarget.cp in Sources */,
@@ -2641,7 +2647,7 @@
 				C95E6087198B76DC004C6CEF /* TCoreAudioSoundManager.cp in Sources */,
 				C95E6088198B76DC004C6CEF /* TNullSoundManager.cp in Sources */,
 				C95E6089198B76DC004C6CEF /* TSoundManager.cp in Sources */,
-				C90240BD1A992C25009C5506 /* ScreenUpdateTask.cp in Sources */,
+				C90240BD1A992C25009C5506 /* ScreenUpdateTaskSupport.cp in Sources */,
 				C95E608A198B76DC004C6CEF /* TARMProcessor.cp in Sources */,
 				C95E608B198B76DC004C6CEF /* TDMAManager.cp in Sources */,
 				C95E608C198B76DC004C6CEF /* TEmulator.cp in Sources */,

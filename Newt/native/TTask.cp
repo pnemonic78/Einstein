@@ -15,7 +15,7 @@
 #include "TInterruptManager.h"
 #include "TMemory.h"
 
-#include "Newt/core/ScreenUpdateTask.h"
+#include "ScreenUpdateTask.h"
 
 #ifdef IS_NEWT_SIM
 #include <stdlib.h>
@@ -25,79 +25,15 @@
 #pragma mark - C and C++ Functions
 
 
-/**
- * Transcoded function ClearInterrupt
- * ROM: 0x000E5960 - 0x000E598C
- */
-void Func_0x000E5960(TARMProcessor* ioCPU, KUInt32 ret)
+NewtonErr ClearInterrupt(InterruptObject *inIntObj)
 {
-	// 000E5960: E5902008  ldr	r2, [r0, #0x008]
-	SETPC(0x000E5960+8);
-	R2 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R0 + 0x0008);
-	
-	// 000E5964: E3120040  tst	r2, #0x00000040
-	{
-		KUInt32 Opnd2 = 0x00000040;
-		KUInt32 Opnd1 = R2;
-		const KUInt32 theResult = Opnd1 & Opnd2;
-		ioCPU->mCPSR_Z = (theResult==0);
-		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
+	if ( (inIntObj->Flags() & 0x00000040) == 0 ) {
+		gCPU->GetMemory()->GetInterruptManager()->ClearInterrupts(inIntObj->HWIntMask());
+	} else {
+		inIntObj->SetFlags( inIntObj->Flags() & 0x00000200 );
 	}
-	
-	// 000E5968: E3A01000  mov	r1, #0x00000000
-	R1 = 0x00000000; // 0
-	
-	// 000E596C: 05900000  ldreq	r0, [r0]
-	if (ioCPU->TestEQ()) {
-		SETPC(0x000E596C+8);
-		R0 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R0);
-	}
-	
-	// 000E5970: 059F2010  ldreq	r2, 000E5988=ClearInterrupt+28
-	if (ioCPU->TestEQ()) {
-		R2 = 0x0F183800; // kHdWr_IntClear
-	}
-	
-	// 000E5974: 05820000  streq	r0, [r2]
-	if (ioCPU->TestEQ()) {
-		SETPC(0x000E5974+8);
-		UJITGenericRetargetSupport::ManagedMemoryWrite(ioCPU, R2, R0);
-	}
-	
-	// 000E5978: 13C22C02  bicne	r2, r2, #0x00000200
-	if (ioCPU->TestNE()) {
-		R2 = R2 & 0xFFFFFDFF;
-	}
-	
-	// 000E597C: 15A02008  strne	r2, [r0, #0x008]!
-	if (ioCPU->TestNE()) {
-		KUInt32 offset = 0x00000008;
-		KUInt32 theAddress = R0 + offset;
-		KUInt32 theValue = R2;
-		SETPC(0x000E597C+8);
-		UJITGenericRetargetSupport::ManagedMemoryWrite(ioCPU, theAddress, theValue);
-		R0 = theAddress;
-	}
-	
-	// 000E5980: E1A00001  mov	r0, r1
-	R0 = R1;
-	
-	// 000E5984: E1A0F00E  mov	pc, lr
-	{
-		KUInt32 Opnd2 = LR;
-		const KUInt32 theResult = Opnd2;
-		SETPC(theResult + 4);
-		if (ret==0xFFFFFFFF)
-			return; // Return to emulator
-		if (PC!=ret)
-			__asm__("int $3\n" : : ); // Unexpected return address
-		return;
-	}
-	
-	// KUInt32 D_000E5988 = 0x0F183800; // kHdWr_IntClear
-	__asm__("int $3\n" : : ); // There was no return instruction found
+	return 0;
 }
-T_ROM_SIMULATION3(0x000E5960, "ClearInterrupt", Func_0x000E5960)
 
 
 void SwapInGlobals(TTask *inTask)
@@ -511,67 +447,6 @@ TObject *TObjectTable::Get(ObjectId inId)
 }
 
 
-#pragma mark - Still to do:
-
-// ScreenUpdateTask__FPvUlT2
-//  SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
-//   _SemaphoreOpGlue
-//    swi 0x0000000B (COMPLEX!) calling DoSemaphoreOp at 0x003ADEF8
-//     003AD698-003AD74C SWIBoot
-//     Jump table dispatch from 003AD568
-//     003ADEE4
-//      DoSemaphoreOp
-//     At 003ADF14 (or later if Semaphore is blocking), jump to 003AD750 (task switch)
-//      DoDeferrals
-//       _EnterAtomicFast (leaf)
-//       _ExitAtomicFast (laef)
-//       PortDeferredSendNotify__Fv ?
-//       DeferredNotify__Fv ?
-//       DoDeferral__18TExtPageTrackerMgrFv ?
-//        Peek__17TDoubleQContainerFv ?
-//        DoDeferral__15TExtPageTrackerFv ?
-//         RemovePMappings__FUlT1 ?
-//          IsSuperMode ?
-//          PrimRemovePMappings__FUlT1 ?
-//          _GenericSWI ? (moan!)
-//         Remove__12TObjectTableFUl (leaf)
-//        GetNext__17TDoubleQContainerFPv (leaf)
-//      Scheduler ?
-//      SwapInGlobals ?
-//      StartScheduler ?
-//     exit to task at 003ADB10 (or wherever task switching leads us)
-
-// bl      VEC_SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags  @ 0x001CD160 0xEB6836F5 - .h6.
-// bl      VEC_SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags  @ 0x001CD194 0xEB6836E8 - .h6.
-// SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags: 0x0025A464-0x0025A470
-// _SemaphoreOpGlue
-// SWIBoot: 0x003AD698-0x003ADBB4
-
-
-/**
- * Transcoded function SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
- * ROM: 0x0025A464 - 0x0025A470
- */
-void Func_0x0025A464(TARMProcessor* ioCPU, KUInt32 ret)
-{
-	// 0025A464: E5911000  ldr	r1, [r1]
-	SETPC(0x0025A464+8);
-	R1 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R1);
-	
-	// 0025A468: E5900000  ldr	r0, [r0]
-	SETPC(0x0025A468+8);
-	R0 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R0);
-	
-	// 0025A46C: EA054F62  b	_SemaphoreOpGlue
-	// rt cjitr _SemaphoreOpGlue
-	SETPC(0x003AE1FC+4);
-	return Func_0x003AE1FC(ioCPU, ret);
-	
-	__asm__("int $3\n" : : ); // There was no return instruction found
-}
-T_ROM_SIMULATION3(0x0025A464, "SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags", Func_0x0025A464)
-
-
 #pragma mark - Stubs for all the functions above
 
 /**
@@ -845,4 +720,17 @@ void Func_0x0025215C(TARMProcessor* ioCPU, KUInt32 ret)
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x0025215C, "SwapInGlobals", Func_0x0025215C)
+
+/**
+ * ClearInterrupt
+ * ROM: 0x000E5960 - 0x000E598C
+ */
+void Func_0x000E5960(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	InterruptObject *inIntObj = (InterruptObject*)R0;
+	R0 = ClearInterrupt(inIntObj);
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x000E5960, "ClearInterrupt", Func_0x000E5960)
+
 

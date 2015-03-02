@@ -12,6 +12,9 @@
 #include "globals.h"
 #include "ScreenUpdateTask.h"
 
+#include "TInterruptManager.h"
+
+
 // ScreenUpdateTask__FPvUlT2
 //  SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
 //   _SemaphoreOpGlue
@@ -41,7 +44,7 @@
 //        _EnterFIQAtomicFast (leaf)
 //        _ExitFIQAtomicFast (leaf)
 //        SetAndClearBitsAtomic ("leaf")
-//        ClearInterrupt (leaf)
+//        !ClearInterrupt!
 //       QuickEnableInterrupt ?
 //     exit to task at 003ADB10 (or wherever task switching leads us)
 
@@ -50,6 +53,40 @@
 // SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags: 0x0025A464-0x0025A470
 // _SemaphoreOpGlue
 // SWIBoot: 0x003AD698-0x003ADBB4
+
+
+void PublicEnterAtomic()
+{
+	if ( GAtomicFIQNestCountFast()!=0 )
+	{
+		SetGAtomicIRQNestCountFast( GAtomicIRQNestCountFast() + 1 );
+			return;
+	}
+	
+	gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( 0x0C400000 );
+	
+	ULong mask = gCPU->GetMemory()->GetInterruptManager()->GetFIQMask();
+	mask &= GIntMaskShadowReg();
+	mask |= 0x0C400000;
+	
+	SetGAtomicIRQNestCountFast( GAtomicIRQNestCountFast() + 1 );
+	
+	gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( mask );
+}
+
+
+/**
+ * PublicEnterAtomic
+ * ROM: 0x00392AC0 - 0x00392B1C
+ */
+void Func_0x00392AC0(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	PublicEnterAtomic();
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x00392AC0, "PublicEnterAtomic", Func_0x00392AC0)
+
+
 
 
 NewtonErr UndefinedSWI()
@@ -155,8 +192,23 @@ void SWI11_SemOp(TARMProcessor* ioCPU)
 	return;
 }
 
-T_ROM_PATCH(0x003ADEE4, "SWI_SemOp") {
+T_ROM_PATCH(0x003ADEE4, "SWI11_SemOp") {
 	SWI11_SemOp(ioCPU);
+	SETPC(0x003AD750+4);
+	MMUCALLNEXT_AFTERSETPC
+}
+
+
+
+void SWI34_Scheduler(TARMProcessor* ioCPU)
+{
+	R0 = 0;
+	R1 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, SP+4);
+	SP += 8;
+}
+
+T_ROM_PATCH(0x003AE14C, "SWI34_Scheduler") {
+	SWI34_Scheduler(ioCPU);
 	SETPC(0x003AD750+4);
 	MMUCALLNEXT_AFTERSETPC
 }
@@ -202,6 +254,7 @@ void Func_0x003AD698(TARMProcessor* ioCPU, KUInt32 ret, KUInt32 inSWI)
 	
 	switch (inSWI) {
 		case 0x0000000B: SWI11_SemOp(ioCPU); break;
+		case 0x00000022: SWI34_Scheduler(ioCPU); break;
 		default: R0 = (KUInt32)UndefinedSWI(); break;
 	}
 	
@@ -1498,6 +1551,45 @@ NewtonErr SemaphoreOpGlue(ObjectId inGroupId, ObjectId inListId, SemFlags inBloc
 	gCPU->SetRegister(0, inGroupId);
 	gCPU->SetRegister(1, inListId);
 	gCPU->SetRegister(2, inBlocking);
+	gCPU->SetRegister(15, 0x003AE1FC+8);
+	gCPU->DoSWI();
+	Func_0x003AD698(gCPU, -1, 0x0000000B);
+	return gCPU->GetRegister(0);
+}
+
+
+/**
+ * Transcoded function DoSchedulerSWI
+ * ROM: 0x003AD658 - 0x003AD698
+ */
+void Func_0x003AD658(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	// 003AD658: EF000022  swi	0x00000022
+	SETPC(0x003AD658+8);
+	ioCPU->DoSWI();
+	Func_0x003AD698(ioCPU, 0x003AD660, 0x22);
+	
+	// 003AD65C: E1A0F00E  mov	pc, lr
+	{
+		KUInt32 Opnd2 = LR;
+		const KUInt32 theResult = Opnd2;
+		SETPC(theResult + 4);
+		if (ret==0xFFFFFFFF)
+			return; // Return to emulator
+		if (PC!=ret)
+			__asm__("int $3\n" : : ); // Unexpected return address
+		return;
+	}
+}
+T_ROM_SIMULATION3(0x003AD658, "DoSchedulerSWI", Func_0x003AD658)
+
+/**
+ * Call the Scheduler to allow task switching.
+ * \return error code
+ */
+NewtonErr DoSchedulerSWI()
+{
+	gCPU->SetRegister(15, 0x003AD658+8);
 	gCPU->DoSWI();
 	Func_0x003AD698(gCPU, -1, 0x0000000B);
 	return gCPU->GetRegister(0);

@@ -1,0 +1,50 @@
+#
+# Retarget functions related to teh ScreenUpdate task
+#
+
+rt open ScreenUpdateTaskSupport
+
+# This is the Task that we plan to create in an all-native manner
+rt cjit ScreenUpdateTask__FPvUlT2
+	rt cjitr GetADCObject__Fv
+		# don't follow this as this is not supported in emulation
+	rt cjitr SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
+		# _SemaphoreOpGlue in SWI.cp
+			# SWI 11
+				rt cjit DoDeferrals
+					# PublicEnterAtomic in SWI.cp
+					rt cjitr _ExitAtomic
+						# inside _ExitFIQAtomicFast <---===
+						# DoSchedulerSWI in SWI.cp
+					rt cjitr PortDeferredSendNotify__Fv
+						# ?
+					rt cjitr DeferredNotify__Fv
+						# ?
+					rt cjitr DoDeferral__18TExtPageTrackerMgrFv
+						# ?
+					rt cjitr DisableInterrupt
+						# ?
+					rt cjitr QuickEnableInterrupt
+						# ?
+				rt cjitr Scheduler
+					# ?
+				rt cjit StartScheduler
+					# ?
+	rt cjitr Acquire__18TULockingSemaphoreF8SemFlags
+		# ??
+	rt cjitr TimeFromNow
+		# ??
+	rt cjitr UpdateHardwareScreen__Fv
+		# ??
+	rt cjitr Release__18TULockingSemaphoreFv
+		# ??
+	rt cjitr GetGlobalTime
+		# ??
+	rt cjitr CompCompare
+		# ??
+	rt cjitr GetSample__4TADCF10ADCMuxTypeUlPFPvlUl_vPv
+		# don't follow this as this is not supported in emulation
+	rt cjitr SleepTill__FP5TTime
+		# ??
+
+rt close

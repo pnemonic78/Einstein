@@ -202,5 +202,6 @@ extern TARMProcessor *gCPU;
 #include "native/TTask.h"
 #include "native/globals.h"
 #include "native/swi.h"
+#include "native/ScreenUpdateTask.h"
 
 #endif /* EINSTEIN_NEWT_SIMULATOR_GLUE_H */
