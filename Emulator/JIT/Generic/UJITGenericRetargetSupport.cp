@@ -32,6 +32,10 @@
 
 #define HANDLE_DATA_ABORT_LOCALLY 0
 
+
+KSInt32	UJITGenericRetargetSupport::pMustNotThrowDataAbort = 0;
+
+
 /**
  * Read emulated memory from a virtual address.
  * This function handles all exceptions that may happen during this process.
@@ -49,6 +53,10 @@ UJITGenericRetargetSupport::ManagedMemoryReadAligned(TARMProcessor* ioCPU, KUInt
 	}
 #else
 	if (theMemoryInterface->ReadAligned(inAddress, theData)) {
+		if (pMustNotThrowDataAbort) {
+			fprintf(stderr, "PANIC: DataAbort in native mode!\n");
+			__asm__("int $3\n" : : );
+		}
 		ioCPU->DataAbort();
 		throw "DataAbort";
 	}
@@ -79,6 +87,10 @@ UJITGenericRetargetSupport::ManagedMemoryRead(TARMProcessor* ioCPU, KUInt32 inAd
 	}
 #else
 	if (theMemoryInterface->Read(inAddress, theData)) {
+		if (pMustNotThrowDataAbort) {
+			fprintf(stderr, "PANIC: DataAbort in native mode!\n");
+			__asm__("int $3\n" : : );
+		}
 		ioCPU->DataAbort();
 		throw "DataAbort";
 	}
@@ -104,6 +116,10 @@ UJITGenericRetargetSupport::ManagedMemoryReadB(TARMProcessor* ioCPU, KUInt32 inA
 	}
 #else
 	if (theMemoryInterface->ReadB(inAddress, theData)) {
+		if (pMustNotThrowDataAbort) {
+			fprintf(stderr, "PANIC: DataAbort in native mode!\n");
+			__asm__("int $3\n" : : );
+		}
 		ioCPU->DataAbort();
 		throw "DataAbort";
 	}
@@ -128,6 +144,10 @@ UJITGenericRetargetSupport::ManagedMemoryWriteAligned(TARMProcessor* ioCPU, KUIn
 	}
 #else
 	if (theMemoryInterface->WriteAligned(inAddress, inData)) {
+		if (pMustNotThrowDataAbort) {
+			fprintf(stderr, "PANIC: DataAbort in native mode!\n");
+			__asm__("int $3\n" : : );
+		}
 		ioCPU->DataAbort();
 		throw "DataAbort";
 	}
@@ -151,6 +171,10 @@ UJITGenericRetargetSupport::ManagedMemoryWrite(TARMProcessor* ioCPU, KUInt32 inA
 	}
 #else
 	if (theMemoryInterface->Write(inAddress, inData)) {
+		if (pMustNotThrowDataAbort) {
+			fprintf(stderr, "PANIC: DataAbort in native mode!\n");
+			__asm__("int $3\n" : : );
+		}
 		ioCPU->DataAbort();
 		throw "DataAbort";
 	}
@@ -174,110 +198,15 @@ UJITGenericRetargetSupport::ManagedMemoryWriteB(TARMProcessor* ioCPU, KUInt32 in
 	}
 #else
 	if (theMemoryInterface->WriteB(inAddress, inData)) {
+		if (pMustNotThrowDataAbort) {
+			fprintf(stderr, "PANIC: DataAbort in native mode!\n");
+			__asm__("int $3\n" : : );
+		}
 		ioCPU->DataAbort();
 		throw "DataAbort";
 	}
 #endif
 }
-
-
-
-/**
- * Read emulated memory from a virtual address.
- * This function handles all exceptions that may happen during this process.
- * The function may invoke the scheduler and switch tasks.
- */
-KUInt32
-UJITGenericRetargetSupport::NoAbortMemoryReadAligned(TARMProcessor* ioCPU, KUInt32 inAddress)
-{
-    KUInt32 theData;
-    TMemory *theMemoryInterface = ioCPU->GetMemory();
-    if (theMemoryInterface->ReadAligned(inAddress, theData)) {
-        __asm__("int $3\n" : : );
-    }
-    return theData;
-}
-
-
-/**
- * Read emulated memory from a virtual address.
- * This function handles all exceptions that may happen during this process.
- * The function may invoke the scheduler and switch tasks.
- */
-KUInt32
-UJITGenericRetargetSupport::NoAbortMemoryRead(TARMProcessor* ioCPU, KUInt32 inAddress)
-{
-    KUInt32 theData;
-    TMemory *theMemoryInterface = ioCPU->GetMemory();
-    if (theMemoryInterface->Read(inAddress, theData)) {
-        __asm__("int $3\n" : : );
-    }
-    return theData;
-}
-
-
-/**
- * Read emulated memory from a virtual address.
- * This function handles all exceptions that may happen during this process.
- * The function may invoke the scheduler and switch tasks.
- */
-KUInt8
-UJITGenericRetargetSupport::NoAbortMemoryReadB(TARMProcessor* ioCPU, KUInt32 inAddress)
-{
-    KUInt8 theData;
-    TMemory *theMemoryInterface = ioCPU->GetMemory();
-    if (theMemoryInterface->ReadB(inAddress, theData)) {
-        __asm__("int $3\n" : : );
-    }
-    return theData;
-}
-
-
-/**
- * Write emulated memory at a virtual address.
- * This function handles all exceptions that may happen during this process.
- * The function may invoke the scheduler and switch tasks.
- */
-void
-UJITGenericRetargetSupport::NoAbortMemoryWriteAligned(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData)
-{
-    TMemory *theMemoryInterface = ioCPU->GetMemory();
-    if (theMemoryInterface->WriteAligned(inAddress, inData)) {
-        __asm__("int $3\n" : : );
-    }
-}
-
-
-/**
- * Write emulated memory at a virtual address.
- * This function handles all exceptions that may happen during this process.
- * The function may invoke the scheduler and switch tasks.
- */
-void
-UJITGenericRetargetSupport::NoAbortMemoryWrite(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData)
-{
-    TMemory *theMemoryInterface = ioCPU->GetMemory();
-    if (theMemoryInterface->Write(inAddress, inData)) {
-        __asm__("int $3\n" : : );
-    }
-}
-
-
-/**
- * Write emulated memory at a virtual address.
- * This function handles all exceptions that may happen during this process.
- * The function may invoke the scheduler and switch tasks.
- */
-void
-UJITGenericRetargetSupport::NoAbortMemoryWriteB(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt8 inData)
-{
-    TMemory *theMemoryInterface = ioCPU->GetMemory();
-    if (theMemoryInterface->WriteB(inAddress, inData)) {
-        __asm__("int $3\n" : : );
-    }
-}
-
-
 
 
 /**
@@ -389,6 +318,10 @@ UJITGenericRetargetSupport::ManagedMemoryReadS(TARMProcessor* ioCPU, KUInt32 inA
 	}
 #else
 	if (theMemoryInterface->Read((inAddress&0xFFFFFFFC), theData)) {
+		if (pMustNotThrowDataAbort) {
+			fprintf(stderr, "PANIC: DataAbort in native mode!\n");
+			__asm__("int $3\n" : : );
+		}
 		ioCPU->DataAbort();
 		throw "DataAbort";
 	}
@@ -399,6 +332,14 @@ UJITGenericRetargetSupport::ManagedMemoryReadS(TARMProcessor* ioCPU, KUInt32 inA
 		return (theData>>16);
 }
 
+
+void UJITGenericRetargetSupport::EndNativeCode() {
+	pMustNotThrowDataAbort--;
+	if (pMustNotThrowDataAbort<0) {
+		fprintf(stderr, "PANIC: ...NativeCode() underrun!\n");
+		__asm__("int $3\n" : : );
+	}
+}
 
 
 #endif

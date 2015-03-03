@@ -19,23 +19,72 @@ rt cjit ScreenUpdateTask__FPvUlT2
 						# _EnterFIQAtomic in SWI.cp
 						# Remove__17TDoubleQContainerFv in TTask.cp
 						# _ExitFIQAtomicFast in SWI.cp
-							# LEAF <---===
-						rt cjitr QueueDelay__12TTimerEngineFP13TSharedMemMsg
-							# ?
-						rt cjitr NotifySend__FP13TSharedMemMsg
-							# ?
-					rt cjitr DeferredNotify__Fv
-						# ?
-					rt cjitr DoDeferral__18TExtPageTrackerMgrFv
-						# ?
-					rt cjitr DisableInterrupt
-						# ?
-					rt cjitr QuickEnableInterrupt
-						# ?
-				rt cjitr Scheduler
-					# ?
-				rt cjit StartScheduler
-					# ?
+						rt cjit QueueDelay__12TTimerEngineFP13TSharedMemMsg
+							rt cjit Queue__12TTimerEngineFP13TSharedMemMsg
+								# Peek__17TDoubleQContainerFv in TTask.cp
+								rt cjit SetAlarmAtomic__FR5TTime
+									rt cjit SetAlarm
+										rt cjit SetAlarm1
+											# LEAF <---===
+										rt cjit DisableAlarm1
+											# LEAF
+								rt cjit Alarm__12TTimerEngineFv
+									rt cjit ClearAlarmAtomic__Fv
+										rt cjit ClearAlarm
+											# LEAF
+									rt cjit GetClock
+										# LEAF
+								rt cjit AddToFront__17TDoubleQContainerFPv
+									rt cjit CheckBeforeAdd__17TDoubleQContainerFPv
+										# LEAF
+								rt cjit AddBefore__17TDoubleQContainerFPvT1
+									# LEAF
+								rt cjit GetNext__17TDoubleQContainerFPv
+									# LEAF
+								rt cjit Add__17TDoubleQContainerFPv
+									# LEAF
+						rt cjit NotifySend__FP13TSharedMemMsg
+							rt cjit ConvertIdToObj__F11KernelTypesUlPv
+								rt cjit LocalToGlobalId__FUl
+									# LEAF
+								# Get__12TObjectTableFUl in TTask.cp
+							rt cjit Send__5TPortFP13TSharedMemMsgUl
+								rt cjit QueueTimeout__12TTimerEngineFP13TSharedMemMsg
+									rt cjit CompAdd
+										# LEAF
+									rt cjit __nw__FUi
+										rt cjit malloc
+											rt cjitr NewPtr
+												# ? DEEP!
+								rt cjit RemoveFromQueue__17TDoubleQContainerFPv
+									# LEAF
+								rt cjit CompleteReceiver__13TSharedMemMsgFP13TSharedMemMsgl
+									rt cjitr CompleteMsg__13TSharedMemMsgFUcUll
+										# ? deep
+							rt cjit CompleteSender__13TSharedMemMsgFl
+								# LEAF
+					rt cjit DeferredNotify__Fv
+						rt cjit NotifyTimeout__FP13TSharedMemMsg
+							# LEAF
+					rt cjit DoDeferral__18TExtPageTrackerMgrFv
+						rt cjitr DoDeferral__15TExtPageTrackerFv
+							# ? deep
+					rt cjit DisableInterrupt
+						rt cjit SetAndClearBitsAtomic
+							# LEAF
+					rt cjit QuickEnableInterrupt
+						# LEAF
+				rt cjit Scheduler
+					rt cjit StartScheduler
+						rt cjit Schedule__10TSchedulerFv
+							rt cjit RemoveHighestPriority__10TSchedulerFv
+								# LEAF
+							rt cjit StopScheduler__Fv
+								# LEAF
+						rt cjit _Swap
+							# LEAF
+						rt cjit CompSub
+							# LEAF
 	rt cjitr Acquire__18TULockingSemaphoreF8SemFlags
 		# ??
 	rt cjitr TimeFromNow

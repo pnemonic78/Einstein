@@ -473,6 +473,39 @@ void *TDoubleQContainer::Remove()
 	return NULL;
 }
 
+
+/**
+ * Return the first item in the queue.
+ * \return NULL if the queue is empty.
+ */
+void *TDoubleQContainer::Peek()
+{
+	TDoubleQItem *item = Head();
+	if (item) {
+		return ((char*)item) - OffsetToDoubleQItem();
+	}
+	return NULL;
+}
+
+
+#pragma mark - Stubs for all the functions above
+
+
+/**
+ * Peek__17TDoubleQContainerFv
+ * ROM: 0x0009C884 - 0x0009C89C
+ */
+void Func_0x0009C884(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		TDoubleQContainer *This = (TDoubleQContainer*)R0;
+		R0 = (KUInt32)This->Peek();
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x0009C884, "Peek__17TDoubleQContainerFv", Func_0x0009C884)
+
+
 /**
  * Remove__17TDoubleQContainerFv
  * ROM: 0x0009C77C - 0x0009C7C4
@@ -486,9 +519,6 @@ void Func_0x0009C77C(TARMProcessor* ioCPU, KUInt32 ret)
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x0009C77C, "Remove__17TDoubleQContainerFv", Func_0x0009C77C)
-
-
-#pragma mark - Stubs for all the functions above
 
 
 /**
@@ -514,9 +544,11 @@ T_ROM_SIMULATION3(0x001D4CE4, "DoSemaphoreOp", Func_0x001D4CE4)
  */
 void Func_0x00319F14(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TObjectTable *This = (TObjectTable*)(R0);
 	ObjectId inId = (ObjectId)(R1);
 	R0 = (KUInt32)This->Get(inId);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x00319F14, "Get__12TObjectTableFUl", Func_0x00319F14)
@@ -527,11 +559,13 @@ T_ROM_SIMULATION3(0x00319F14, "Get__12TObjectTableFUl", Func_0x00319F14)
  */
 void Func_0x001D4F38(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TSemaphoreGroup *This = (TSemaphoreGroup*)(R0);
 	TSemaphoreOpList *inList = (TSemaphoreOpList*)(R1);
 	SemFlags inFlags = (SemFlags)(R2);
 	TTask *inTask = (TTask*)(R3);
 	R0 = (KUInt32)This->SemOp(inList, inFlags, inTask);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001D4F38, "SemOp__15TSemaphoreGroupFP16TSemaphoreOpList8SemFlagsP5TTask", Func_0x001D4F38)
@@ -542,10 +576,12 @@ T_ROM_SIMULATION3(0x001D4F38, "SemOp__15TSemaphoreGroupFP16TSemaphoreOpList8SemF
  */
 void Func_0x001D4EE8(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TSemaphoreGroup *This = (TSemaphoreGroup*)(R0);
 	TSemaphoreOpList *inList = (TSemaphoreOpList*)(R1);
 	long index = (long)(R2);
 	This->UnwindOp(inList, index);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001D4EE8, "UnWindOp__15TSemaphoreGroupFP16TSemaphoreOpListl", Func_0x001D4EE8)
@@ -556,10 +592,12 @@ T_ROM_SIMULATION3(0x001D4EE8, "UnWindOp__15TSemaphoreGroupFP16TSemaphoreOpListl"
  */
 void Func_0x001D5264(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TSemaphore *This = (TSemaphore*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	SemFlags inFlags = (SemFlags)(R2);
 	This->BlockOnZero(inTask, inFlags);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001D5264, "BlockOnZero__10TSemaphoreFP5TTask8SemFlags", Func_0x001D5264)
@@ -570,10 +608,12 @@ T_ROM_SIMULATION3(0x001D5264, "BlockOnZero__10TSemaphoreFP5TTask8SemFlags", Func
  */
 void Func_0x001D4D98(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TSemaphore *This = (TSemaphore*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	SemFlags inFlags = (SemFlags)(R2);
 	This->BlockOnInc(inTask, inFlags);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001D4D98, "BlockOnInc__10TSemaphoreFP5TTask8SemFlags", Func_0x001D4D98)
@@ -584,7 +624,9 @@ T_ROM_SIMULATION3(0x001D4D98, "BlockOnInc__10TSemaphoreFP5TTask8SemFlags", Func_
  */
 void Func_0x001918FC(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	UnScheduleTask((TTask*)(R0));
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001918FC, "UnScheduleTask__FP5TTask", Func_0x001918FC)
@@ -595,9 +637,11 @@ T_ROM_SIMULATION3(0x001918FC, "UnScheduleTask__FP5TTask", Func_0x001918FC)
  */
 void Func_0x001CC5F8(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TScheduler *This = (TScheduler*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	This->Remove(inTask);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001CC5F8, "Remove__10TSchedulerFP5TTask", Func_0x001CC5F8)
@@ -608,10 +652,12 @@ T_ROM_SIMULATION3(0x001CC5F8, "Remove__10TSchedulerFP5TTask", Func_0x001CC5F8)
  */
 void Func_0x00359B5C(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TTaskQueue *This = (TTaskQueue*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	KernelObjectState inState = (KernelObjectState)(R2);
 	R0 = (KUInt32)This->RemoveFromQueue(inTask, inState);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x00359B5C, "RemoveFromQueue__10TTaskQueueFP5TTask17KernelObjectState", Func_0x00359B5C)
@@ -622,8 +668,10 @@ T_ROM_SIMULATION3(0x00359B5C, "RemoveFromQueue__10TTaskQueueFP5TTask17KernelObje
  */
 void Func_0x001CC1B0(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TScheduler *This = (TScheduler*)(R0);
 	This->UpdateCurrentBucket();
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001CC1B0, "UpdateCurrentBucket__10TSchedulerFv", Func_0x001CC1B0)
@@ -634,8 +682,10 @@ T_ROM_SIMULATION3(0x001CC1B0, "UpdateCurrentBucket__10TSchedulerFv", Func_0x001C
  */
 void Func_0x00359BE0(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TTaskQueue *This = (TTaskQueue*)(R0);
 	R0 = (KUInt32)This->Peek();
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x00359BE0, "Peek__10TTaskQueueFv", Func_0x00359BE0)
@@ -646,8 +696,10 @@ T_ROM_SIMULATION3(0x00359BE0, "Peek__10TTaskQueueFv", Func_0x00359BE0)
  */
 void Func_0x001D4DD4(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TSemaphore *This = (TSemaphore*)(R0);
 	This->WakeTasksOnZero();
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001D4DD4, "WakeTasksOnZero__10TSemaphoreFv", Func_0x001D4DD4)
@@ -658,8 +710,10 @@ T_ROM_SIMULATION3(0x001D4DD4, "WakeTasksOnZero__10TSemaphoreFv", Func_0x001D4DD4
  */
 void Func_0x001D4E18(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TSemaphore *This = (TSemaphore*)(R0);
 	This->WakeTasksOnInc();
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001D4E18, "WakeTasksOnInc__10TSemaphoreFv", Func_0x001D4E18)
@@ -670,8 +724,10 @@ T_ROM_SIMULATION3(0x001D4E18, "WakeTasksOnInc__10TSemaphoreFv", Func_0x001D4E18)
  */
 void Func_0x001918E8(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TTask *inTask = (TTask*)(R0);
 	ScheduleTask(inTask);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001918E8, "ScheduleTask__FP5TTask", Func_0x001918E8)
@@ -682,9 +738,11 @@ T_ROM_SIMULATION3(0x001918E8, "ScheduleTask__FP5TTask", Func_0x001918E8)
  */
 void Func_0x001CC5E0(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TScheduler *This = (TScheduler*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	This->AddWhenNotCurrent(inTask);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001CC5E0, "AddWhenNotCurrent__10TSchedulerFP5TTask", Func_0x001CC5E0)
@@ -695,9 +753,11 @@ T_ROM_SIMULATION3(0x001CC5E0, "AddWhenNotCurrent__10TSchedulerFP5TTask", Func_0x
  */
 void Func_0x001CC564(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TScheduler *This = (TScheduler*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	This->Add(inTask);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001CC564, "Add__10TSchedulerFP5TTask", Func_0x001CC564)
@@ -708,11 +768,13 @@ T_ROM_SIMULATION3(0x001CC564, "Add__10TSchedulerFP5TTask", Func_0x001CC564)
  */
 void Func_0x00359AAC(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TTaskQueue *This = (TTaskQueue*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	KernelObjectState inState = (KernelObjectState)(R2);
 	TTaskContainer *inContainer = (TTaskContainer*)(R3);
 	This->Add(inTask, inState, inContainer);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x00359AAC, "Add__10TTaskQueueFP5TTask17KernelObjectStateP14TTaskContainer", Func_0x00359AAC)
@@ -723,9 +785,11 @@ T_ROM_SIMULATION3(0x00359AAC, "Add__10TTaskQueueFP5TTask17KernelObjectStateP14TT
  */
 void Func_0x00359AA8(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TTaskQueue *This = (TTaskQueue*)(R0);
 	TTask *inTask = (TTask*)(R1);
 	This->CheckBeforeAdd(inTask);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x00359AA8, "CheckBeforeAdd__10TTaskQueueFP5TTask", Func_0x00359AA8)
@@ -736,7 +800,9 @@ T_ROM_SIMULATION3(0x00359AA8, "CheckBeforeAdd__10TTaskQueueFP5TTask", Func_0x003
  */
 void Func_0x001CC7F4(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	WantSchedule();
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001CC7F4, "WantSchedule__Fv", Func_0x001CC7F4)
@@ -747,9 +813,11 @@ T_ROM_SIMULATION3(0x001CC7F4, "WantSchedule__Fv", Func_0x001CC7F4)
  */
 void Func_0x00359B14(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	TTaskQueue *This = (TTaskQueue*)(R0);
 	KernelObjectState inState = (KernelObjectState)(R1);
 	R0 = (KUInt32)This->Remove(inState);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x00359B14, "Remove__10TTaskQueueF17KernelObjectState", Func_0x00359B14)
@@ -760,7 +828,9 @@ T_ROM_SIMULATION3(0x00359B14, "Remove__10TTaskQueueF17KernelObjectState", Func_0
  */
 void Func_0x0025215C(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	SwapInGlobals((TTask*)R0);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x0025215C, "SwapInGlobals", Func_0x0025215C)
@@ -771,8 +841,10 @@ T_ROM_SIMULATION3(0x0025215C, "SwapInGlobals", Func_0x0025215C)
  */
 void Func_0x000E5960(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	InterruptObject *inIntObj = (InterruptObject*)R0;
 	R0 = ClearInterrupt(inIntObj);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x000E5960, "ClearInterrupt", Func_0x000E5960)

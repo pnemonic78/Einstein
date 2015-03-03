@@ -40,19 +40,15 @@ public:
 	static KUInt16	ManagedMemoryReadS(TARMProcessor* ioCPU, KUInt32 inAddress);
 	static void		ManagedMemoryWriteS(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt16 inData);
 
-	static KUInt32	NoAbortMemoryReadAligned(TARMProcessor* ioCPU, KUInt32 inAddress);
-	static KUInt32	NoAbortMemoryRead(TARMProcessor* ioCPU, KUInt32 inAddress);
-	static KUInt8	NoAbortMemoryReadB(TARMProcessor* ioCPU, KUInt32 inAddress);
-	static void		NoAbortMemoryWriteAligned(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData);
-	static void		NoAbortMemoryWrite(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt32 inData);
-	static void		NoAbortMemoryWriteB(TARMProcessor* ioCPU, KUInt32 inAddress, KUInt8 inData);
-	
 	static void		UnexpectedPC(TARMProcessor* ioCPU);
 	static void		ReturnToEmulator(TARMProcessor* ioCPU, KUInt32 inPC);
 	static void		JumpToCalculatedAddress(TARMProcessor* ioCPU, KUInt32 inPC, KUInt32 ret=0xFFFFFFFF);
 	
-	static void		BeginNativeCode() { }
-	static void		EndNativeCode() { }
+	static void		BeginNativeCode() { pMustNotThrowDataAbort++; }
+	static void		EndNativeCode();
+private:
+	static KSInt32	pMustNotThrowDataAbort;
+	
 };
 
 

@@ -453,7 +453,7 @@ public:
 //	void		addToFront(void * inItem);
 //	void		checkBeforeAdd(void * inItem);
 //	
-//	void *	peek(void);
+	void			*Peek();
 //	void *	getNext(void * inItem);
 //	
 	void			*Remove();						///< Remove the first item in the Queue
@@ -494,6 +494,8 @@ extern void Func_0x00359B5C(TARMProcessor* ioCPU, KUInt32 ret); // RemoveFromQue
 extern void Func_0x001CC564(TARMProcessor* ioCPU, KUInt32 ret); // Add__10TSchedulerFP5TTask
 extern void Func_0x000E5960(TARMProcessor* ioCPU, KUInt32 ret); // ClearInterrupt
 extern void Func_0x0009C77C(TARMProcessor* ioCPU, KUInt32 ret); // Remove__17TDoubleQContainerFv
-
+extern void Func_0x00319F14(TARMProcessor* ioCPU, KUInt32 ret); // Get__12TObjectTableFUl
+extern void Func_0x001918FC(TARMProcessor* ioCPU, KUInt32 ret); // UnScheduleTask__FP5TTask
+extern void Func_0x0009C884(TARMProcessor* ioCPU, KUInt32 ret); // Peek__17TDoubleQContainerFv
 
 #endif /* defined(_NEWT_TTASK_) */

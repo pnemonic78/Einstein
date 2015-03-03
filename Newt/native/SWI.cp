@@ -101,7 +101,9 @@ void _EnterFIQAtomic()
  */
 void Func_0x00392B90(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	_EnterFIQAtomic();
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x00392B90, "_EnterFIQAtomic", Func_0x00392B90)
@@ -156,7 +158,9 @@ void _ExitAtomic()
  */
 void Func_0x00392B1C(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	_ExitAtomic();
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x00392B1C, "_ExitAtomic", Func_0x00392B1C)
@@ -189,7 +193,9 @@ void PublicEnterAtomic()
  */
 void Func_0x00392AC0(TARMProcessor* ioCPU, KUInt32 ret)
 {
+	NEWT_NATIVE({
 	PublicEnterAtomic();
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x00392AC0, "PublicEnterAtomic", Func_0x00392AC0)
@@ -301,7 +307,9 @@ void SWI11_SemOp(TARMProcessor* ioCPU)
 }
 
 T_ROM_PATCH(0x003ADEE4, "SWI11_SemOp") {
+	NEWT_NATIVE({
 	SWI11_SemOp(ioCPU);
+	})
 	SETPC(0x003AD750+4);
 	MMUCALLNEXT_AFTERSETPC
 }
@@ -316,7 +324,9 @@ void SWI34_Scheduler(TARMProcessor* ioCPU)
 }
 
 T_ROM_PATCH(0x003AE14C, "SWI34_Scheduler") {
+	NEWT_NATIVE({
 	SWI34_Scheduler(ioCPU);
+	})
 	SETPC(0x003AD750+4);
 	MMUCALLNEXT_AFTERSETPC
 }
@@ -1656,12 +1666,14 @@ T_ROM_SIMULATION3(0x003AE1FC, "_SemaphoreOpGlue", Func_0x003AE1FC)
  */
 NewtonErr SemaphoreOpGlue(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking)
 {
+	NEWT_NATIVE({
 	gCPU->SetRegister(0, inGroupId);
 	gCPU->SetRegister(1, inListId);
 	gCPU->SetRegister(2, inBlocking);
 	gCPU->SetRegister(15, 0x003AE1FC+8);
 	gCPU->DoSWI();
 	Func_0x003AD698(gCPU, -1, 0x0000000B);
+	})
 	return gCPU->GetRegister(0);
 }
 
