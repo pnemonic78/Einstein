@@ -10,8 +10,10 @@
 #define _NEWT_SWI_
 
 #include "Newt/native/types.h"
+#include "Newt/native/TTask.h"
+#include "Newt/native/TDoubleQContainer.h"
 
-#include "SimulatorGlue.h"
+#include "SimGlue.h"
 
 
 class TTime
@@ -46,6 +48,22 @@ public:
 };
 
 
+class TTimerEngine : public TDoubleQContainer
+{
+public:
+//	CTimerEngine();
+//	
+//	void		init(void);
+//	void		start(void);
+	void				Alarm();
+//	BOOL		queueTimer(CSharedMemMsg * inMsg, Timeout inTimeout, void * inData, TimeoutProcPtr inProc);
+//	BOOL		queueTimeout(CSharedMemMsg * inMsg);
+//	BOOL		queueDelay(CSharedMemMsg * inMsg);
+//	BOOL		queue(CSharedMemMsg * inMsg);
+//	void		remove(CSharedMemMsg * inMsg);
+};
+
+
 extern void Func_0x00392AC0(TARMProcessor* ioCPU, KUInt32 ret); // PublicEnterAtomic
 extern void Func_0x001CC7F4(TARMProcessor* ioCPU, KUInt32 ret); // WantSchedule__Fv
 extern void Func_0x001CC1B0(TARMProcessor* ioCPU, KUInt32 ret); // UpdateCurrentBucket__10TSchedulerFv
@@ -57,17 +75,29 @@ extern void Func_0x001CC564(TARMProcessor* ioCPU, KUInt32 ret); // Add__10TSched
 extern void Func_0x003AE1FC(TARMProcessor* ioCPU, KUInt32 ret); // _SemaphoreOpGlue
 extern void Func_0x003AD658(TARMProcessor* ioCPU, KUInt32 ret); // DoSchedulerSWI
 extern void Func_0x00392B1C(TARMProcessor* ioCPU, KUInt32 ret); // _ExitAtomic
-extern void Func_0x00392B90(TARMProcessor* ioCPU, KUInt32 ret); // _EnterFIQAtomic
+extern void Func_0x00392B90(TARMProcessor* ioCPU, KUInt32 ret); // _EnterFIQAtomicFast
 extern void Func_0x00392BB0(TARMProcessor* ioCPU, KUInt32 ret); // _ExitFIQAtomicFast
 extern void Func_0x003AD390(TARMProcessor* ioCPU, KUInt32 ret); // SetAlarm1
 extern void Func_0x003AD3BC(TARMProcessor* ioCPU, KUInt32 ret); // DisableAlarm1
 extern void Func_0x003AD448(TARMProcessor* ioCPU, KUInt32 ret); // SetAlarm
+extern void Func_0x00255620(TARMProcessor* ioCPU, KUInt32 ret); // SetAlarmAtomic__FR5TTime
+extern void Func_0x003AD4C4(TARMProcessor* ioCPU, KUInt32 ret); // ClearAlarm
+extern void Func_0x00255C04(TARMProcessor* ioCPU, KUInt32 ret); // ClearAlarmAtomic__Fv
+extern void Func_0x003AD41C(TARMProcessor* ioCPU, KUInt32 ret); // GetClock
+extern void Func_0x00255CB0(TARMProcessor* ioCPU, KUInt32 ret); // Alarm__12TTimerEngineFv
+extern void Func_0x00070D80(TARMProcessor* ioCPU, KUInt32 ret); // (RET) CompCompare
 
 
+int CompCompare(KSInt64 *a, KSInt64 *b);
+void GetClock(TTime *);
+void ClearAlarmAtomic();
+void ClearAlarm();
+BOOL SetAlarmAtomic(TTime *inTime);
 BOOL SetAlarm(TTime *inTime);
 void SetAlarm1(ULong when);
 void DisableAlarm1();
-void _EnterFIQAtomic();
+void _EnterFIQAtomicFast();
+void _ExitFIQAtomicFast();
 void _ExitAtomic();
 NewtonErr SemaphoreOpGlue(ObjectId inGroupId, ObjectId inListId, SemFlags inBlocking);
 NewtonErr DoSchedulerSWI();

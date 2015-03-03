@@ -423,6 +423,7 @@
 		C9B4ABC2123D6D5400D8D2C7 /* TNE2000Card.cp in Sources */ = {isa = PBXBuildFile; fileRef = C932C4C011A1AB5D00F6A7E4 /* TNE2000Card.cp */; };
 		C9B4ABC9123D709D00D8D2C7 /* TNetworkManager.cp in Sources */ = {isa = PBXBuildFile; fileRef = C962429E11B6A20A00EE66F3 /* TNetworkManager.cp */; };
 		C9B72B3F1AA50FEE00559524 /* ScreenUpdateTask.cp in Sources */ = {isa = PBXBuildFile; fileRef = C9B72B3D1AA50FEE00559524 /* ScreenUpdateTask.cp */; };
+		C9B72B421AA6699000559524 /* TDoubleQContainer.cp in Sources */ = {isa = PBXBuildFile; fileRef = C9B72B401AA6699000559524 /* TDoubleQContainer.cp */; };
 		C9BE33D0133E64F60052EA2F /* TJITPerformance.cp in Sources */ = {isa = PBXBuildFile; fileRef = C9BE33CF133E64F60052EA2F /* TJITPerformance.cp */; };
 		C9BE33D1133E64F60052EA2F /* TJITPerformance.cp in Sources */ = {isa = PBXBuildFile; fileRef = C9BE33CF133E64F60052EA2F /* TJITPerformance.cp */; };
 		C9CEB43F19601CA3002198A7 /* TJITGenericRetarget.cp in Sources */ = {isa = PBXBuildFile; fileRef = C9CEB43D19601CA3002198A7 /* TJITGenericRetarget.cp */; };
@@ -754,7 +755,7 @@
 		C98AB2561A351EE6001BB1CD /* TSingleQContainer.rts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TSingleQContainer.rts; sourceTree = "<group>"; };
 		C98AB25B1A351EE6001BB1CD /* SimHandcoded.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimHandcoded.cp; sourceTree = "<group>"; };
 		C98AB25C1A351EE6001BB1CD /* SimHandcoded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimHandcoded.h; sourceTree = "<group>"; };
-		C98AB25D1A351EE6001BB1CD /* SimulatorGlue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimulatorGlue.h; sourceTree = "<group>"; };
+		C98AB25D1A351EE6001BB1CD /* SimIncludeAll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimIncludeAll.h; sourceTree = "<group>"; };
 		C98AB25F1A351EE6001BB1CD /* unsorted_001.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unsorted_001.cp; sourceTree = "<group>"; };
 		C98AB2601A351EE6001BB1CD /* unsorted_001.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unsorted_001.h; sourceTree = "<group>"; };
 		C98AB2611A351EE6001BB1CD /* unsorted_001.rts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = unsorted_001.rts; sourceTree = "<group>"; };
@@ -1084,6 +1085,9 @@
 		C9B4AA49123D480900D8D2C7 /* iEinsteinView.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = iEinsteinView.h; path = Classes/iEinsteinView.h; sourceTree = "<group>"; tabWidth = 4; };
 		C9B72B3D1AA50FEE00559524 /* ScreenUpdateTask.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScreenUpdateTask.cp; path = native/ScreenUpdateTask.cp; sourceTree = "<group>"; };
 		C9B72B3E1AA50FEE00559524 /* ScreenUpdateTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenUpdateTask.h; path = native/ScreenUpdateTask.h; sourceTree = "<group>"; };
+		C9B72B401AA6699000559524 /* TDoubleQContainer.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TDoubleQContainer.cp; path = native/TDoubleQContainer.cp; sourceTree = "<group>"; };
+		C9B72B411AA6699000559524 /* TDoubleQContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDoubleQContainer.h; path = native/TDoubleQContainer.h; sourceTree = "<group>"; };
+		C9B72B431AA66AF700559524 /* SimGlue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimGlue.h; sourceTree = "<group>"; };
 		C9BE33CE133E64F60052EA2F /* TJITPerformance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = TJITPerformance.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		C9BE33CF133E64F60052EA2F /* TJITPerformance.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = TJITPerformance.cp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		C9CEB43D19601CA3002198A7 /* TJITGenericRetarget.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TJITGenericRetarget.cp; sourceTree = "<group>"; };
@@ -1316,6 +1320,8 @@
 				C9D8E9AB1AA1D7F3006788C7 /* SWI.h */,
 				C9B72B3D1AA50FEE00559524 /* ScreenUpdateTask.cp */,
 				C9B72B3E1AA50FEE00559524 /* ScreenUpdateTask.h */,
+				C9B72B401AA6699000559524 /* TDoubleQContainer.cp */,
+				C9B72B411AA6699000559524 /* TDoubleQContainer.h */,
 			);
 			name = native;
 			sourceTree = "<group>";
@@ -1370,7 +1376,8 @@
 				C98AB25E1A351EE6001BB1CD /* unsorted */,
 				C98AB25B1A351EE6001BB1CD /* SimHandcoded.cp */,
 				C98AB25C1A351EE6001BB1CD /* SimHandcoded.h */,
-				C98AB25D1A351EE6001BB1CD /* SimulatorGlue.h */,
+				C98AB25D1A351EE6001BB1CD /* SimIncludeAll.h */,
+				C9B72B431AA66AF700559524 /* SimGlue.h */,
 			);
 			name = Newt;
 			path = ../../Newt;
@@ -2680,6 +2687,7 @@
 				C95E60A5198B76DC004C6CEF /* TError.cp in Sources */,
 				C95E60A6198B76DC004C6CEF /* TException.cp in Sources */,
 				C95E60A7198B76DC004C6CEF /* TIOException.cp in Sources */,
+				C9B72B421AA6699000559524 /* TDoubleQContainer.cp in Sources */,
 				C95E60A8198B76DC004C6CEF /* TMemError.cp in Sources */,
 				DA52C8A61A409C18008A17D0 /* UJITGenericRetargetSupport.cp in Sources */,
 				DA52C8941A409164008A17D0 /* TJITGenericROMPatch.cp in Sources */,

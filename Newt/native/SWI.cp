@@ -87,7 +87,7 @@ T_ROM_SIMULATION3(0x00392BB0, "_ExitFIQAtomicFast", Func_0x00392BB0)
 
 
 
-void _EnterFIQAtomic()
+void _EnterFIQAtomicFast()
 {
 	gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( 0x0c400000 );
 	
@@ -102,11 +102,11 @@ void _EnterFIQAtomic()
 void Func_0x00392B90(TARMProcessor* ioCPU, KUInt32 ret)
 {
 	NEWT_NATIVE({
-	_EnterFIQAtomic();
+	_EnterFIQAtomicFast();
 	})
 	SETPC(LR+4);
 }
-T_ROM_SIMULATION3(0x00392B90, "_EnterFIQAtomic", Func_0x00392B90)
+T_ROM_SIMULATION3(0x00392B90, "_EnterFIQAtomicFast", Func_0x00392B90)
 
 
 
@@ -167,7 +167,7 @@ T_ROM_SIMULATION3(0x00392B1C, "_ExitAtomic", Func_0x00392B1C)
 
 
 
-void PublicEnterAtomic()
+void _EnterAtomicFast()
 {
 	if ( GAtomicFIQNestCountFast()!=0 )
 	{
@@ -190,15 +190,16 @@ void PublicEnterAtomic()
 /**
  * PublicEnterAtomic
  * ROM: 0x00392AC0 - 0x00392B1C
+ * alias EnterAtomic, PublicEnterAtomic
  */
 void Func_0x00392AC0(TARMProcessor* ioCPU, KUInt32 ret)
 {
 	NEWT_NATIVE({
-	PublicEnterAtomic();
+		_EnterAtomicFast();
 	})
 	SETPC(LR+4);
 }
-T_ROM_SIMULATION3(0x00392AC0, "PublicEnterAtomic", Func_0x00392AC0)
+T_ROM_SIMULATION3(0x00392AC0, "_EnterAtomicFast", Func_0x00392AC0)
 
 
 
@@ -1716,6 +1717,295 @@ NewtonErr DoSchedulerSWI()
 }
 
 
+void TTimerEngine::Alarm()
+{
+	TARMProcessor *ioCPU = gCPU;
+	
+	// 00255CB0: E1A0C00D  mov	r12, r13
+	R12 = SP;
+	
+	// 00255CB4: E92DD830  stmfd	r13!, {r4-r5, r11-r12, lr-pc}
+	{
+		KUInt32 baseAddress = SP;
+		KUInt32 wbAddress = baseAddress - (6 * 4);
+		baseAddress -= (6 * 4);
+		SETPC(0x00255CB4+8);
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R4); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R5); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R11); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, R12); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, LR); baseAddress += 4;
+		UJITGenericRetargetSupport::ManagedMemoryWriteAligned(ioCPU, baseAddress, 0x00255CB4 + 12);
+		SP = wbAddress;
+	}
+	
+	// 00255CB8: E24CB004  sub	r11, r12, #0x00000004
+	R11 = R12 - 0x00000004; // 4
+	
+	// 00255CBC: E1A04000  mov	r4, r0
+	R4 = R0;
+	
+	// 00255CC0: E24DD008  sub	r13, r13, #0x00000008
+	SP = SP - 0x00000008; // 8
+
+	_EnterAtomicFast();
+	
+	// 00255CC8: E1A00004  mov	r0, r4
+	R0 = R4;
+	
+	R0 = (KUInt32) ((TDoubleQContainer*)R0)->Peek();
+
+	// 00255CD0: E1B05000  movs	r5, r0
+	{
+		KUInt32 Opnd2 = R0;
+		const KUInt32 theResult = Opnd2;
+		R5 = theResult;
+		ioCPU->mCPSR_Z = (theResult==0);
+		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
+	}
+	
+	// 00255CD4: 1A000001  bne	00255CE0=Alarm__12TTimerEngineFv+30
+	if (ioCPU->TestNE()) {
+		SETPC(0x00255CE0+4);
+		goto L00255CE0;
+	}
+	
+	ClearAlarmAtomic();
+	
+	// 00255CDC: EA000018  b	00255D44=Alarm__12TTimerEngineFv+94
+	SETPC(0x00255D44+4);
+	goto L00255D44;
+	
+L00255CE0:
+	// 00255CE0: E1A0000D  mov	r0, r13
+	R0 = SP;
+	
+	GetClock((TTime*)R0);
+	
+	// 00255CE8: E2851028  add	r1, r5, #0x00000028
+	R1 = R5 + 0x00000028; // 40
+	
+	// 00255CEC: E1A0000D  mov	r0, r13
+	R0 = SP;
+	
+	R0 = CompCompare((KSInt64*)R0, (KSInt64*)R1);
+	
+	// 00255CF4: E3500000  cmp	r0, #0x00000000
+	{
+		KUInt32 Opnd2 = 0x00000000;
+		KUInt32 Opnd1 = R0;
+		const KUInt32 theResult = Opnd1 - Opnd2;
+		ioCPU->mCPSR_Z = (theResult==0);
+		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
+		ioCPU->mCPSR_C = ( ((Opnd1&~Opnd2)|(Opnd1&~theResult)|(~Opnd2&~theResult)) >> 31);
+		ioCPU->mCPSR_V = ( ((Opnd1&~Opnd2&~theResult)|(~Opnd1&Opnd2&theResult)) >> 31);
+	}
+	
+	// 00255CF8: BA000009  blt	00255D24=Alarm__12TTimerEngineFv+74
+	if (ioCPU->TestLT()) {
+		SETPC(0x00255D24+4);
+		goto L00255D24;
+	}
+	
+	// 00255CFC: E1A00004  mov	r0, r4
+	R0 = R4;
+	
+	R0 = (KUInt32) ((TDoubleQContainer*)R0)->Remove();
+	
+	// 00255D04: E595003C  ldr	r0, [r5, #0x03c]
+	SETPC(0x00255D04+8);
+	R0 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R5 + 0x003C);
+	
+	// 00255D08: E2001C06  and	r1, r0, #0x00000600
+	R1 = R0 & 0x00000600;
+	
+	// 00255D0C: E3310C06  teq	r1, #0x00000600
+	{
+		KUInt32 Opnd2 = 0x00000600;
+		KUInt32 Opnd1 = R1;
+		const KUInt32 theResult = Opnd1 ^ Opnd2;
+		ioCPU->mCPSR_Z = (theResult==0);
+		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
+		ioCPU->mCPSR_C = ((Opnd2&0x80000000)!=0);
+	}
+	
+	// 00255D10: 03C00C06  biceq	r0, r0, #0x00000600
+	if (ioCPU->TestEQ()) {
+		R0 = R0 & 0xFFFFF9FF;
+	}
+	
+	// 00255D14: 0585003C  streq	r0, [r5, #0x03c]
+	if (ioCPU->TestEQ()) {
+		SETPC(0x00255D14+8);
+		UJITGenericRetargetSupport::ManagedMemoryWrite(ioCPU, R5 + 0x003C, R0);
+	}
+	
+	// 00255D18: E59500A0  ldr	r0, [r5, #0x0a0]
+	SETPC(0x00255D18+8);
+	R0 = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, R5 + 0x00A0);
+	
+	// 00255D1C: E1A0E00F  mov	lr, pc
+	{
+		KUInt32 Opnd2 = 0x00255D1C + 8;
+		const KUInt32 theResult = Opnd2;
+		LR = theResult;
+	}
+	
+	// 00255D20: E595F0A4  ldr	pc, [r5, #0x0a4]
+	{
+		KUInt32 offset = 0x000000A4;
+		KUInt32 theAddress = R5 + offset;
+		SETPC(0x00255D20+8);
+		KUInt32 theData = UJITGenericRetargetSupport::ManagedMemoryRead(ioCPU, theAddress);
+		SETPC(theData + 4);
+		UJITGenericRetargetSupport::JumpToCalculatedAddress(ioCPU, PC, 0x00255D28);
+	}
+	
+L00255D24:
+	// 00255D24: E1A00004  mov	r0, r4
+	R0 = R4;
+	
+	R0 = (KUInt32) ((TDoubleQContainer*)R0)->Peek();
+	
+	// 00255D2C: E1B05000  movs	r5, r0
+	{
+		KUInt32 Opnd2 = R0;
+		const KUInt32 theResult = Opnd2;
+		R5 = theResult;
+		ioCPU->mCPSR_Z = (theResult==0);
+		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
+	}
+	
+	// 00255D30: 0A000003  beq	00255D44=Alarm__12TTimerEngineFv+94
+	if (ioCPU->TestEQ()) {
+		SETPC(0x00255D44+4);
+		goto L00255D44;
+	}
+	
+	// 00255D34: E2850028  add	r0, r5, #0x00000028
+	R0 = R5 + 0x00000028; // 40
+	
+	R0 = SetAlarmAtomic((TTime*)R0);
+	
+	// 00255D3C: E3300000  teq	r0, #0x00000000
+	{
+		KUInt32 Opnd2 = 0x00000000;
+		KUInt32 Opnd1 = R0;
+		const KUInt32 theResult = Opnd1 ^ Opnd2;
+		ioCPU->mCPSR_Z = (theResult==0);
+		ioCPU->mCPSR_N = ((theResult&0x80000000)!=0);
+	}
+	
+	// 00255D40: 0AFFFFE6  beq	00255CE0=Alarm__12TTimerEngineFv+30
+	if (ioCPU->TestEQ()) {
+		SETPC(0x00255CE0+4);
+		goto L00255CE0;
+	}
+	
+L00255D44:
+	_ExitAtomic();
+	
+	// 00255D48: E91BA830  ldmdb	r11, {r4-r5, r11, r13, pc}
+	{
+		KUInt32 baseAddress = R11;
+		baseAddress -= (5 * 4);
+		SETPC(0x00255D48+8);
+		R4 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		R5 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		R11 = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		SP = UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress); baseAddress += 4;
+		SETPC( UJITGenericRetargetSupport::ManagedMemoryReadAligned(ioCPU, baseAddress)) + 4;
+		return; //MMUCALLNEXT_AFTERSETPC;
+	}
+	
+	__asm__("int $3\n" : : ); // There was no return instruction found
+}
+
+/**
+ * Transcoded function Alarm__12TTimerEngineFv
+ * ROM: 0x00255CB0 - 0x00255D4C
+ */
+void Func_0x00255CB0(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		TTimerEngine *This = (TTimerEngine*)R0;
+		This->Alarm();
+	})
+	SETPC(LR+4);
+}
+//T_ROM_SIMULATION3(0x00255CB0, "Alarm__12TTimerEngineFv", Func_0x00255CB0)
+
+
+
+void GetClock(TTime *outTime)
+{
+	TInterruptManager *intMgr = gCPU->GetMemory()->GetInterruptManager();
+
+	KSInt32 sampleTimeHi = GTimerSampleHi();
+	KUInt32 sampleTimeLo = GTimerSampleLo();
+
+	KUInt32 nowLo = intMgr->GetTimer();
+	
+	if ( nowLo<=sampleTimeLo )
+		sampleTimeHi++;
+	sampleTimeLo = nowLo;
+	
+	outTime->SetTimeHi( sampleTimeHi );
+	outTime->SetTimeLo( sampleTimeLo );	
+}
+
+/**
+ * Transcoded function GetClock
+ * ROM: 0x003AD41C - 0x003AD440
+ */
+void Func_0x003AD41C(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		TTime *outTime = (TTime*)R0;
+		GetClock(outTime);
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x003AD41C, "GetClock", Func_0x003AD41C)
+
+
+void ClearAlarmAtomic()
+{
+	_EnterFIQAtomicFast();
+	ClearAlarm();
+	_ExitFIQAtomicFast();
+}
+
+/**
+ * Transcoded function ClearAlarmAtomic__Fv
+ * ROM: 0x00255C04 - 0x00255C20
+ */
+void Func_0x00255C04(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		ClearAlarmAtomic();
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x00255C04, "ClearAlarmAtomic__Fv", Func_0x00255C04)
+
+
+
+void ClearAlarm()
+{
+	DisableAlarm1();
+}
+
+void Func_0x003AD4C4(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		ClearAlarm();
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x003AD4C4, "ClearAlarm", Func_0x003AD4C4)
+
+
 void SetAlarm1(ULong inWhen)
 {
 	TInterruptManager *intMgr = gCPU->GetMemory()->GetInterruptManager();
@@ -1724,7 +2014,6 @@ void SetAlarm1(ULong inWhen)
 	intMgr->SetIntEDReg1( intMgr->GetIntEDReg1() | 0x20 );
 	SetGIntMaskShadowReg( GIntMaskShadowReg() | 0x20 );
 }
-
 
 /**
  * Transcoded function SetAlarm1
@@ -1762,6 +2051,34 @@ void Func_0x003AD3BC(TARMProcessor* ioCPU, KUInt32 ret)
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x003AD3BC, "DisableAlarm1", Func_0x003AD3BC)
+
+
+
+BOOL SetAlarmAtomic(TTime *inTime)
+{
+	_EnterFIQAtomicFast();
+	BOOL ret = SetAlarm(inTime);
+	_ExitFIQAtomicFast();
+	return ret;
+}
+
+/**
+ * Transcoded function SetAlarmAtomic__FR5TTime
+ * ROM: 0x00255620 - 0x0025564C
+ */
+void Func_0x00255620(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		TTime *inTime = (TTime*)R0;
+		R0 = SetAlarmAtomic(inTime);
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x00255620, "SetAlarmAtomic__FR5TTime", Func_0x00255620)
+
+
+
+
 
 
 BOOL SetAlarm(TTime *inTime)
@@ -1823,6 +2140,40 @@ void Func_0x003AD448(TARMProcessor* ioCPU, KUInt32 ret)
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x003AD448, "SetAlarm", Func_0x003AD448)
+
+
+KSInt64 GetWide(KSInt64 *inPtr) {
+	KUInt32 a = UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, (KUInt32)inPtr);
+	KUInt32 b = UJITGenericRetargetSupport::ManagedMemoryRead(gCPU, ((KUInt32)inPtr)+4);
+	return (((KSInt64)a)<<32) | b;
+}
+
+int CompCompare(KSInt64 *a, KSInt64 *b)
+{
+	KSInt64 va = GetWide(a);
+	KSInt64 vb = GetWide(b);
+
+	if (va < vb)
+		return -1;
+	if (va > vb)
+		return 1;
+	return 0;
+}
+
+/**
+ * Transcoded function CompCompare
+ * ROM: 0x00070D80 - 0x00070DC0
+ */
+void Func_0x00070D80(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		KSInt64 *a = (KSInt64*)R0;
+		KSInt64 *b = (KSInt64*)R1;
+		R0 = CompCompare(a, b);
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x00070D80, "CompCompare", Func_0x00070D80)
 
 
 

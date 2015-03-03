@@ -22,16 +22,14 @@ rt cjit ScreenUpdateTask__FPvUlT2
 						rt cjit QueueDelay__12TTimerEngineFP13TSharedMemMsg
 							rt cjit Queue__12TTimerEngineFP13TSharedMemMsg
 								# Peek__17TDoubleQContainerFv in TTask.cp
-								rt cjit SetAlarmAtomic__FR5TTime
-									# SetAlarm in SWI.cp <---===
+								# SetAlarmAtomic__FR5TTime in SWI.cp
+									# SetAlarm in SWI.cp
 										# SetAlarm1 in SWI.cp
 										# DisableAlarm1 in SWI.cp
-								rt cjit Alarm__12TTimerEngineFv
-									rt cjit ClearAlarmAtomic__Fv
-										rt cjit ClearAlarm
-											# LEAF
-									rt cjit GetClock
-										# LEAF
+								# Alarm__12TTimerEngineFv <---===
+									# ClearAlarmAtomic__Fv in SWI.cp
+										# ClearAlarm in SWI.cp
+									# GetClock in SWI.cp
 								rt cjit AddToFront__17TDoubleQContainerFPv
 									rt cjit CheckBeforeAdd__17TDoubleQContainerFPv
 										# LEAF
@@ -93,7 +91,7 @@ rt cjit ScreenUpdateTask__FPvUlT2
 		# ??
 	rt cjitr GetGlobalTime
 		# ??
-	rt cjitr CompCompare
+	# CompCompare in SWI.cp
 		# ??
 	rt cjitr GetSample__4TADCF10ADCMuxTypeUlPFPvlUl_vPv
 		# don't follow this as this is not supported in emulation

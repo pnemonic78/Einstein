@@ -11,7 +11,7 @@
 #define ScreenUpdateTask_H
 
 #include "Newt/core/ScreenUpdateTaskSupport.h"
-#include "SimulatorGlue.h"
+#include "SimGlue.h"
 
 
 

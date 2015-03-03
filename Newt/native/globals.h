@@ -11,7 +11,7 @@
 
 #include "Newt/native/types.h"
 
-#include "SimulatorGlue.h"
+#include "SimGlue.h"
 
 
 NEWT_GLOBAL_W_REF(0x0C008400, TParamBlock*,		ParamBlockFromImage)

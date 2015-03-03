@@ -9,17 +9,15 @@
 #ifndef _NEWT_TTASK_
 #define _NEWT_TTASK_
 
-
+#include "SimGlue.h"
 #include "Newt/native/types.h"
+#include "Newt/native/globals.h"
 
 enum SemFlags
 {
 	kWaitOnBlock,				// ok if we need to block
 	kNoWaitOnBlock				// don't wait if need to block
 };
-
-
-#include "SimulatorGlue.h"
 
 
 class TEnvironment
@@ -423,58 +421,6 @@ public:
 };
 
 
-class TDoubleQContainer;
-
-class TDoubleQItem
-{
-public:
-//	TDoubleQItem();
-	
-	NEWT_GET_SET_W(0x000, TDoubleQItem*, Next);
-	TDoubleQItem	*pNext;							///< 000
-	NEWT_GET_SET_W(0x004, TDoubleQItem*, Prev);
-	TDoubleQItem	*pPrev;							///< 004
-	NEWT_GET_SET_W(0x008, TDoubleQContainer*, Container);
-	TDoubleQContainer *pContainer;					///< 008
-};
-
-
-typedef void (*DestructorProcPtr)(void *, void *);		// instance pointer, data to destroy
-
-class TDoubleQContainer
-{
-public:
-//	TDoubleQContainer();
-//	TDoubleQContainer(ULong inOffsetToDoubleQItem);
-//	TDoubleQContainer(ULong inOffsetToDoubleQItem, DestructorProcPtr, void*);
-//	
-//	void		add(void * inItem);
-//	void		addBefore(void * inItem, void * inBeforeItem);
-//	void		addToFront(void * inItem);
-//	void		checkBeforeAdd(void * inItem);
-//	
-	void			*Peek();
-//	void *	getNext(void * inItem);
-//	
-	void			*Remove();						///< Remove the first item in the Queue
-//	BOOL		removeFromQueue(void * inItem);
-//	BOOL		deleteFromQueue(void * inItem);
-//	
-//	void		init(ULong inOffsetToDoubleQItem);
-	
-	NEWT_GET_SET_W(0x000, TDoubleQItem*, Head);
-	TDoubleQItem	*pHead;							///< 000
-	NEWT_GET_SET_W(0x004, TDoubleQItem*, Tail);
-	TDoubleQItem	*pTail;							///< 004
-	NEWT_GET_SET_W(0x008, ULong, OffsetToDoubleQItem);
-	ULong			pOffsetToDoubleQItem;			///< 008
-	NEWT_GET_SET_W(0x00C, DestructorProcPtr, Destructor);
-	DestructorProcPtr pDestructor;					///< 00C
-	NEWT_GET_SET_W(0x010, void*, DestructorInstance);
-	void			*pDestructorInstance;			///< 010
-};
-
-
 extern void WantSchedule();
 extern void ScheduleTask(TTask*);
 extern void UnScheduleTask(TTask *inTask);
@@ -496,6 +442,5 @@ extern void Func_0x000E5960(TARMProcessor* ioCPU, KUInt32 ret); // ClearInterrup
 extern void Func_0x0009C77C(TARMProcessor* ioCPU, KUInt32 ret); // Remove__17TDoubleQContainerFv
 extern void Func_0x00319F14(TARMProcessor* ioCPU, KUInt32 ret); // Get__12TObjectTableFUl
 extern void Func_0x001918FC(TARMProcessor* ioCPU, KUInt32 ret); // UnScheduleTask__FP5TTask
-extern void Func_0x0009C884(TARMProcessor* ioCPU, KUInt32 ret); // Peek__17TDoubleQContainerFv
 
 #endif /* defined(_NEWT_TTASK_) */

@@ -9,7 +9,7 @@
 #ifndef __Einstein__SimHandcoded__
 #define __Einstein__SimHandcoded__
 
-#include "SimulatorGlue.h"
+#include "SimGlue.h"
 
 // keep this empty if possible
 

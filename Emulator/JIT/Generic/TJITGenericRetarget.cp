@@ -211,7 +211,8 @@ bool TJITGenericRetarget::OpenFiles(const char *filePathAndName)
 		return true;
 	}
 	fprintf(pCOut, "/**\n * Collection of transcoded functions\n */\n\n");
-	fprintf(pCOut, "#include \"%s.h\"\n\n", fileName);
+	fprintf(pCOut, "#include \"%s.h\"\n", fileName);
+	fprintf(pCOut, "#include \"SimIncludeAll.h\"\n\n");
 
 	snprintf(buf, 2047, "%s.h", filePathAndName);
 	pHOut = fopen(buf, "wb");
@@ -235,7 +236,7 @@ bool TJITGenericRetarget::OpenFiles(const char *filePathAndName)
 	fprintf(pHOut, "/**\n * Collection of transcoded functions\n */\n\n");
 	fprintf(pHOut, "#ifndef %s_H\n", fileID);
 	fprintf(pHOut, "#define %s_H\n\n", fileID);
-	fprintf(pHOut, "#include \"SimulatorGlue.h\"\n\n\n");
+	fprintf(pHOut, "#include \"SimGlue.h\"\n\n\n");
 	return false;
 }
 
