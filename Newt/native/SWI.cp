@@ -15,51 +15,76 @@
 #include "TInterruptManager.h"
 
 
-// ScreenUpdateTask__FPvUlT2
-//  SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
-//   _SemaphoreOpGlue
-//    swi 0x0000000B (COMPLEX!) calling DoSemaphoreOp at 0x003ADEF8
-//     003AD698-003AD74C SWIBoot
-//     Jump table dispatch from 003AD568
-//     003ADEE4
-//      DoSemaphoreOp
-//     At 003ADF14 (or later if Semaphore is blocking), jump to 003AD750 (task switch)
-//      DoDeferrals
-//       _EnterAtomicFast (leaf)
-//       _ExitAtomicFast (laef)
-//       PortDeferredSendNotify__Fv ?
-//       DeferredNotify__Fv ?
-//       DoDeferral__18TExtPageTrackerMgrFv ?
-//        Peek__17TDoubleQContainerFv ?
-//        DoDeferral__15TExtPageTrackerFv ?
-//         RemovePMappings__FUlT1 ?
-//          IsSuperMode ?
-//          PrimRemovePMappings__FUlT1 ?
-//          _GenericSWI ? (moan!)
-//         Remove__12TObjectTableFUl (leaf)
-//        GetNext__17TDoubleQContainerFPv (leaf)
-//      Scheduler ?
-//      StartScheduler
-//       DisableInterrupt
-//        _EnterFIQAtomicFast (leaf)
-//        _ExitFIQAtomicFast (leaf)
-//        SetAndClearBitsAtomic ("leaf")
-//        !ClearInterrupt!
-//       QuickEnableInterrupt ?
-//     exit to task at 003ADB10 (or wherever task switching leads us)
-
-// bl      VEC_SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags  @ 0x001CD160 0xEB6836F5 - .h6.
-// bl      VEC_SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags  @ 0x001CD194 0xEB6836E8 - .h6.
-// SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags: 0x0025A464-0x0025A470
-// _SemaphoreOpGlue
-// SWIBoot: 0x003AD698-0x003ADBB4
-
-
 NewtonErr PANIC_ExitAtomicUnderflow()
 {
 	fprintf(stderr, "SYSTEM PANIC: ExitAtomic underflow\n\n");
 	return -1;
 }
+
+
+void _ExitFIQAtomicFast()
+{
+	TARMProcessor *ioCPU = gCPU;
+	
+	// Decrement the FIQ lock count
+	int nestCount = GAtomicFIQNestCountFast() - 1;
+	SetGAtomicFIQNestCountFast( nestCount );
+	
+	// Panic, if we have more Exit calls than Enter calls
+	if ( nestCount<0) {
+		PANIC_ExitAtomicUnderflow();
+		return;
+	}
+	
+	// If we are still locked, do nothing
+	if ( nestCount!=0 ) {
+		return;
+	}
+	
+	// Grab the interrup mask
+	ULong intMask = GIntMaskShadowReg();
+	
+	// mask out the FIQ interrupt bit
+	if ( GAtomicIRQNestCountFast()!=0 ) {
+		intMask &= gCPU->GetMemory()->GetInterruptManager()->GetFIQMask();
+	}
+	
+	// add some required bits
+	intMask |= 0x0C400000;
+	
+	// Grab the processor status register
+	ULong PSR = ioCPU->GetCPSR() & 0x0000001F;
+	if (PSR!=0x10 && PSR!=0x00) {
+		// don't do anything if we are not in supervisor mode
+		gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( intMask );
+	} else {
+		// we are in supervisor mode
+		if ( GWantDeferred() || GSchedule() ) {
+			// allow tasks to switch
+			gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( intMask );
+			DoSchedulerSWI();
+		} else {
+			// just re-enable interrupts
+			gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( intMask );
+		}
+	}
+	
+}
+
+/**
+ * _ExitFIQAtomicFast
+ * ROM: 0x00392BB0 - 0x00392C4C
+ */
+void Func_0x00392BB0(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		_ExitFIQAtomicFast();
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x00392BB0, "_ExitFIQAtomicFast", Func_0x00392BB0)
+
+
 
 
 void _EnterFIQAtomic()
@@ -119,7 +144,7 @@ void _ExitAtomic()
 			gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( intMask );
 			DoSchedulerSWI();
 		} else {
-			// just reanble interrupts
+			// just re-enable interrupts
 			gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( intMask );
 		}
 	}

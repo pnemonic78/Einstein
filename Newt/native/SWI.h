@@ -30,6 +30,7 @@ extern void Func_0x003AD658(TARMProcessor* ioCPU, KUInt32 ret); // DoSchedulerSW
 
 extern void Func_0x00392B1C(TARMProcessor* ioCPU, KUInt32 ret); // _ExitAtomic
 extern void Func_0x00392B90(TARMProcessor* ioCPU, KUInt32 ret); // _EnterFIQAtomic
+extern void Func_0x00392BB0(TARMProcessor* ioCPU, KUInt32 ret); // _ExitFIQAtomicFast
 
 void _EnterFIQAtomic();
 void _ExitAtomic();
