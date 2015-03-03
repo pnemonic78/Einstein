@@ -447,7 +447,49 @@ TObject *TObjectTable::Get(ObjectId inId)
 }
 
 
+#pragma mark - TDoubleQContainer
+
+
+/**
+ * Remove the first item in the Queue.
+ * \return a pointer to the data of the first item
+ */
+void *TDoubleQContainer::Remove()
+{
+	TDoubleQItem *item = Head();
+	if (item)
+	{
+		TDoubleQItem *next = item->Next();
+		SetHead( next );
+		if ( next )
+			next->SetPrev( NULL );
+		else
+			SetTail( NULL );
+		item->SetNext( NULL );
+		item->SetPrev( NULL );
+		item->SetContainer( NULL );
+		return ((char*)item) - OffsetToDoubleQItem();
+	}
+	return NULL;
+}
+
+/**
+ * Remove__17TDoubleQContainerFv
+ * ROM: 0x0009C77C - 0x0009C7C4
+ */
+void Func_0x0009C77C(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		TDoubleQContainer *This = (TDoubleQContainer*)R0;
+		R0 = (KUInt32)This->Remove();
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x0009C77C, "Remove__17TDoubleQContainerFv", Func_0x0009C77C)
+
+
 #pragma mark - Stubs for all the functions above
+
 
 /**
  * DoSemaphoreOp
@@ -455,11 +497,13 @@ TObject *TObjectTable::Get(ObjectId inId)
  */
 void Func_0x001D4CE4(TARMProcessor* ioCPU, KUInt32 ret)
 {
-	ObjectId inGroupId = (ObjectId)(R0);
-	ObjectId inListId = (ObjectId)(R1);
-	SemFlags inBlocking = (SemFlags)(R2);
-	TTask *inTask = (TTask*)(R3);
-	R0 = (KUInt32)DoSemaphoreOp(inGroupId, inListId, inBlocking, inTask);
+	NEWT_NATIVE({
+		ObjectId inGroupId = (ObjectId)(R0);
+		ObjectId inListId = (ObjectId)(R1);
+		SemFlags inBlocking = (SemFlags)(R2);
+		TTask *inTask = (TTask*)(R3);
+		R0 = (KUInt32)DoSemaphoreOp(inGroupId, inListId, inBlocking, inTask);
+	})
 	SETPC(LR+4);
 }
 T_ROM_SIMULATION3(0x001D4CE4, "DoSemaphoreOp", Func_0x001D4CE4)

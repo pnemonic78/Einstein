@@ -49,7 +49,10 @@ public:
 	
 	static void		UnexpectedPC(TARMProcessor* ioCPU);
 	static void		ReturnToEmulator(TARMProcessor* ioCPU, KUInt32 inPC);
-	static void		JumpToCalculatedAddress(TARMProcessor* ioCPU, KUInt32 inPC, KUInt32 ret=0xFFFFFFFF);	
+	static void		JumpToCalculatedAddress(TARMProcessor* ioCPU, KUInt32 inPC, KUInt32 ret=0xFFFFFFFF);
+	
+	static void		BeginNativeCode() { }
+	static void		EndNativeCode() { }
 };
 
 

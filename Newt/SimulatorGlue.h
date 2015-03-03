@@ -155,6 +155,9 @@ KUInt32 const ptr_##name = (addr);
 #define NEWT_ASSERT(cond) \
 	if (!(cond)) __asm__("int $3\n" : : );
 
+#define NEWT_NATIVE(a) \
+	UJITGenericRetargetSupport::BeginNativeCode(); a; UJITGenericRetargetSupport::EndNativeCode();
+
 extern TARMProcessor *gCPU;
 
 

@@ -17,10 +17,10 @@ rt cjit ScreenUpdateTask__FPvUlT2
 						# DoSchedulerSWI in SWI.cp
 					rt cjit PortDeferredSendNotify__Fv
 						# _EnterFIQAtomic in SWI.cp
-						rt cjitr Remove__17TDoubleQContainerFv
-							# ? <---===
-						rt cjitr _ExitFIQAtomicFast
-							# ?
+						# Remove__17TDoubleQContainerFv in TTask.cp
+							# LEAF <---===
+						rt cjit _ExitFIQAtomicFast
+							# LEAF
 						rt cjitr QueueDelay__12TTimerEngineFP13TSharedMemMsg
 							# ?
 						rt cjitr NotifySend__FP13TSharedMemMsg
