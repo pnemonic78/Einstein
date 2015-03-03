@@ -55,6 +55,89 @@
 // SWIBoot: 0x003AD698-0x003ADBB4
 
 
+NewtonErr PANIC_ExitAtomicUnderflow()
+{
+	fprintf(stderr, "SYSTEM PANIC: ExitAtomic underflow\n\n");
+	return -1;
+}
+
+
+void _EnterFIQAtomic()
+{
+	gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( 0x0c400000 );
+	
+	int nestCount = GAtomicFIQNestCountFast() + 1;
+	SetGAtomicFIQNestCountFast( nestCount );
+}
+
+/**
+ * Transcoded function _EnterFIQAtomic
+ * ROM: 0x00392B90 - 0x00392BB0
+ */
+void Func_0x00392B90(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	_EnterFIQAtomic();
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x00392B90, "_EnterFIQAtomic", Func_0x00392B90)
+
+
+
+void _ExitAtomic()
+{
+	// Decrement the IRQ lock count
+	int nestCount = GAtomicIRQNestCountFast() - 1;
+	SetGAtomicIRQNestCountFast( nestCount );
+	
+	// if the lock count is negative, we called ExitAtomic too often
+	if ( nestCount<0 ) {
+		PANIC_ExitAtomicUnderflow();
+		return;
+	}
+	
+	// if we are still locked, do nothing
+	if ( nestCount!=0 ) {
+		return;
+	}
+	
+	// if the FIQ is still locked, don;t do anything either
+	if ( GAtomicFIQNestCountFast()!=0 )
+		return;
+	
+	// Grab the interrup mask
+	ULong intMask = GIntMaskShadowReg() | 0x0c400000;
+	
+	// Grab the processor status register
+	ULong PSR = gCPU->GetCPSR() & 0x0000001f;
+	if (PSR!=0x10 && PSR!=0x00) {
+		// don't do anything if we are not in supervisor mode
+		gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( intMask );
+	} else {
+		// we are in supervisor mode
+		if ( GWantDeferred() || GSchedule() ) {
+			// allow tasks to switch
+			gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( intMask );
+			DoSchedulerSWI();
+		} else {
+			// just reanble interrupts
+			gCPU->GetMemory()->GetInterruptManager()->SetIntCtrlReg( intMask );
+		}
+	}
+}
+
+/**
+ * Transcoded function _ExitAtomic
+ * ROM: 0x00392B1C - 0x00392B90
+ */
+void Func_0x00392B1C(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	_ExitAtomic();
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x00392B1C, "_ExitAtomic", Func_0x00392B1C)
+
+
+
 void PublicEnterAtomic()
 {
 	if ( GAtomicFIQNestCountFast()!=0 )

@@ -1,5 +1,5 @@
 #
-# Retarget functions related to teh ScreenUpdate task
+# Retarget functions related to the ScreenUpdate task
 #
 
 rt open ScreenUpdateTaskSupport
@@ -8,16 +8,23 @@ rt open ScreenUpdateTaskSupport
 rt cjit ScreenUpdateTask__FPvUlT2
 	rt cjitr GetADCObject__Fv
 		# don't follow this as this is not supported in emulation
-	rt cjitr SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
+	rt cjit SemOp__16TUSemaphoreGroupFP17TUSemaphoreOpList8SemFlags
 		# _SemaphoreOpGlue in SWI.cp
 			# SWI 11
 				rt cjit DoDeferrals
 					# PublicEnterAtomic in SWI.cp
-					rt cjitr _ExitAtomic
-						# inside _ExitFIQAtomicFast <---===
+					# _ExitAtomic in SWI.cp
 						# DoSchedulerSWI in SWI.cp
-					rt cjitr PortDeferredSendNotify__Fv
-						# ?
+					rt cjit PortDeferredSendNotify__Fv
+						# _EnterFIQAtomic in SWI.cp
+						rt cjitr Remove__17TDoubleQContainerFv
+							# ? <---===
+						rt cjitr _ExitFIQAtomicFast
+							# ?
+						rt cjitr QueueDelay__12TTimerEngineFP13TSharedMemMsg
+							# ?
+						rt cjitr NotifySend__FP13TSharedMemMsg
+							# ?
 					rt cjitr DeferredNotify__Fv
 						# ?
 					rt cjitr DoDeferral__18TExtPageTrackerMgrFv
