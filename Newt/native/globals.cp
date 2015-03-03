@@ -39,6 +39,8 @@ NEWT_GLOBAL_W_IMP(0x0C101054, ObjectId,			CurrentTaskId)
 NEWT_GLOBAL_W_IMP(0x0C101058, ObjectId,			CurrentMonitorId)
 NEWT_GLOBAL_W_IMP(0x0C10105C, void*,			CurrentGlobals)
 
+NEWT_GLOBAL_L_IMP(0x0C10156C, KSInt64,			TimerSample)
+
 NEWT_GLOBAL_W_IMP(0x0C101980, int,				TaskPriority)
 
 NEWT_GLOBAL_W_IMP(0x0C101A2C, BOOL,				WantSchedulerToRun)

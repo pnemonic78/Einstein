@@ -23,11 +23,9 @@ rt cjit ScreenUpdateTask__FPvUlT2
 							rt cjit Queue__12TTimerEngineFP13TSharedMemMsg
 								# Peek__17TDoubleQContainerFv in TTask.cp
 								rt cjit SetAlarmAtomic__FR5TTime
-									rt cjit SetAlarm
-										rt cjit SetAlarm1
-											# LEAF <---===
-										rt cjit DisableAlarm1
-											# LEAF
+									# SetAlarm in SWI.cp <---===
+										# SetAlarm1 in SWI.cp
+										# DisableAlarm1 in SWI.cp
 								rt cjit Alarm__12TTimerEngineFv
 									rt cjit ClearAlarmAtomic__Fv
 										rt cjit ClearAlarm

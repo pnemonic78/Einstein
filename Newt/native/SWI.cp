@@ -1716,3 +1716,114 @@ NewtonErr DoSchedulerSWI()
 }
 
 
+void SetAlarm1(ULong inWhen)
+{
+	TInterruptManager *intMgr = gCPU->GetMemory()->GetInterruptManager();
+	
+	intMgr->SetTimerMatchRegister(2, inWhen);
+	intMgr->SetIntEDReg1( intMgr->GetIntEDReg1() | 0x20 );
+	SetGIntMaskShadowReg( GIntMaskShadowReg() | 0x20 );
+}
+
+
+/**
+ * Transcoded function SetAlarm1
+ * ROM: 0x003AD390 - 0x003AD3BC
+ */
+void Func_0x003AD390(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		ULong inWhen = R0;
+		SetAlarm1(inWhen);
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x003AD390, "SetAlarm1", Func_0x003AD390)
+
+
+void DisableAlarm1()
+{
+	TInterruptManager *intMgr = gCPU->GetMemory()->GetInterruptManager();	
+	
+	intMgr->SetIntEDReg1( intMgr->GetIntEDReg1() & ~0x20 );
+	SetGIntMaskShadowReg( GIntMaskShadowReg() & ~0x20 );
+	intMgr->ClearInterrupts( 0x20 );
+}
+
+/**
+ * Transcoded function DisableAlarm1
+ * ROM: 0x003AD3BC - 0x003AD3EC
+ */
+void Func_0x003AD3BC(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		DisableAlarm1();
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x003AD3BC, "DisableAlarm1", Func_0x003AD3BC)
+
+
+BOOL SetAlarm(TTime *inTime)
+{
+	TInterruptManager *intMgr = gCPU->GetMemory()->GetInterruptManager();
+
+	// get the alarm time
+	KSInt32 alarmTimeHi = inTime->TimeHi();
+	KUInt32 alarmTimeLo = inTime->TimeLo();
+	
+	// ignore requests in the past
+	if (alarmTimeHi<0)
+		return 0;
+	
+	// get the last timer sample
+	KSInt32 sampleTimeHi = GTimerSampleHi();
+	KUInt32 sampleTimeLo = GTimerSampleLo();
+	
+	// update the time to the 64bit time now
+	KUInt32 nowLo = intMgr->GetTimer();
+
+	// increment the high word if there was an overflow in the low word
+	if ( nowLo<=sampleTimeLo )
+		sampleTimeHi++;
+	sampleTimeLo = nowLo;
+
+	// return from function if the alarm time already passed
+	if ( alarmTimeHi<sampleTimeHi || ( alarmTimeHi==sampleTimeHi && alarmTimeLo<sampleTimeLo ) )
+		return 0;
+	
+	// register an interrupt at the alarm time
+	SetAlarm1( alarmTimeLo );
+	
+	// calculate the new current time
+	nowLo = intMgr->GetTimer();
+	if ( nowLo<=sampleTimeLo )
+		sampleTimeHi++;
+	sampleTimeLo = nowLo;
+	
+	// if the alarm time did now pass, disable the timer interrupt again
+	if ( alarmTimeHi<sampleTimeHi || ( alarmTimeHi==sampleTimeHi && alarmTimeLo<sampleTimeLo ) ) {
+		DisableAlarm1();
+		return 0;
+	}
+	
+	return 1;
+}
+
+/**
+ * Transcoded function SetAlarm
+ * ROM: 0x003AD448 - 0x003AD4C4
+ */
+void Func_0x003AD448(TARMProcessor* ioCPU, KUInt32 ret)
+{
+	NEWT_NATIVE({
+		TTime *inTime = (TTime*)R0;
+		R0 = SetAlarm(inTime);
+	})
+	SETPC(LR+4);
+}
+T_ROM_SIMULATION3(0x003AD448, "SetAlarm", Func_0x003AD448)
+
+
+
+
