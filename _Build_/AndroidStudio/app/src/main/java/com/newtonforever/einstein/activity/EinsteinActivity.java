@@ -27,7 +27,6 @@ import com.newtonforever.einstein.EinsteinApplication;
 import com.newtonforever.einstein.R;
 import com.newtonforever.einstein.action.EinsteinActionHandler;
 import com.newtonforever.einstein.jni.Native;
-import com.newtonforever.einstein.startup.IStartup.LoadResult;
 import com.newtonforever.einstein.startup.Startup;
 import com.newtonforever.einstein.startup.StartupConstants;
 import com.newtonforever.einstein.utils.MiscUtils;
@@ -39,6 +38,8 @@ import com.newtonforever.einstein.view.EinsteinView;
 
 import java.io.File;
 import java.util.Timer;
+
+import static com.newtonforever.einstein.startup.Startup.LoadResult;
 
 /**
  * The main user interface to the emulator.

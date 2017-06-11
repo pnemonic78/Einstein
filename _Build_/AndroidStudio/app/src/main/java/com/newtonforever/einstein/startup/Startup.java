@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.res.Resources;
 
 import com.newtonforever.einstein.R;
-import com.newtonforever.einstein.startup.IStartup.LoadResult;
 import com.newtonforever.einstein.utils.StringUtils;
 import com.newtonforever.einstein.utils.debug.DebugUtils;
 import com.newtonforever.einstein.utils.screen.ScreenDimensionsInitializer;
@@ -14,6 +13,13 @@ import com.newtonforever.einstein.utils.screen.ScreenDimensionsInitializer;
 import java.io.File;
 
 public class Startup {
+
+    /**
+     * Return values for file loads
+     */
+    public enum LoadResult {
+        OK, ROM_FILE_MISSING, REX_FILE_MISSING, APPLICATION_ICON_MISSING
+    }
 
     private final Context context;
 
