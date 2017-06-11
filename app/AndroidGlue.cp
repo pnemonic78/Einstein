@@ -108,13 +108,17 @@ JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_initEmulator( 
 }
 
 
-JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_runEmulator( JNIEnv* env, jobject thiz, jstring dataPath, jint screenWidth, jint screenHeight )
+JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_runEmulator( JNIEnv* env, jobject thiz, jstring dataPath, jstring romPath, jstring rexPath, jint screenWidth, jint screenHeight )
 {
 	jboolean isCopy;
 	const char *cDataPath = env->GetStringUTFChars(dataPath, &isCopy);
-	if (theLog) theLog->FLogLine("runEmulator: start (dataPath=%s)", cDataPath);
-	theApp->Run(cDataPath, screenWidth, screenHeight, theLog);
+	const char *cROMPath = env->GetStringUTFChars(romPath, &isCopy);
+    const char *cREXPath = env->GetStringUTFChars(rexPath, &isCopy);
+	if (theLog) theLog->FLogLine("runEmulator: start (dataPath=%s)(romPath=%s)(rexPath=%s)", cDataPath, cROMPath, cREXPath);
+	theApp->Run(cDataPath, cROMPath, cREXPath, screenWidth, screenHeight, theLog);
 	env->ReleaseStringUTFChars(dataPath, cDataPath);
+	env->ReleaseStringUTFChars(romPath, cROMPath);
+    env->ReleaseStringUTFChars(rexPath, cREXPath);
 }
 
 

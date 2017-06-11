@@ -177,7 +177,10 @@ public class EinsteinActivity extends Activity implements OnSharedPreferenceChan
         } else {
             String id = sharedPrefs.getString("newtonid", StartupConstants.DEFAULT_NEWTON_ID);
             Native.setNewtonID(id);
-            pEinstein.run(StartupConstants.DATA_FILE_PATH, ScreenDimensions.NEWTON_SCREEN_WIDTH, ScreenDimensions.NEWTON_SCREEN_HEIGHT);
+            String dataPath = StartupConstants.DATA_FILE_PATH;
+            String romPath = dataPath + File.separator + StartupConstants.ROM_FILE_NAME;
+            String rexPath = dataPath + File.separator + StartupConstants.REX_FILE_NAME;
+            pEinstein.run(dataPath, romPath, rexPath, ScreenDimensions.NEWTON_SCREEN_WIDTH, ScreenDimensions.NEWTON_SCREEN_HEIGHT);
             // TODO FG 2013_10_19 Only required when using Frank's Flash ROM board data. Remove in a final version.
             //MiscUtils.sleepForMillis(2000);
             //DebugUtils.logGreen(TAG, "Sleeping for 2s after calling run because we're using Frank's ROM...");

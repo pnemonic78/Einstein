@@ -175,7 +175,7 @@ TAndroidApp::~TAndroidApp( void )
 // Run( int, char** )
 // -------------------------------------------------------------------------- //
 void
-TAndroidApp::Run(const char *dataPath, int newtonScreenWidth, int newtonScreenHeight, TLog *inLog)
+TAndroidApp::Run(const char *dataPath, const char *theROMPath, const char *theREXPath, int newtonScreenWidth, int newtonScreenHeight, TLog *inLog)
 {
 	mProgramName = "Einstein";
 	mROMImage = NULL;
@@ -197,8 +197,6 @@ TAndroidApp::Run(const char *dataPath, int newtonScreenWidth, int newtonScreenHe
     //#endif
 	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mLog);
 
-	char theROMPath[MAX_PATH];
-	snprintf(theROMPath, MAX_PATH, "%s/717006.rom", dataPath);
 	if (inLog) inLog->FLogLine("  ROM exists at %s?", theROMPath);
 	if (access(theROMPath, R_OK)==-1) {
 		if (inLog) inLog->FLogLine("Can't read ROM file %s", theROMPath);
@@ -206,8 +204,6 @@ TAndroidApp::Run(const char *dataPath, int newtonScreenWidth, int newtonScreenHe
 	}
 	if (inLog) inLog->FLogLine("    OK");
 
-	char theREXPath[MAX_PATH];
-	snprintf(theREXPath, MAX_PATH, "%s/Einstein.rex", dataPath);
 	if (inLog) inLog->FLogLine("  ROM exists at %s?", theREXPath);
 	if (access(theREXPath, R_OK)==-1) {
 		if (inLog) inLog->FLogLine("Can't read REX file %s", theREXPath);
@@ -216,11 +212,12 @@ TAndroidApp::Run(const char *dataPath, int newtonScreenWidth, int newtonScreenHe
 	if (inLog) inLog->FLogLine("    OK");
 	
 	char theImagePath[MAX_PATH];
-	snprintf(theImagePath, MAX_PATH, "%s/717006.img", dataPath);
+	snprintf(theImagePath, strlen(theROMPath) - 3, "%s", theROMPath);
+    strcat(theImagePath, ".img");
 	
 	char theFlashPath[MAX_PATH];
 	snprintf(theFlashPath, MAX_PATH, "%s/flash", dataPath);
-	
+
 	if (inLog) inLog->FLogLine("  ROM Image:");
 	mROMImage = new TFlatROMImageWithREX(theROMPath, theREXPath, "717006", false, theImagePath);
 	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mROMImage);

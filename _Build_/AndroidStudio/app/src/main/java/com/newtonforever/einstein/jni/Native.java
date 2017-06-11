@@ -23,7 +23,7 @@ public class Native {
     /**
      * Launches the emulator.
      */
-    public static native void runEmulator(String dataPath, int screenWidth, int screenHeight);
+    public static native void runEmulator(String dataPath, String romPath, String rexPath, int screenWidth, int screenHeight);
 
     /**
      * Stops the emulator.

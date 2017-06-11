@@ -46,7 +46,7 @@ extern "C" {
 	extern JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_initEmulator( JNIEnv* env, jobject thiz, jstring logPath );
 	
 	/** Launches the emulator. */
-	extern JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_runEmulator( JNIEnv* env, jobject thiz, jstring dataPath, jint screenWidth, jint screenHeight );
+	extern JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_runEmulator( JNIEnv* env, jobject thiz, jstring dataPath, jstring romPath, jstring rexPath, jint screenWidth, jint screenHeight );
 	
 	/** Stops the emulator. */
 	extern JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_stopEmulator( JNIEnv* env, jobject thiz );

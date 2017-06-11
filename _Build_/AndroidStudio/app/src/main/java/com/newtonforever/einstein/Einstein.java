@@ -15,8 +15,8 @@ public class Einstein {
 
     private boolean pRunning = false;
 
-    public void run(String dataPath, int screenWidth, int screenHeight) {
-        Native.runEmulator(dataPath, screenWidth, screenHeight);
+    public void run(String dataPath, String romPath, String rexPath, int screenWidth, int screenHeight) {
+        Native.runEmulator(dataPath, romPath, rexPath, screenWidth, screenHeight);
         this.pRunning = true;
     }
 
