@@ -6,7 +6,6 @@ import android.preference.PreferenceActivity;
 import android.util.Log;
 
 import com.newtonforever.einstein.R;
-import com.newtonforever.einstein.utils.Dimension;
 import com.newtonforever.einstein.utils.debug.DebugUtils;
 import com.newtonforever.einstein.utils.screen.ScreenDimensions;
 
@@ -44,14 +43,15 @@ public class EinsteinPreferencesActivity extends PreferenceActivity {
      */
     private final void initScreenSizePreferences() {
         DebugUtils.appendLog("EinsteinPreferencesActivity: Entering initScreenSizePreferences");
-        final Dimension hostScreenSize = ScreenDimensions.HOST_SCREEN_SIZE;
-        final boolean isPortrait = hostScreenSize.width <= hostScreenSize.height;
+        final int hostScreenWidth = ScreenDimensions.HOST_SCREEN_WIDTH;
+        final int hostScreenHeight = ScreenDimensions.HOST_SCREEN_HEIGHT;
+        final boolean isPortrait = hostScreenWidth <= hostScreenHeight;
         final int minWidth = isPortrait ? 320 : 480;
         final int minHeight = isPortrait ? 480 : 320;
         int w = minWidth;
         int h = minHeight;
         DebugUtils.appendLog("EinsteinPreferencesActivity: Calculating entries");
-        Log.i("SIZE", "Screen: " + hostScreenSize.width + " x " + hostScreenSize.height);
+        Log.i("SIZE", "Screen: " + hostScreenWidth + " x " + hostScreenHeight);
         final Vector<String> temp = new Vector<String>();
         int i, currentSize = 0;
         temp.add(String.valueOf(w) + " x " + String.valueOf(h) + " (original size)"); // always add the native NewtonOS size
@@ -62,16 +62,16 @@ public class EinsteinPreferencesActivity extends PreferenceActivity {
             int f = i / 3;
             switch (i % 3) {
                 case 0:
-                    w = hostScreenSize.width / f;
-                    h = hostScreenSize.height / f;
+                    w = hostScreenWidth / f;
+                    h = hostScreenHeight / f;
                     break;
                 case 1:
-                    w = hostScreenSize.width * 3 / 4 / f;
-                    h = hostScreenSize.height * 3 / 4 / f;
+                    w = hostScreenWidth * 3 / 4 / f;
+                    h = hostScreenHeight * 3 / 4 / f;
                     break;
                 case 2:
-                    w = hostScreenSize.width * 2 / 3 / f;
-                    h = hostScreenSize.height * 2 / 3 / f;
+                    w = hostScreenWidth * 2 / 3 / f;
+                    h = hostScreenHeight * 2 / 3 / f;
                     break;
             }
             w = w & 0xfffffffe; // width must always be an even number

@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 
-import com.newtonforever.einstein.utils.Dimension;
 import com.newtonforever.einstein.utils.debug.DebugUtils;
 
 /**
@@ -29,24 +28,6 @@ public class ScreenDimensionsInitializer {
     }
 
     /**
-     * Returns the size of the Newton screen. This value depends on the setting in the preferences.
-     */
-    public static Dimension getNewtonScreenSize(SharedPreferences prefs) {
-        final String value = prefs.getString("screenpresets", "1");
-        DebugUtils.appendLog("ScreenDimensionInitializer.getNewtonScreenSize: Currently set preference is " + value);
-        final int separatorPosition = value.indexOf(" x ");
-        final String sw = value.substring(0, separatorPosition - 1);
-        DebugUtils.appendLog("ScreenDimensionInitializer.getNewtonScreenSize: Width got from preference string is " + sw);
-        final String sh = value.substring(separatorPosition + 3, value.length() - 1);
-        DebugUtils.appendLog("ScreenDimensionInitializer.getNewtonScreenSize: Height got from preference string is " + sh);
-        final int w = Integer.valueOf(sw);
-        final int h = Integer.valueOf(sh);
-        final Dimension size = new Dimension(w, h);
-        DebugUtils.appendLog("ScreenDimensionInitializer.getNewtonScreenSize: Returning " + size);
-        return size;
-    }
-
-    /**
      * Initializes the host screen dimensions.
      */
     private static void initHostScreenDimensions(Context context) {
@@ -57,8 +38,7 @@ public class ScreenDimensionsInitializer {
         final DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         ScreenDimensions.HOST_SCREEN_WIDTH = metrics.widthPixels;
         ScreenDimensions.HOST_SCREEN_HEIGHT = metrics.heightPixels;
-        ScreenDimensions.HOST_SCREEN_SIZE = new Dimension(metrics.widthPixels, metrics.heightPixels);
-        DebugUtils.appendLog("ScreenDimensionInitializer.initHostScreenDimensions: Host screen size is " + ScreenDimensions.HOST_SCREEN_SIZE);
+        DebugUtils.appendLog("ScreenDimensionInitializer.initHostScreenDimensions: Host screen size is " + ScreenDimensions.HOST_SCREEN_WIDTH + "x" + ScreenDimensions.HOST_SCREEN_HEIGHT);
     }
 
     /**
@@ -68,17 +48,14 @@ public class ScreenDimensionsInitializer {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         final String value = prefs.getString("screenpresets", "320 x 480");
         DebugUtils.appendLog("ScreenDimensionInitializer.initNewtonScreenDimensions: Current preference is " + value);
-        final int separatorPosition = value.indexOf(" x ");
-        final String sw = value.substring(0, separatorPosition);
+        final int separatorPosition = value.indexOf("x");
+        final String sw = value.substring(0, separatorPosition).trim();
         DebugUtils.appendLog("ScreenDimensionInitializer.initNewtonScreenDimensions: Width got from preference string is " + sw);
-        String sh = value.substring(separatorPosition + 3, value.length());
-        final int endPosition = sh.indexOf(" ");
-        if (endPosition != -1) sh = sh.substring(0, endPosition);
+        String sh = value.substring(separatorPosition + 1, value.length()).trim();
         DebugUtils.appendLog("ScreenDimensionInitializer.initNewtonScreenDimensions: Height got from preference string is " + sh);
-        ScreenDimensions.NEWTON_SCREEN_WIDTH = Integer.valueOf(sw);
-        ScreenDimensions.NEWTON_SCREEN_HEIGHT = Integer.valueOf(sh);
-        ScreenDimensions.NEWTON_SCREEN_SIZE = new Dimension(ScreenDimensions.NEWTON_SCREEN_WIDTH, ScreenDimensions.NEWTON_SCREEN_HEIGHT);
-        DebugUtils.appendLog("ScreenDimensionInitializer.initNewtonScreenDimensions: Newton window size is " + ScreenDimensions.NEWTON_SCREEN_SIZE);
+        ScreenDimensions.NEWTON_SCREEN_WIDTH = Integer.parseInt(sw);
+        ScreenDimensions.NEWTON_SCREEN_HEIGHT = Integer.parseInt(sh);
+        DebugUtils.appendLog("ScreenDimensionInitializer.initNewtonScreenDimensions: Newton window size is " + ScreenDimensions.NEWTON_SCREEN_WIDTH + "x" + ScreenDimensions.NEWTON_SCREEN_HEIGHT);
     }
 
 }

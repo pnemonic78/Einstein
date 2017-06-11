@@ -8,9 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.newtonforever.einstein.jni.Native;
-import com.newtonforever.einstein.utils.Dimension;
 import com.newtonforever.einstein.utils.screen.ScreenDimensions;
-
 
 /**
  * @author matt
@@ -29,7 +27,8 @@ import com.newtonforever.einstein.utils.screen.ScreenDimensions;
  */
 public class EinsteinView extends View {
     private Bitmap mBitmap;
-    private Dimension emulatorWindowSize;
+    private int emulatorWindowWidth;
+    private int emulatorWindowHeight;
     private Rect emulatorWindowBounds;
     final Rect dstRect = new Rect();
 
@@ -66,8 +65,8 @@ public class EinsteinView extends View {
             case MotionEvent.ACTION_MOVE:
                 final Rect dstRect = new Rect();
                 this.getDrawingRect(dstRect);
-                final int x = (int) (ev.getX() * this.emulatorWindowSize.width / dstRect.width());
-                final int y = (int) (ev.getY() * this.emulatorWindowSize.height / dstRect.height());
+                final int x = (int) (ev.getX() * emulatorWindowWidth / dstRect.width());
+                final int y = (int) (ev.getY() * emulatorWindowHeight / dstRect.height());
                 Native.penDown(x, y);
                 break;
             case MotionEvent.ACTION_UP:
@@ -84,8 +83,9 @@ public class EinsteinView extends View {
     public void updateDimensions() {
         this.mBitmap = null;
         this.emulatorWindowBounds = null;
-        this.emulatorWindowSize = ScreenDimensions.NEWTON_SCREEN_SIZE;
-        this.mBitmap = Bitmap.createBitmap(emulatorWindowSize.width, emulatorWindowSize.height, Bitmap.Config.RGB_565);
-        this.emulatorWindowBounds = new Rect(0, 0, this.emulatorWindowSize.width, this.emulatorWindowSize.height);
+        this.emulatorWindowWidth = ScreenDimensions.NEWTON_SCREEN_WIDTH;
+        this.emulatorWindowHeight = ScreenDimensions.NEWTON_SCREEN_HEIGHT;
+        this.mBitmap = Bitmap.createBitmap(emulatorWindowWidth, emulatorWindowHeight, Bitmap.Config.RGB_565);
+        this.emulatorWindowBounds = new Rect(0, 0, emulatorWindowWidth, emulatorWindowHeight);
     }
 }

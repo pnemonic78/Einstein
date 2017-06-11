@@ -1,7 +1,5 @@
 package com.newtonforever.einstein.utils.screen;
 
-import com.newtonforever.einstein.utils.Dimension;
-
 public class ScreenDimensions {
 
     /**
@@ -15,11 +13,6 @@ public class ScreenDimensions {
     public static int HOST_SCREEN_HEIGHT = -1;
 
     /**
-     * The size of the host device's screen.
-     */
-    public static Dimension HOST_SCREEN_SIZE = null;
-
-    /**
      * The width of the Newton emulator window.
      */
     public static int NEWTON_SCREEN_WIDTH = -1;
@@ -28,10 +21,5 @@ public class ScreenDimensions {
      * The height of the Newton emulator window.
      */
     public static int NEWTON_SCREEN_HEIGHT = -1;
-
-    /**
-     * The size of the Newton emulator window.
-     */
-    public static Dimension NEWTON_SCREEN_SIZE = null;
 
 }
