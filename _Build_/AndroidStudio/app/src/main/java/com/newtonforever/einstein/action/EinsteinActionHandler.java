@@ -1,22 +1,18 @@
 package com.newtonforever.einstein.action;
 
-import java.util.TimerTask;
-
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
-import android.media.ToneGenerator;
-
 import com.newtonforever.einstein.jni.Native;
 import com.newtonforever.einstein.sound.SoundManager;
-import com.newtonforever.einstein.startup.StartupConstants;
 import com.newtonforever.einstein.utils.debug.DebugUtils;
 import com.newtonforever.einstein.view.EinsteinView;
+
+import java.util.TimerTask;
 
 /** Polls the C side and handles actions that the C side wants us to do. @author Frank Gruendel. */
 /** Currently our run method is called at every screen refresh request. This must urgently be changed. */
 // TODO FG 2013_10_19 Put sound issues into a separate Thread. */
 public class EinsteinActionHandler extends TimerTask {
+
+    private static final String TAG = "EinsteinActionHandler";
 
     /** If no bits are set, we will do nothing. */
     private final int NO_ACTION_MASK = 0x00;
@@ -56,7 +52,7 @@ public class EinsteinActionHandler extends TimerTask {
         // So don't even think of using else if here...
         if (this.isPlaySound(actionMask)) {
             // NewtonOS wants to start a sound or (if a sound is currently played) add more samples to the buffers.
-            DebugUtils.logGreen("EinsteinActionHandler: ", "Requesting sound output with " + actionMask);
+            DebugUtils.logGreen(TAG, "Requesting sound output with " + actionMask);
             this.m_soundManager.playSound(Native.getSoundBufferSize());
             Native.soundBufferFinishedOrCanceled();
         }

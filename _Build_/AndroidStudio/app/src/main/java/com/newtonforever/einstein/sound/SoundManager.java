@@ -1,7 +1,5 @@
 package com.newtonforever.einstein.sound;
 
-import java.util.Calendar;
-
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -13,6 +11,8 @@ import com.newtonforever.einstein.startup.StartupConstants;
 import com.newtonforever.einstein.utils.debug.DebugUtils;
 
 public class SoundManager {
+
+    private static final String TAG = "SoundManager";
 
     private ToneGenerator m_toneGenerator;
 
@@ -39,8 +39,8 @@ public class SoundManager {
         if (0 == soundBufferSize) {
             return;
         }
-        DebugUtils.logGreen("SoundManager: ", "Entering playSound()");
-        DebugUtils.logGreen("SoundManager: ", "Sound buffer size: " + soundBufferSize);
+        DebugUtils.logGreen(TAG, "Entering playSound()");
+        DebugUtils.logGreen(TAG, "Sound buffer size: " + soundBufferSize);
         final short[] soundBuffer = new short[soundBufferSize];
         final int bytesReceived = Native.fillSoundBuffer(soundBuffer);
         final int samplesReceived = bytesReceived / 2;
@@ -54,17 +54,17 @@ public class SoundManager {
             m_audioTrack.write(tmpBuffer, 0, tmpBufferSize);
             m_audioTrack.flush();
         }
-        DebugUtils.logGreen("SoundManager: ", "Leaving playSound()");
+        DebugUtils.logGreen(TAG, "Leaving playSound()");
     }
 
     public void stopSound() {
-        DebugUtils.logRed("SoundManager: ", "Entering stopSound()");                
+        DebugUtils.logRed(TAG, "Entering stopSound()");
         this.m_toneGenerator.stopTone();
     }
 
     public void changeVolume() {
         m_volume = Native.getSoundVolume();
-        Log.e("SoundManager.changeVolume", "Changed volume to " + m_volume);
+        Log.e(TAG, "Changed volume to " + m_volume);
     }
 }
 
