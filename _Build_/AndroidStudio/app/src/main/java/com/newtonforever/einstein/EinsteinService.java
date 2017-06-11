@@ -2,20 +2,18 @@
 
 package com.newtonforever.einstein;
 
-import com.newtonforever.einstein.R;
-
-import com.newtonforever.einstein.activity.ActionsActivity;
-import com.newtonforever.einstein.activity.EinsteinActivity;
-
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
+
+import com.newtonforever.einstein.activity.ActionsActivity;
+import com.newtonforever.einstein.activity.EinsteinActivity;
 
 /**
  * A service that keeps the emulator alive in the background.

@@ -2,8 +2,6 @@
 
 package com.newtonforever.einstein.activity;
 
-import com.newtonforever.einstein.R;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -14,10 +12,12 @@ import android.view.KeyEvent;
 import android.view.View;
 
 import com.newtonforever.einstein.EinsteinApplication;
+import com.newtonforever.einstein.R;
 import com.newtonforever.einstein.dialog.DialogFragmentTags;
 import com.newtonforever.einstein.dialog.URLPickerFragment;
 import com.newtonforever.einstein.jni.Native;
 import com.newtonforever.einstein.utils.debug.DebugUtils;
+
 // Note that the names of the onClick methods must match those defined in actions.xml
 public class ActionsActivity extends FragmentActivity {
 

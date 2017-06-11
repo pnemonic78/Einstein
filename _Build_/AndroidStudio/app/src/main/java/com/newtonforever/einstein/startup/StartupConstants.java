@@ -2,11 +2,11 @@
 
 package com.newtonforever.einstein.startup;
 
-import java.io.File;
-
 import android.media.AudioFormat;
 import android.media.AudioTrack;
 import android.os.Environment;
+
+import java.io.File;
 
 public class StartupConstants {
 	

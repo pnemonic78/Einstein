@@ -1,17 +1,16 @@
 package com.newtonforever.einstein.activity;
 
-import java.util.Vector;
-
-import com.newtonforever.einstein.R;
-
-import com.newtonforever.einstein.utils.Dimension;
-import com.newtonforever.einstein.utils.debug.DebugUtils;
-import com.newtonforever.einstein.utils.screen.ScreenDimensions;
-
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.util.Log;
+
+import com.newtonforever.einstein.R;
+import com.newtonforever.einstein.utils.Dimension;
+import com.newtonforever.einstein.utils.debug.DebugUtils;
+import com.newtonforever.einstein.utils.screen.ScreenDimensions;
+
+import java.util.Vector;
 
 /** 
  * This activity loads the "preferences.xml" file. 

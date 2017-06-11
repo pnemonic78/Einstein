@@ -1,19 +1,18 @@
 package com.newtonforever.einstein.utils.debug;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.newtonforever.einstein.startup.StartupConstants;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
-
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.os.Environment;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.newtonforever.einstein.startup.StartupConstants;
 
 /** A small helper class for debugging the Einstein app. @author Frank Gruendel */
 public class DebugUtils {
