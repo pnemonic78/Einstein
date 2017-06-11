@@ -30,6 +30,7 @@ include_directories(
 SET (SourceFiles
     ${LOCAL_PATH}/app/AndroidGlue.cp
 	${LOCAL_PATH}/app/TAndroidApp.cp
+	${LOCAL_PATH}/app/TAndroidLog.cp
 	${LOCAL_PATH}/Emulator/Files/TFileManager.cp
 	${LOCAL_PATH}/Emulator/Screen/TAndroidScreenManager.cp
 	${LOCAL_PATH}/Emulator/TARMProcessor.cp

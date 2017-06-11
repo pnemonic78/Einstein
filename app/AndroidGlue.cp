@@ -23,13 +23,12 @@
 
 #include <app/AndroidGlue.h>
 #include <app/TAndroidApp.h>
+#include <app/TAndroidLog.h>
 #include <Emulator/Screen/TScreenManager.h>
 #include <Emulator/Sound/TAndroidSoundManager.h>
 #include <Platform/TPlatformManager.h>
 #include <Log/TFileLog.h>
 #include <Log/TStdOutLog.h>
-#include <string.h>
-#include <dlfcn.h>
 
 #include <android/bitmap.h>
 
@@ -40,20 +39,8 @@ const jint kRequiredActionsStopSound		= 0x04;
 const jint kRequiredActionsSetVolume		= 0x08;
 
 
-TAndroidApp *theApp = 0;
-TLog *theLog = 0;
-
-
-class TAndroidLog : public TLog
-{
-public:
-	TAndroidLog() { }
-protected:
-	virtual void DoLogLine(const char* inLine) {
-		__android_log_print(ANDROID_LOG_WARN, "NewtonEmulator", "%s", inLine);
-	}
-};
-
+TAndroidApp *theApp = NULL;
+TLog *theLog = NULL;
 
 /*
  We need to find a way to stop all threads when the Java part of our app 
@@ -105,12 +92,12 @@ JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_initEmulator( 
 		} else if (strcmp(cLogPath, "CONSOLE")==0) {
 			theLog = new TAndroidLog();
 		} else if (strcmp(cLogPath, "NULL")==0) {
-			theLog = 0L;
+			theLog = NULL;
 		} else {
 			theLog = new TFileLog(cLogPath);
 		}
 	} else {
-		theLog = 0L;
+		theLog = NULL;
 	}
 	
 	if (theLog) theLog->LogLine("initEmulator: start");

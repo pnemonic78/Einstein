@@ -32,8 +32,7 @@ extern "C" {
 #include <jni.h>
 #include <sys/time.h>
 #include <time.h>
-#include <android/log.h>
-	
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

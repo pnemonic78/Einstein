@@ -23,6 +23,7 @@
 
 #include <K/Defines/KDefinitions.h>
 #include "TAndroidApp.h"
+#include "TAndroidLog.h"
 
 // ANSI C & POSIX
 #include <stdio.h>
@@ -33,7 +34,6 @@
 // Einstein
 #include "Emulator/ROM/TROMImage.h"
 #include "Emulator/ROM/TFlatROMImageWithREX.h"
-#include "Emulator/ROM/TAIFROMImageWithREXes.h"
 #include "Emulator/Network/TNetworkManager.h"
 #include "Emulator/Network/TUsermodeNetwork.h"
 #include "Emulator/Sound/TAndroidSoundManager.h"
@@ -41,7 +41,6 @@
 #include "Emulator/Platform/TPlatformManager.h"
 #include "Emulator/TEmulator.h"
 #include "Emulator/TMemory.h"
-#include "Log/TLog.h"
 
 //#include <SLES/OpenSLES.h>
 //#include <SLES/OpenSLES_Android.h>
@@ -185,14 +184,17 @@ TAndroidApp::Run(const char *dataPath, int newtonScreenWidth, int newtonScreenHe
 	mScreenManager = NULL;
 	mPlatformManager = NULL;
 	mLog = NULL;
-	
+
 	if (inLog) inLog->LogLine("Loading assets...");
 	
 	if (inLog) inLog->LogLine("  Log:");
-	// The log slows down the emulator and may cause a deadlock when running 
-	// the Network card emulation. Only activate if you really need it!
-	// CAUTION: the destructor will delete our mLog. That is not good! Avoid!
-	//if (inLog) mLog = inLog;
+    // Create a log if possible
+    //#ifdef _DEBUG
+    if (inLog == NULL) {
+        inLog = new TAndroidLog();
+        mLog = inLog;
+    }
+    //#endif
 	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mLog);
 
 	char theROMPath[MAX_PATH];
@@ -241,7 +243,7 @@ TAndroidApp::Run(const char *dataPath, int newtonScreenWidth, int newtonScreenHe
 	
 	if (inLog) inLog->FLogLine("  Emulator:");
 	mEmulator = new TEmulator(
-							  mLog, 
+							  mLog,
 							  mROMImage, 
 							  theFlashPath,
 							  mSoundManager, 
