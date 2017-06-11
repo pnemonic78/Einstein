@@ -7,7 +7,10 @@ import com.newtonforever.einstein.view.EinsteinView;
 
 import java.util.TimerTask;
 
-/** Polls the C side and handles actions that the C side wants us to do. @author Frank Gruendel. */
+/**
+ * Polls the C side and handles actions that the C side wants us to do. @author Frank Gruendel.
+ */
+
 /** Currently our run method is called at every screen refresh request. This must urgently be changed. */
 // TODO FG 2013_10_19 Put sound issues into a separate Thread. */
 public class EinsteinActionHandler extends TimerTask {
@@ -93,8 +96,7 @@ public class EinsteinActionHandler extends TimerTask {
 
     /** Refreshes the Android screen area inhabited by our Einstein view. */
     private void handleScreenRefresh() {
-        if (!m_screenRefreshStarted)
-        {
+        if (!m_screenRefreshStarted) {
             //DebugUtils.logGreen("EinsteinActionHandler: ", "First time screen refresh");
             m_screenRefreshStarted = true;
         }

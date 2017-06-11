@@ -17,7 +17,7 @@ public class SoundManager {
     private ToneGenerator m_toneGenerator;
 
     private final AudioTrack m_audioTrack;
-    
+
     private int m_volume;
 
     public SoundManager() {
@@ -31,7 +31,7 @@ public class SoundManager {
         final int minBufferSize = StartupConstants.AUDIO_TRACK_MIN_BUFFER_SIZE;
         final int bufferMode = AudioTrack.MODE_STREAM;
         this.m_audioTrack = new AudioTrack(streamType, sampleRateInHz, channelConfig, audioFormat, minBufferSize, bufferMode);
-        this.m_audioTrack.setStereoVolume(m_volume/100.0f, m_volume/100.0f);
+        this.m_audioTrack.setStereoVolume(m_volume / 100.0f, m_volume / 100.0f);
         this.m_audioTrack.play(); // Note that this only puts the AudioTrack into play mode. It won't play anything yet.
     }
 
@@ -50,7 +50,7 @@ public class SoundManager {
         if (bytesWritten < StartupConstants.AUDIO_TRACK_MIN_BUFFER_SIZE) {
             final int tmpBufferSize = (StartupConstants.AUDIO_TRACK_MIN_BUFFER_SIZE - bytesWritten) / 2;
             final short[] tmpBuffer = new short[tmpBufferSize];
-            m_audioTrack.setStereoVolume(m_volume/100.0f, m_volume/100.0f);
+            m_audioTrack.setStereoVolume(m_volume / 100.0f, m_volume / 100.0f);
             m_audioTrack.write(tmpBuffer, 0, tmpBufferSize);
             m_audioTrack.flush();
         }
