@@ -118,8 +118,7 @@ namespace packt {
 }
 #endif
 
-
-
+#define MAX_PATH 1024
 
 // -------------------------------------------------------------------------- //
 //  * TAndroidApp( void )
@@ -189,58 +188,58 @@ TAndroidApp::Run(const char *dataPath, int newtonScreenWidth, int newtonScreenHe
 	
 	if (inLog) inLog->LogLine("Loading assets...");
 	
-	if (inLog) inLog->LogLine("  mLog:");
+	if (inLog) inLog->LogLine("  Log:");
 	// The log slows down the emulator and may cause a deadlock when running 
 	// the Network card emulation. Only activate if you really need it!
 	// CAUTION: the destructor will delete our mLog. That is not good! Avoid!
 	//if (inLog) mLog = inLog;
 	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mLog);
 
-	char theROMPath[1024];
-	snprintf(theROMPath, 1024, "%s/717006.rom", dataPath);
-	if (mLog) mLog->FLogLine("  ROM exists at %s?", theROMPath);
+	char theROMPath[MAX_PATH];
+	snprintf(theROMPath, MAX_PATH, "%s/717006.rom", dataPath);
+	if (inLog) inLog->FLogLine("  ROM exists at %s?", theROMPath);
 	if (access(theROMPath, R_OK)==-1) {
-		if (mLog) mLog->FLogLine("Can't read ROM file %s", theROMPath);
+		if (inLog) inLog->FLogLine("Can't read ROM file %s", theROMPath);
 		return;
 	}
-	if (mLog) mLog->FLogLine("    OK");
+	if (inLog) inLog->FLogLine("    OK");
 
-	char theREXPath[1024];
-	snprintf(theREXPath, 1024, "%s/Einstein.rex", dataPath);
-	if (mLog) mLog->FLogLine("  ROM exists at %s?", theREXPath);
+	char theREXPath[MAX_PATH];
+	snprintf(theREXPath, MAX_PATH, "%s/Einstein.rex", dataPath);
+	if (inLog) inLog->FLogLine("  ROM exists at %s?", theREXPath);
 	if (access(theREXPath, R_OK)==-1) {
-		if (mLog) mLog->FLogLine("Can't read REX file %s", theREXPath);
+		if (inLog) inLog->FLogLine("Can't read REX file %s", theREXPath);
 		return;
 	}
-	if (mLog) mLog->FLogLine("    OK");
+	if (inLog) inLog->FLogLine("    OK");
 	
-	char theImagePath[1024];
-	snprintf(theImagePath, 1024, "%s/717006.img", dataPath);
+	char theImagePath[MAX_PATH];
+	snprintf(theImagePath, MAX_PATH, "%s/717006.img", dataPath);
 	
-	char theFlashPath[1024];
-	snprintf(theFlashPath, 1024, "%s/flash", dataPath);
+	char theFlashPath[MAX_PATH];
+	snprintf(theFlashPath, MAX_PATH, "%s/flash", dataPath);
 	
-	if (mLog) mLog->FLogLine("  mROMImage:");
+	if (inLog) inLog->FLogLine("  ROM Image:");
 	mROMImage = new TFlatROMImageWithREX(theROMPath, theREXPath, "717006", false, theImagePath);
-	if (mLog) mLog->FLogLine("    OK: 0x%08x", (intptr_t)mROMImage);
+	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mROMImage);
 
-	if (mLog) mLog->FLogLine("  mSoundManager:");
-	mSoundManager = new TAndroidSoundManager(mLog);
-	if (mLog) mLog->FLogLine("    OK: 0x%08x", (intptr_t)mSoundManager);
+	if (inLog) inLog->FLogLine("  Sound Manager:");
+	mSoundManager = new TAndroidSoundManager(inLog);
+	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mSoundManager);
 
 	Boolean isLandscape = false;
-	if (mLog) mLog->FLogLine("  mScreenManager");
+	if (inLog) inLog->FLogLine("  Screen Manager");
 	mScreenManager = new TAndroidScreenManager(mLog,
 											   newtonScreenWidth, newtonScreenHeight,
 											   true, // fullscreen
 											   isLandscape);
-	if (mLog) mLog->FLogLine("    OK: 0x%08x", (intptr_t)mScreenManager);
+	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mScreenManager);
 	
-	if (mLog) mLog->FLogLine("  mNetworkManager:");
+	if (inLog) inLog->FLogLine("  Network Manager:");
 	mNetworkManager = new TUsermodeNetwork(mLog);
-	if (mLog) mLog->FLogLine("    OK: 0x%08x", (intptr_t)mNetworkManager);
+	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mNetworkManager);
 	
-	if (mLog) mLog->FLogLine("  mEmulator:");
+	if (inLog) inLog->FLogLine("  Emulator:");
 	mEmulator = new TEmulator(
 							  mLog, 
 							  mROMImage, 
@@ -249,7 +248,7 @@ TAndroidApp::Run(const char *dataPath, int newtonScreenWidth, int newtonScreenHe
 							  mScreenManager, 
 							  mNetworkManager, 
 							  0x40 << 16);
-	if (mLog) mLog->FLogLine("    OK: 0x%08x", (intptr_t)mEmulator);
+	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mEmulator);
 	mEmulator->SetNewtonID(mNewtonID0, mNewtonID1);
 
 	mPlatformManager = mEmulator->GetPlatformManager();
@@ -262,14 +261,14 @@ TAndroidApp::Run(const char *dataPath, int newtonScreenWidth, int newtonScreenHe
 	mScreenManager->OverlayPrintProgress(1, 0);
 	mScreenManager->OverlayFlush();
 
-	if (mLog) mLog->FLogLine("Creating helper thread.");
+	if (inLog) inLog->FLogLine("Creating helper thread.");
 	pthread_t theThread;
 	int theErr = ::pthread_create( &theThread, NULL, SThreadEntry, this );
 	if (theErr) {
-		if (mLog) mLog->FLogLine( "Error with pthread_create (%i)\n", theErr );
+		if (inLog) inLog->FLogLine( "Error with pthread_create (%i)\n", theErr );
 		::exit(2);
 	}
-	if (mLog) mLog->FLogLine("Booting NewtonOS...");
+	if (inLog) inLog->FLogLine("Booting NewtonOS...");
 }
 
 
