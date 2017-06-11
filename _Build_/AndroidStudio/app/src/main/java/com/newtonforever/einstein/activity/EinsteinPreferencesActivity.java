@@ -9,7 +9,8 @@ import com.newtonforever.einstein.R;
 import com.newtonforever.einstein.utils.debug.DebugUtils;
 import com.newtonforever.einstein.utils.screen.ScreenDimensions;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This activity loads the "preferences.xml" file.
@@ -52,9 +53,9 @@ public class EinsteinPreferencesActivity extends PreferenceActivity {
         int h = minHeight;
         DebugUtils.appendLog("EinsteinPreferencesActivity: Calculating entries");
         Log.i("SIZE", "Screen: " + hostScreenWidth + " x " + hostScreenHeight);
-        final Vector<String> temp = new Vector<String>();
+        final List<String> sizes = new ArrayList<>();
         int i, currentSize = 0;
-        temp.add(String.valueOf(w) + " x " + String.valueOf(h) + " (original size)"); // always add the native NewtonOS size
+        sizes.add(String.valueOf(w) + " x " + String.valueOf(h) + " (original size)"); // always add the native NewtonOS size
         double d = Math.abs(ScreenDimensions.NEWTON_SCREEN_WIDTH - w) + Math.abs(ScreenDimensions.NEWTON_SCREEN_HEIGHT - h);
         Log.i("SIZE", "Choice: " + w + " x " + h);
         Log.i("SIZE", "Newton: " + ScreenDimensions.NEWTON_SCREEN_WIDTH + " x " + ScreenDimensions.NEWTON_SCREEN_HEIGHT);
@@ -77,14 +78,14 @@ public class EinsteinPreferencesActivity extends PreferenceActivity {
             w = w & 0xfffffffe; // width must always be an even number
             if (w <= minWidth || h <= minHeight) continue;
             // Create a preference entry of the form "w x h", e. g. "320 x 480"
-            temp.add(String.valueOf(w) + " x " + String.valueOf(h));
+            sizes.add(String.valueOf(w) + " x " + String.valueOf(h));
             double d1 = Math.abs(ScreenDimensions.NEWTON_SCREEN_WIDTH - w) + Math.abs(ScreenDimensions.NEWTON_SCREEN_HEIGHT - h);
             if (d1 < d) {
                 d = d1;
-                currentSize = temp.size() - 1;
+                currentSize = sizes.size() - 1;
             }
         }
-        final int entryCount = temp.size();
+        final int entryCount = sizes.size();
         DebugUtils.appendLog("EinsteinPreferencesActivity: Preparing " + entryCount + " preference entries");
         final CharSequence[] entryValues = new CharSequence[entryCount];
         final CharSequence[] entries = new CharSequence[entryCount];
@@ -92,14 +93,14 @@ public class EinsteinPreferencesActivity extends PreferenceActivity {
         // when we query the preference. In our case both must be the same, since ScreenDimensionInitializer will query
         // the preference and parse the string to determine the Newton screen size
         for (i = 0; i < entryCount; i++) {
-            entryValues[i] = temp.get(i);
-            entries[i] = temp.get(i);
+            entryValues[i] = sizes.get(i);
+            entries[i] = sizes.get(i);
         }
         DebugUtils.appendLog("EinsteinPreferencesActivity: Setting preference entries");
-        final ListPreference screenPresets = (ListPreference) (super.findPreference("screenpresets"));
+        final ListPreference screenPresets = (ListPreference) findPreference("screenpresets");
         screenPresets.setEntries(entries);
         screenPresets.setEntryValues(entryValues);
-        screenPresets.setValue(temp.get(currentSize));
+        screenPresets.setValue(sizes.get(currentSize));
         DebugUtils.appendLog("EinsteinPreferencesActivity: Leaving EinsteinPreferencesActivity");
     }
 

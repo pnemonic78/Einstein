@@ -52,6 +52,8 @@ public class ScreenDimensionsInitializer {
         final String sw = value.substring(0, separatorPosition).trim();
         DebugUtils.appendLog("ScreenDimensionInitializer.initNewtonScreenDimensions: Width got from preference string is " + sw);
         String sh = value.substring(separatorPosition + 1, value.length()).trim();
+        final int endPosition = sh.indexOf(' ');    // in case suffixed " (original size)"
+        if (endPosition != -1) sh = sh.substring(0, endPosition);
         DebugUtils.appendLog("ScreenDimensionInitializer.initNewtonScreenDimensions: Height got from preference string is " + sh);
         ScreenDimensions.NEWTON_SCREEN_WIDTH = Integer.parseInt(sw);
         ScreenDimensions.NEWTON_SCREEN_HEIGHT = Integer.parseInt(sh);
