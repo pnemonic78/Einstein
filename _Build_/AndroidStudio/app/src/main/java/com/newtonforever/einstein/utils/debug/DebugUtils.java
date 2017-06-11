@@ -104,7 +104,7 @@ public class DebugUtils {
         }
         final File logFolder = new File(logFolderName);
         if (!logFolder.exists()) {
-            createLogFolderPath(logFolderName);
+            createLogFolderPath(logFolder);
         }
         final String logFileName = logFolderName + File.separator + StartupConstants.LOG_FILE_NAME;
         logFile = new File(logFileName);
@@ -120,8 +120,7 @@ public class DebugUtils {
         return logFile;
     }
 
-    private static void createLogFolderPath(final String path) {
-        File dir = new File(path);
+    private static void createLogFolderPath(final File dir) {
         dir.mkdirs();
         if (!dir.isDirectory()) {
             Log.e("ERROR", "Can't create path");
