@@ -34,6 +34,7 @@
 // Einstein
 #include "Emulator/ROM/TROMImage.h"
 #include "Emulator/ROM/TFlatROMImageWithREX.h"
+#include "Emulator/ROM/TAIFROMImageWithREXes.h"
 #include "Emulator/Network/TNetworkManager.h"
 #include "Emulator/Network/TUsermodeNetwork.h"
 #include "Emulator/Sound/TAndroidSoundManager.h"
@@ -41,6 +42,7 @@
 #include "Emulator/Platform/TPlatformManager.h"
 #include "Emulator/TEmulator.h"
 #include "Emulator/TMemory.h"
+#include "Log/TLog.h"
 
 //#include <SLES/OpenSLES.h>
 //#include <SLES/OpenSLES_Android.h>
@@ -188,13 +190,13 @@ TAndroidApp::Run(const char *dataPath, const char *theROMPath, const char *theRE
 	if (inLog) inLog->LogLine("Loading assets...");
 	
 	if (inLog) inLog->LogLine("  Log:");
-    // Create a log if possible
-    //#ifdef _DEBUG
-    if (inLog == NULL) {
-        inLog = new TAndroidLog();
-        mLog = inLog;
-    }
-    //#endif
+	// Create a log if possible
+	//#ifdef _DEBUG
+	if (inLog == NULL) {
+		inLog = new TAndroidLog();
+		mLog = inLog;
+	}
+	//#endif
 	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mLog);
 
 	if (inLog) inLog->FLogLine("  ROM exists at %s?", theROMPath);

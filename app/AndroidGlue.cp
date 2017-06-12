@@ -29,6 +29,8 @@
 #include <Platform/TPlatformManager.h>
 #include <Log/TFileLog.h>
 #include <Log/TStdOutLog.h>
+#include <string.h>
+#include <dlfcn.h>
 
 #include <android/bitmap.h>
 
