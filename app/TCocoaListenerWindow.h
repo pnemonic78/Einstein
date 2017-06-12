@@ -32,6 +32,6 @@ class TCocoaFileManager;
 @property (assign) TCocoaFileManager *fileManager;
 
 - (void) appendString:(NSString *)string;
-- (KSInt32) writeInputIntoBuffer:(void *)buffer
-					   maxLength:(KUInt32)maxLength;
+- (NSInteger) writeInputIntoBuffer:(void *)buffer
+					   maxLength:(NSUInteger)maxLength;
 @end
