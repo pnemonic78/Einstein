@@ -28,7 +28,7 @@
 
 #include <stdlib.h>
 
-#if RASPBERRY_PI || TARGET_OS_LINUX
+#if RASPBERRY_PI || TARGET_OS_LINUX || TARGET_OS_ANDROID
 #include <string.h>
 #endif
 
