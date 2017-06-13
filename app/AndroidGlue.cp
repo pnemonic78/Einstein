@@ -85,9 +85,7 @@ JNIEXPORT jstring JNICALL Java_com_newtonforever_einstein_jni_Native_stringFromJ
 
 JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_initEmulator( JNIEnv* env, jobject thiz, jstring logPath )
 {
-	jboolean isCopy;
-	
-	const char *cLogPath = env->GetStringUTFChars(logPath, &isCopy);
+	const char *cLogPath = env->GetStringUTFChars(logPath, NULL);
 	if (cLogPath && *cLogPath) {
 		if (strcmp(cLogPath, "STDOUT")==0) {
 			theLog = new TStdOutLog();
@@ -101,26 +99,27 @@ JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_initEmulator( 
 	} else {
 		theLog = NULL;
 	}
-	
+	env->ReleaseStringUTFChars(logPath, cLogPath);
+
 	if (theLog) theLog->LogLine("initEmulator: start");
 	theApp = new TAndroidApp();
+	if (theLog) theLog->FLogLine("initEmulator: app: 0x%08x", (intptr_t)theApp);
 	if (theLog) theLog->LogLine("initEmulator: done");
-	
-	env->ReleaseStringUTFChars(logPath, cLogPath);
 }
 
 
 JNIEXPORT void JNICALL Java_com_newtonforever_einstein_jni_Native_runEmulator( JNIEnv* env, jobject thiz, jstring dataPath, jstring romPath, jstring rexPath, jint screenWidth, jint screenHeight )
 {
-	jboolean isCopy;
-	const char *cDataPath = env->GetStringUTFChars(dataPath, &isCopy);
-	const char *cROMPath = env->GetStringUTFChars(romPath, &isCopy);
-    const char *cREXPath = env->GetStringUTFChars(rexPath, &isCopy);
-	if (theLog) theLog->FLogLine("runEmulator: start (dataPath=%s)(romPath=%s)(rexPath=%s)", cDataPath, cROMPath, cREXPath);
-	theApp->Run(cDataPath, cROMPath, cREXPath, screenWidth, screenHeight, theLog);
+	const char *cDataPath = env->GetStringUTFChars(dataPath, NULL);
+	const char *cROMPath = env->GetStringUTFChars(romPath, NULL);
+	const char *cREXPath = env->GetStringUTFChars(rexPath, NULL);
+	const int newtonScreenWidth = screenWidth;
+	const int newtonScreenHeight = screenHeight;
+	if (theLog) theLog->FLogLine("runEmulator: start (dataPath=%s)(romPath=%s)(rexPath=%s) (%d x %d)", cDataPath, cROMPath, cREXPath, newtonScreenWidth, newtonScreenHeight);
+	theApp->Run(cDataPath, cROMPath, cREXPath, newtonScreenWidth, newtonScreenHeight, theLog);
 	env->ReleaseStringUTFChars(dataPath, cDataPath);
 	env->ReleaseStringUTFChars(romPath, cROMPath);
-    env->ReleaseStringUTFChars(rexPath, cREXPath);
+	env->ReleaseStringUTFChars(rexPath, cREXPath);
 }
 
 

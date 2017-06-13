@@ -64,7 +64,7 @@ public class StartupConstants {
         EXTERNAL_STORAGE_PUBLIC_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         APPLICATION_SUBDIR = "Einstein"; // TODO Change this?
         ROM_FILE_NAME = "717006.rom";
-        //ROM_FILE_NAME = "FranksFlashRomBoard.rom";
+        //ROM_FILE_NAME = "Senior CirrusNoDebug image";
         REX_FILE_NAME = "Einstein.rex";
         DATA_FILE_PATH = EXTERNAL_STORAGE_PUBLIC_DIR + File.separator + APPLICATION_SUBDIR;
         LOG_FOLDER = "log";

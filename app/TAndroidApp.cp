@@ -208,23 +208,37 @@ TAndroidApp::Run(const char *dataPath, const char *theROMPath, const char *theRE
 		return;
 	}
 	if (inLog) inLog->FLogLine("    OK");
+	size_t theROMPathLength = strlen(theROMPath);
 
-	if (inLog) inLog->FLogLine("  ROM exists at %s?", theREXPath);
+	if (inLog) inLog->FLogLine("  REX exists at %s?", theREXPath);
 	if (access(theREXPath, R_OK)==-1) {
 		if (inLog) inLog->FLogLine("Can't read REX file %s", theREXPath);
 		return;
 	}
 	if (inLog) inLog->FLogLine("    OK");
-	
-	char theImagePath[MAX_PATH];
-	snprintf(theImagePath, strlen(theROMPath) - 3, "%s", theROMPath);
-    strcat(theImagePath, ".img");
-	
+
 	char theFlashPath[MAX_PATH];
 	snprintf(theFlashPath, MAX_PATH, "%s/flash", dataPath);
 
 	if (inLog) inLog->FLogLine("  ROM Image:");
-	mROMImage = new TFlatROMImageWithREX(theROMPath, theREXPath, "717006", false, theImagePath);
+	char* theREX0Path = nil;
+	if (strcmp(theROMPath + theROMPathLength - 6, " image") == 0) {
+		theREX0Path = (char *) malloc(MAX_PATH);
+		bzero(theREX0Path, theROMPathLength);
+		strncpy(theREX0Path, theROMPath, theROMPathLength - 6);
+		strcat(theREX0Path, " high");
+	}
+	if (theREX0Path) {
+		mROMImage = new TAIFROMImageWithREXes(theROMPath, theREX0Path, theREXPath, "717006");
+		free(theREX0Path);
+	} else {
+		char theImagePath[MAX_PATH];
+		bzero(theImagePath, MAX_PATH);
+		strncpy(theImagePath, theROMPath, theROMPathLength - 4);
+		strcat(theImagePath, ".img");
+
+		mROMImage = new TFlatROMImageWithREX(theROMPath, theREXPath, "717006", false, theImagePath);
+	}
 	if (inLog) inLog->FLogLine("    OK: 0x%08x", (intptr_t)mROMImage);
 
 	if (inLog) inLog->FLogLine("  Sound Manager:");
