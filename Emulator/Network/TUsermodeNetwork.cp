@@ -118,7 +118,7 @@
 #include <fcntl.h>
 #endif
 
-#if RASPBERRY_PI || TARGET_OS_LINUX
+#if RASPBERRY_PI || TARGET_OS_LINUX || TARGET_OS_ANDROID
 #include <stdio.h>
 #include <fcntl.h>
 #include <string.h>
