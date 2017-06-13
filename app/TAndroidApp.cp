@@ -30,7 +30,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <unistd.h>
+#if !TARGET_OS_WIN32
+	#include <unistd.h>
+#endif
 
 // Einstein
 #include "Emulator/ROM/TROMImage.h"
